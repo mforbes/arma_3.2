@@ -1308,7 +1308,7 @@ class partial_unwrap_check< Op< Col<eT>, op_htrans2> >
   public:
   
   arma_hot inline
-  partial_unwrap_check(const Op< Mat<eT>, op_htrans2>& A, const Mat<eT>& B)
+  partial_unwrap_check(const Op< Col<eT>, op_htrans2>& A, const Mat<eT>& B)
     : val     (A.aux)
     , M_local ( (&A.m == &B) ? new Mat<eT>(A.m) : 0   )
     , M       ( (&A.m == &B) ? (*M_local)       : A.m )
