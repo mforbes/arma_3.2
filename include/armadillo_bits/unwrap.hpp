@@ -38,7 +38,7 @@ template<typename eT>
 class unwrap< Mat<eT> >
   {
   public:
-
+  
   inline unwrap(const Mat<eT>& A)
     : M(A)
     {
@@ -54,7 +54,7 @@ template<typename eT>
 class unwrap< Row<eT> >
   {
   public:
-
+  
   inline unwrap(const Row<eT>& A)
     : M(A)
     {
@@ -70,7 +70,7 @@ template<typename eT>
 class unwrap< Col<eT> >
   {
   public:
-
+  
   inline unwrap(const Col<eT>& A)
     : M(A)
     {
@@ -78,6 +78,22 @@ class unwrap< Col<eT> >
     }
 
   const Col<eT>& M;
+  };
+
+
+
+template<typename eT>
+class unwrap< subview_col<eT> >
+  {
+  public:
+  
+  inline unwrap(const subview_col<eT>& A)
+    : M( const_cast<eT*>( A.colptr(0) ), A.n_rows, 1, false, false )
+    {
+    arma_extra_debug_sigprint();
+    }
+
+  const Mat<eT> M;
   };
 
 
@@ -162,10 +178,7 @@ class unwrap_check< Mat<eT> >
     {
     arma_extra_debug_sigprint();
     
-    if(M_local)
-      {
-      delete M_local;
-      }
+    if(M_local) { delete M_local; }
     }
   
   
@@ -195,10 +208,7 @@ class unwrap_check< Row<eT> >
     {
     arma_extra_debug_sigprint();
     
-    if(M_local)
-      {
-      delete M_local;
-      }
+    if(M_local) { delete M_local; }
     }
   
   
@@ -228,10 +238,7 @@ class unwrap_check< Col<eT> >
     {
     arma_extra_debug_sigprint();
     
-    if(M_local)
-      {
-      delete M_local;
-      }
+    if(M_local) { delete M_local; }
     }
   
   
@@ -239,6 +246,30 @@ class unwrap_check< Col<eT> >
   const Col<eT>* M_local;
   const Col<eT>& M;
   
+  };
+
+
+
+template<typename eT>
+class unwrap_check< subview_col<eT> >
+  {
+  public:
+  
+  inline
+  unwrap_check(const subview_col<eT>& A, const Mat<eT>& B)
+    : M( const_cast<eT*>( A.colptr(0) ), A.n_rows, 1, (&(A.m) == &B), false )
+    {
+    arma_extra_debug_sigprint();
+    }
+  
+  
+  inline
+  ~unwrap_check()
+    {
+    arma_extra_debug_sigprint();
+    }
+  
+  const Mat<eT> M;
   };
 
 
@@ -295,10 +326,7 @@ class unwrap_check_mixed< Mat<eT1> >
     {
     arma_extra_debug_sigprint();
     
-    if(M_local)
-      {
-      delete M_local;
-      }
+    if(M_local) { delete M_local; }
     }
   
   
@@ -329,10 +357,7 @@ class unwrap_check_mixed< Row<eT1> >
     {
     arma_extra_debug_sigprint();
     
-    if(M_local)
-      {
-      delete M_local;
-      }
+    if(M_local) { delete M_local; }
     }
   
   
@@ -363,10 +388,7 @@ class unwrap_check_mixed< Col<eT1> >
     {
     arma_extra_debug_sigprint();
     
-    if(M_local)
-      {
-      delete M_local;
-      }
+    if(M_local) { delete M_local; }
     }
   
   
@@ -945,10 +967,7 @@ class partial_unwrap_check< Mat<eT> >
     {
     arma_extra_debug_sigprint();
     
-    if(M_local)
-      {
-      delete M_local;
-      }
+    if(M_local) { delete M_local; }
     }
   
   
@@ -984,10 +1003,7 @@ class partial_unwrap_check< Row<eT> >
     {
     arma_extra_debug_sigprint();
     
-    if(M_local)
-      {
-      delete M_local;
-      }
+    if(M_local) { delete M_local; }
     }
   
   arma_hot arma_inline eT get_val() const { return eT(1); }
@@ -1022,10 +1038,7 @@ class partial_unwrap_check< Col<eT> >
     {
     arma_extra_debug_sigprint();
     
-    if(M_local)
-      {
-      delete M_local;
-      }
+    if(M_local) { delete M_local; }
     }
   
   
@@ -1038,6 +1051,37 @@ class partial_unwrap_check< Col<eT> >
   // the order below is important
   const Mat<eT>* M_local;
   const Mat<eT>& M;
+  };
+
+
+
+template<typename eT>
+class partial_unwrap_check< subview_col<eT> >
+  {
+  public:
+  
+  arma_hot inline
+  partial_unwrap_check(const subview_col<eT>& A, const Mat<eT>& B)
+    : M( const_cast<eT*>( A.colptr(0) ), A.n_rows, 1, (&(A.m) == &B), false )
+    {
+    arma_extra_debug_sigprint();
+    }
+  
+  
+  inline
+  ~partial_unwrap_check()
+    {
+    arma_extra_debug_sigprint();
+    }
+  
+  
+  arma_hot arma_inline eT get_val() const { return eT(1); }
+  
+  
+  static const bool do_trans = false;
+  static const bool do_times = false;
+  
+  const Mat<eT> M;
   };
 
 
@@ -1092,10 +1136,7 @@ class partial_unwrap_check< Op< Mat<eT>, op_htrans> >
     {
     arma_extra_debug_sigprint();
     
-    if(M_local)
-      {
-      delete M_local;
-      }
+    if(M_local) { delete M_local; }
     }
   
   
@@ -1130,10 +1171,7 @@ class partial_unwrap_check< Op< Row<eT>, op_htrans> >
     {
     arma_extra_debug_sigprint();
     
-    if(M_local)
-      {
-      delete M_local;
-      }
+    if(M_local) { delete M_local; }
     }
   
   
@@ -1168,10 +1206,7 @@ class partial_unwrap_check< Op< Col<eT>, op_htrans> >
     {
     arma_extra_debug_sigprint();
     
-    if(M_local)
-      {
-      delete M_local;
-      }
+    if(M_local) { delete M_local; }
     }
   
   
@@ -1184,6 +1219,36 @@ class partial_unwrap_check< Op< Col<eT>, op_htrans> >
   // the order below is important
   const Mat<eT>* M_local;
   const Mat<eT>& M;
+  };
+
+
+
+template<typename eT>
+class partial_unwrap_check< Op< subview_col<eT>, op_htrans> >
+  {
+  public:
+  
+  arma_hot inline
+  partial_unwrap_check(const Op< subview_col<eT>, op_htrans>& A, const Mat<eT>& B)
+    : M( const_cast<eT*>( A.m.colptr(0) ), A.m.n_rows, 1, (&(A.m.m) == &B), false )
+    {
+    arma_extra_debug_sigprint();
+    }
+  
+  inline
+  ~partial_unwrap_check()
+    {
+    arma_extra_debug_sigprint();
+    }
+  
+  
+  arma_hot arma_inline eT get_val() const { return eT(1); }
+  
+  
+  static const bool do_trans = true;
+  static const bool do_times = false;
+  
+  const Mat<eT> M;
   };
 
 
@@ -1241,10 +1306,7 @@ class partial_unwrap_check< Op< Mat<eT>, op_htrans2> >
     {
     arma_extra_debug_sigprint();
     
-    if(M_local)
-      {
-      delete M_local;
-      }
+    if(M_local) { delete M_local; }
     }
   
   
@@ -1281,10 +1343,7 @@ class partial_unwrap_check< Op< Row<eT>, op_htrans2> >
     {
     arma_extra_debug_sigprint();
     
-    if(M_local)
-      {
-      delete M_local;
-      }
+    if(M_local) { delete M_local; }
     }
   
   
@@ -1321,10 +1380,7 @@ class partial_unwrap_check< Op< Col<eT>, op_htrans2> >
     {
     arma_extra_debug_sigprint();
     
-    if(M_local)
-      {
-      delete M_local;
-      }
+    if(M_local) { delete M_local; }
     }
   
   
@@ -1339,6 +1395,41 @@ class partial_unwrap_check< Op< Col<eT>, op_htrans2> >
   const Mat<eT>* M_local;
   const Mat<eT>& M;
   };
+
+
+
+template<typename eT>
+class partial_unwrap_check< Op< subview_col<eT>, op_htrans2> >
+  {
+  public:
+  
+  arma_hot inline
+  partial_unwrap_check(const Op< subview_col<eT>, op_htrans2>& A, const Mat<eT>& B)
+    : val(A.aux)
+    , M  ( const_cast<eT*>( A.m.colptr(0) ), A.m.n_rows, 1, (&(A.m.m) == &B), false )
+    {
+    arma_extra_debug_sigprint();
+    }
+  
+  inline
+  ~partial_unwrap_check()
+    {
+    arma_extra_debug_sigprint();
+    }
+  
+  
+  arma_hot arma_inline eT get_val() const { return val; }
+  
+  
+  static const bool do_trans = true;
+  static const bool do_times = true;
+  
+  const eT      val;
+  const Mat<eT> M;
+  };
+
+
+
 
 
 
@@ -1382,9 +1473,10 @@ class partial_unwrap_check< eOp<Mat<eT>, eop_scalar_times> >
   public:
   
   arma_hot inline
-  partial_unwrap_check(const eOp<Mat<eT>,eop_scalar_times>& A, const Mat<eT>&)
-    : val(A.aux)
-    , M  (A.P.Q)
+  partial_unwrap_check(const eOp<Mat<eT>,eop_scalar_times>& A, const Mat<eT>& B)
+    : val    (A.aux)
+    , M_local( (&(A.P.Q) == &B) ? new Mat<eT>(A.P.Q) : 0     )
+    , M      ( (&(A.P.Q) == &B) ? *M_local           : A.P.Q )
     {
     arma_extra_debug_sigprint();
     }
@@ -1393,6 +1485,8 @@ class partial_unwrap_check< eOp<Mat<eT>, eop_scalar_times> >
   ~partial_unwrap_check()
     {
     arma_extra_debug_sigprint();
+    
+    if(M_local) { delete M_local; }
     }
   
   
@@ -1403,6 +1497,7 @@ class partial_unwrap_check< eOp<Mat<eT>, eop_scalar_times> >
   static const bool do_times = true;
   
   const eT       val;
+  const Mat<eT>* M_local;
   const Mat<eT>& M;
   };
 
@@ -1414,9 +1509,10 @@ class partial_unwrap_check< eOp<Row<eT>, eop_scalar_times> >
   public:
   
   arma_hot inline
-  partial_unwrap_check(const eOp<Row<eT>,eop_scalar_times>& A, const Mat<eT>&)
+  partial_unwrap_check(const eOp<Row<eT>,eop_scalar_times>& A, const Mat<eT>& B)
     : val(A.aux)
-    , M  (A.P.Q)
+    , M_local( (&(A.P.Q) == &B) ? new Mat<eT>(A.P.Q) : 0     )
+    , M      ( (&(A.P.Q) == &B) ? *M_local           : A.P.Q )
     {
     arma_extra_debug_sigprint();
     }
@@ -1425,6 +1521,8 @@ class partial_unwrap_check< eOp<Row<eT>, eop_scalar_times> >
   ~partial_unwrap_check()
     {
     arma_extra_debug_sigprint();
+    
+    if(M_local) { delete M_local; }
     }
   
   
@@ -1435,6 +1533,7 @@ class partial_unwrap_check< eOp<Row<eT>, eop_scalar_times> >
   static const bool do_times = true;
   
   const eT       val;
+  const Mat<eT>* M_local;
   const Mat<eT>& M;
   };
 
@@ -1446,9 +1545,45 @@ class partial_unwrap_check< eOp<Col<eT>, eop_scalar_times> >
   public:
   
   arma_hot inline
-  partial_unwrap_check(const eOp<Col<eT>,eop_scalar_times>& A, const Mat<eT>&)
+  partial_unwrap_check(const eOp<Col<eT>,eop_scalar_times>& A, const Mat<eT>& B)
     : val(A.aux)
-    , M  (A.P.Q)
+    , M_local( (&(A.P.Q) == &B) ? new Mat<eT>(A.P.Q) : 0     )
+    , M      ( (&(A.P.Q) == &B) ? *M_local           : A.P.Q )
+    {
+    arma_extra_debug_sigprint();
+    }
+  
+  inline
+  ~partial_unwrap_check()
+    {
+    arma_extra_debug_sigprint();
+    
+    if(M_local) { delete M_local; }
+    }
+  
+  
+  arma_hot arma_inline eT get_val() const { return val; }
+  
+  
+  static const bool do_trans = false;
+  static const bool do_times = true;
+  
+  const eT       val;
+  const Mat<eT>* M_local;
+  const Mat<eT>& M;
+  };
+
+
+
+template<typename eT>
+class partial_unwrap_check< eOp<subview_col<eT>, eop_scalar_times> >
+  {
+  public:
+  
+  arma_hot inline
+  partial_unwrap_check(const eOp<subview_col<eT>,eop_scalar_times>& A, const Mat<eT>& B)
+    : val(A.aux)
+    , M  ( const_cast<eT*>( A.P.Q.colptr(0) ), A.P.Q.n_rows, 1, (&(A.P.Q.m) == &B), false )
     {
     arma_extra_debug_sigprint();
     }
@@ -1466,8 +1601,8 @@ class partial_unwrap_check< eOp<Col<eT>, eop_scalar_times> >
   static const bool do_trans = false;
   static const bool do_times = true;
   
-  const eT       val;
-  const Mat<eT>& M;
+  const eT      val;
+  const Mat<eT> M;
   };
 
 
