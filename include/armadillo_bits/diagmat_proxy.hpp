@@ -1,5 +1,5 @@
-// Copyright (C) 2008-2011 NICTA (www.nicta.com.au)
-// Copyright (C) 2008-2011 Conrad Sanderson
+// Copyright (C) 2008-2012 NICTA (www.nicta.com.au)
+// Copyright (C) 2008-2012 Conrad Sanderson
 // 
 // This file is part of the Armadillo C++ library.
 // It is provided without any warranty of fitness
@@ -24,9 +24,9 @@ class diagmat_proxy
   typedef typename T1::elem_type                   elem_type;
   typedef typename get_pod_type<elem_type>::result pod_type;
   
-  inline diagmat_proxy(const Base<typename T1::elem_type,T1>& X)
-    : P       ( X.get_ref() )
-    , P_is_vec( (P.get_n_rows() == 1) || (P.get_n_cols() == 1) )
+  inline diagmat_proxy(const T1& X)
+    : P       ( X )
+    , P_is_vec( (resolves_to_vector<T1>::value) || (P.get_n_rows() == 1) || (P.get_n_cols() == 1) )
     , n_elem  ( P_is_vec ? P.get_n_elem() : (std::min)(P.get_n_elem(), P.get_n_rows()) )
     {
     arma_extra_debug_sigprint();
@@ -91,11 +91,10 @@ class diagmat_proxy< Mat<eT> >
   typedef          eT                              elem_type;
   typedef typename get_pod_type<elem_type>::result pod_type;
   
-  
   inline diagmat_proxy(const Mat<eT>& X)
-    : P(X)
-    , P_is_vec( (P.n_rows == 1) || (P.n_cols == 1) )
-    , n_elem( P_is_vec ? P.n_elem : (std::min)(P.n_elem, P.n_rows) )
+    : P       ( X )
+    , P_is_vec( (X.n_rows == 1) || (X.n_cols == 1) )
+    , n_elem  ( P_is_vec ? X.n_elem : (std::min)(X.n_elem, X.n_rows) )
     {
     arma_extra_debug_sigprint();
     
@@ -106,10 +105,9 @@ class diagmat_proxy< Mat<eT> >
       );
     }
   
-  
   arma_inline elem_type operator[] (const uword i)                    const { return P_is_vec ? P[i] : P.at(i,i);                                         }
   arma_inline elem_type at         (const uword row, const uword col) const { return (row == col) ? ( P_is_vec ? P[row] : P.at(row,row) ) : elem_type(0); }
-
+  
   const Mat<eT>& P;
   const bool     P_is_vec;
   const uword    n_elem;
@@ -128,19 +126,17 @@ class diagmat_proxy< Row<eT> >
   
   inline diagmat_proxy(const Row<eT>& X)
     : P(X)
-    , P_is_vec(true)
-    , n_elem(P.n_elem)
+    , n_elem(X.n_elem)
     {
     arma_extra_debug_sigprint();
     }
   
-  
   arma_inline elem_type operator[] (const uword i)                    const { return P[i];                                                                }
   arma_inline elem_type at         (const uword row, const uword col) const { return (row == col) ? P[row] : elem_type(0); }
-
-
+  
+  static const bool P_is_vec = true;
+  
   const Row<eT>& P;
-  const bool     P_is_vec;
   const uword    n_elem;
   };
 
@@ -157,20 +153,72 @@ class diagmat_proxy< Col<eT> >
   
   inline diagmat_proxy(const Col<eT>& X)
     : P(X)
-    , P_is_vec(true)
-    , n_elem(P.n_elem)
+    , n_elem(X.n_elem)
     {
     arma_extra_debug_sigprint();
     }
   
+  arma_inline elem_type operator[] (const uword i)                    const { return P[i];                                 }
+  arma_inline elem_type at         (const uword row, const uword col) const { return (row == col) ? P[row] : elem_type(0); }
+  
+  static const bool P_is_vec = true;
+  
+  const Col<eT>& P;
+  const uword    n_elem;
+  };
+
+
+
+template<typename eT>
+class diagmat_proxy< subview_row<eT> >
+  {
+  public:
+  
+  typedef          eT                              elem_type;
+  typedef typename get_pod_type<elem_type>::result pod_type;
+  
+  
+  inline diagmat_proxy(const subview_row<eT>& X)
+    : P(X)
+    , n_elem(X.n_elem)
+    {
+    arma_extra_debug_sigprint();
+    }
   
   arma_inline elem_type operator[] (const uword i)                    const { return P[i];                                 }
   arma_inline elem_type at         (const uword row, const uword col) const { return (row == col) ? P[row] : elem_type(0); }
   
+  static const bool P_is_vec = true;
+  
+  const subview_row<eT>& P;
+  const uword            n_elem;
+  };
 
-  const Col<eT>& P;
-  const bool     P_is_vec;
-  const uword    n_elem;
+
+
+template<typename eT>
+class diagmat_proxy< subview_col<eT> >
+  {
+  public:
+  
+  typedef          eT                              elem_type;
+  typedef typename get_pod_type<elem_type>::result pod_type;
+  
+  
+  inline diagmat_proxy(const subview_col<eT>& X)
+    : P(X)
+    , n_elem(X.n_elem)
+    {
+    arma_extra_debug_sigprint();
+    }
+  
+  arma_inline elem_type operator[] (const uword i)                    const { return P[i];                                 }
+  arma_inline elem_type at         (const uword row, const uword col) const { return (row == col) ? P[row] : elem_type(0); }
+  
+  static const bool P_is_vec = true;
+  
+  const subview_col<eT>& P;
+  const uword            n_elem;
   };
 
 
@@ -183,13 +231,12 @@ class diagmat_proxy_check
   typedef typename T1::elem_type                   elem_type;
   typedef typename get_pod_type<elem_type>::result pod_type;
   
-  inline diagmat_proxy_check(const Base<typename T1::elem_type,T1>& X, const Mat<typename T1::elem_type>& out)
-    : P(X.get_ref())
-    , P_is_vec( (P.n_rows == 1) || (P.n_cols == 1) )
+  inline diagmat_proxy_check(const T1& X, const Mat<typename T1::elem_type>&)
+    : P(X)
+    , P_is_vec( (resolves_to_vector<T1>::value) || (P.n_rows == 1) || (P.n_cols == 1) )
     , n_elem( P_is_vec ? P.n_elem : (std::min)(P.n_elem, P.n_rows) )
     {
     arma_extra_debug_sigprint();
-    arma_ignore(out);
     
     arma_debug_check
       (
@@ -198,11 +245,9 @@ class diagmat_proxy_check
       );
     }
   
-  
   arma_inline elem_type operator[] (const uword i)                    const { return P_is_vec ? P[i] : P.at(i,i);                                         }
   arma_inline elem_type at         (const uword row, const uword col) const { return (row == col) ? ( P_is_vec ? P[row] : P.at(row,row) ) : elem_type(0); }
   
-
   const Mat<elem_type> P;
   const bool           P_is_vec;
   const uword          n_elem;
@@ -236,17 +281,12 @@ class diagmat_proxy_check< Mat<eT> >
   
   inline ~diagmat_proxy_check()
     {
-    if(P_local)
-      {
-      delete P_local;
-      }
+    if(P_local) { delete P_local; }
     }
-  
   
   arma_inline elem_type operator[] (const uword i)                    const { return P_is_vec ? P[i] : P.at(i,i);                                         }
   arma_inline elem_type at         (const uword row, const uword col) const { return (row == col) ? ( P_is_vec ? P[row] : P.at(row,row) ) : elem_type(0); }
   
-
   const Mat<eT>* P_local;
   const Mat<eT>& P;
   const bool     P_is_vec;
@@ -266,34 +306,25 @@ class diagmat_proxy_check< Row<eT> >
   inline diagmat_proxy_check(const Row<eT>& X, const Mat<eT>& out)
     : P_local ( (&X == reinterpret_cast<const Row<eT>*>(&out)) ? new Row<eT>(X) : 0 )
     , P       ( (&X == reinterpret_cast<const Row<eT>*>(&out)) ? (*P_local)     : X )
-    , P_is_vec(true)
-    , n_elem  (P.n_elem)
+    , n_elem  (X.n_elem)
     {
     arma_extra_debug_sigprint();
     }
   
-  
   inline ~diagmat_proxy_check()
     {
-    if(P_local)
-      {
-      delete P_local;
-      }
+    if(P_local) { delete P_local; }
     }
-  
   
   arma_inline elem_type operator[] (const uword i)                    const { return P[i];                                 }
   arma_inline elem_type at         (const uword row, const uword col) const { return (row == col) ? P[row] : elem_type(0); }
   
+  static const bool P_is_vec = true;
   
   const Row<eT>* P_local;
   const Row<eT>& P;
-  const bool     P_is_vec;
   const uword    n_elem;
   };
-
-
-
 
 
 
@@ -308,30 +339,76 @@ class diagmat_proxy_check< Col<eT> >
   inline diagmat_proxy_check(const Col<eT>& X, const Mat<eT>& out)
     : P_local ( (&X == reinterpret_cast<const Col<eT>*>(&out)) ? new Col<eT>(X) : 0 )
     , P       ( (&X == reinterpret_cast<const Col<eT>*>(&out)) ? (*P_local)     : X )
-    , P_is_vec(true)
-    , n_elem  (P.n_elem)
+    , n_elem  (X.n_elem)
     {
     arma_extra_debug_sigprint();
     }
   
-  
   inline ~diagmat_proxy_check()
     {
-    if(P_local)
-      {
-      delete P_local;
-      }
+    if(P_local) { delete P_local; }
     }
-  
   
   arma_inline elem_type operator[] (const uword i)                    const { return P[i];                                 }
   arma_inline elem_type at         (const uword row, const uword col) const { return (row == col) ? P[row] : elem_type(0); }
   
+  static const bool P_is_vec = true;
   
   const Col<eT>* P_local;
   const Col<eT>& P;
-  const bool     P_is_vec;
   const uword    n_elem;
+  };
+
+
+
+template<typename eT>
+class diagmat_proxy_check< subview_row<eT> >
+  {
+  public:
+  
+  typedef          eT                              elem_type;
+  typedef typename get_pod_type<elem_type>::result pod_type;
+  
+  inline diagmat_proxy_check(const subview_row<eT>& X, const Mat<eT>&)
+    : P       ( X )
+    , n_elem  ( X.n_elem )
+    {
+    arma_extra_debug_sigprint();
+    }
+  
+  arma_inline elem_type operator[] (const uword i)                    const { return P[i];                                 }
+  arma_inline elem_type at         (const uword row, const uword col) const { return (row == col) ? P[row] : elem_type(0); }
+  
+  static const bool P_is_vec = true;
+  
+  const Row<eT> P;
+  const uword   n_elem;
+  };
+
+
+
+template<typename eT>
+class diagmat_proxy_check< subview_col<eT> >
+  {
+  public:
+  
+  typedef          eT                              elem_type;
+  typedef typename get_pod_type<elem_type>::result pod_type;
+  
+  inline diagmat_proxy_check(const subview_col<eT>& X, const Mat<eT>& out)
+    : P     ( const_cast<eT*>(X.colptr(0)), X.n_rows, (&(X.m) == &out), false )
+    , n_elem( X.n_elem )
+    {
+    arma_extra_debug_sigprint();
+    }
+  
+  arma_inline elem_type operator[] (const uword i)                    const { return P[i];                                 }
+  arma_inline elem_type at         (const uword row, const uword col) const { return (row == col) ? P[row] : elem_type(0); }
+  
+  static const bool P_is_vec = true;
+  
+  const Col<eT> P;
+  const uword   n_elem;
   };
 
 
