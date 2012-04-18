@@ -17,14 +17,14 @@
 
 
 template<typename T1>
-class diagmat_proxy
+class diagmat_proxy_default
   {
   public:
   
   typedef typename T1::elem_type                   elem_type;
   typedef typename get_pod_type<elem_type>::result pod_type;
   
-  inline diagmat_proxy(const T1& X)
+  inline diagmat_proxy_default(const T1& X)
     : P       ( X )
     , P_is_vec( (resolves_to_vector<T1>::value) || (P.get_n_rows() == 1) || (P.get_n_cols() == 1) )
     , n_elem  ( P_is_vec ? P.get_n_elem() : (std::min)(P.get_n_elem(), P.get_n_rows()) )
@@ -39,18 +39,14 @@ class diagmat_proxy
     }
   
   
+  // TODO: possible bug: (Proxy<T1>::prefer_at_accessor == true) does not necessarily mean T1 does not resolve to a vector
+  // TODO: to test: use submatrix with one row via X.submat( 1,1, X.n_rows-2,1 )
+  
   arma_inline
   elem_type
   operator[](const uword i) const
     {
-    if( (Proxy<T1>::prefer_at_accessor == true) || (P_is_vec == false) )
-      {
-      return P.at(i,i);
-      }
-    else
-      {
-      return P[i];
-      }
+    return ( (Proxy<T1>::prefer_at_accessor == true) || (P_is_vec == false) ) ? P.at(i,i) : P[i];
     }
   
   
@@ -60,14 +56,7 @@ class diagmat_proxy
     {
     if(row == col)
       {
-      if( (Proxy<T1>::prefer_at_accessor == true) || (P_is_vec == false) )
-        {
-        return P.at(row,row);
-        }
-      else
-        {
-        return P[row];
-        }
+      return ( (Proxy<T1>::prefer_at_accessor == true) || (P_is_vec == false) ) ? P.at(row,row) : P[row];
       }
     else
       {
@@ -79,6 +68,79 @@ class diagmat_proxy
   const Proxy<T1> P;
   const bool      P_is_vec;
   const uword     n_elem;
+  };
+
+
+
+template<typename T1>
+class diagmat_proxy_fixed
+  {
+  public:
+  
+  typedef typename T1::elem_type                   elem_type;
+  typedef typename get_pod_type<elem_type>::result pod_type;
+  
+  inline diagmat_proxy_fixed(const T1& X)
+    : P(X)
+    {
+    arma_extra_debug_sigprint();
+    
+    arma_debug_check
+      (
+      (P_is_vec == false) && (T1::n_rows != T1::n_cols),
+      "diagmat(): only vectors and square matrices are accepted"
+      );
+    }
+  
+  
+  arma_inline
+  elem_type
+  operator[](const uword i) const
+    {
+    return (P_is_vec == false) ? P.at(i,i) : P[i];
+    }
+  
+  
+  arma_inline
+  elem_type
+  at(const uword row, const uword col) const
+    {
+    if(row == col)
+      {
+      return (P_is_vec == false) ? P.at(row,row) : P[row];
+      }
+    else
+      {
+      return elem_type(0);
+      }
+    }
+  
+  const T1& P;
+  
+  static const bool  P_is_vec = (T1::n_rows == 1) || (T1::n_cols == 1);
+  static const uword n_elem   = P_is_vec ? T1::n_elem : ( (T1::n_elem < T1::n_rows) ? T1::n_elem : T1::n_rows );
+  };
+
+
+
+template<typename T1, bool condition>
+struct diagmat_proxy_redirect {};
+
+template<typename T1>
+struct diagmat_proxy_redirect<T1, false> { typedef diagmat_proxy_default<T1> result; };
+
+template<typename T1>
+struct diagmat_proxy_redirect<T1, true>  { typedef diagmat_proxy_fixed<T1>   result; };
+
+
+template<typename T1>
+class diagmat_proxy : public diagmat_proxy_redirect<T1, is_Mat_fixed<T1>::value >::result
+  {
+  public:
+  inline diagmat_proxy(const T1& X)
+    : diagmat_proxy_redirect< T1, is_Mat_fixed<T1>::value >::result(X)
+    {
+    }
   };
 
 
