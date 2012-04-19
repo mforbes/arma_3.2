@@ -22,7 +22,7 @@ class op_dot
   public:
   
   template<typename eT>
-  arma_hot arma_pure inline static eT direct_dot_arma(const uword n_elem, const eT* const A, const eT* const B);
+  arma_hot arma_pure arma_inline static eT direct_dot_arma(const uword n_elem, const eT* const A, const eT* const B);
   
   template<typename eT>
   arma_hot arma_pure inline static typename arma_float_only<eT>::result
