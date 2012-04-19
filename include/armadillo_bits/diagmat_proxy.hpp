@@ -24,9 +24,11 @@ class diagmat_proxy_default
   typedef typename T1::elem_type                   elem_type;
   typedef typename get_pod_type<elem_type>::result pod_type;
   
-  inline diagmat_proxy_default(const T1& X)
+  inline
+  diagmat_proxy_default(const T1& X)
     : P       ( X )
     , P_is_vec( (resolves_to_vector<T1>::value) || (P.get_n_rows() == 1) || (P.get_n_cols() == 1) )
+    , P_is_col( T1::is_col || (P.get_n_cols() == 1) )
     , n_elem  ( P_is_vec ? P.get_n_elem() : (std::min)(P.get_n_elem(), P.get_n_rows()) )
     {
     arma_extra_debug_sigprint();
@@ -39,14 +41,25 @@ class diagmat_proxy_default
     }
   
   
-  // TODO: possible bug: (Proxy<T1>::prefer_at_accessor == true) does not necessarily mean T1 does not resolve to a vector
-  // TODO: to test: use submatrix with one row via X.submat( 1,1, X.n_rows-2,1 )
-  
   arma_inline
   elem_type
   operator[](const uword i) const
     {
-    return ( (Proxy<T1>::prefer_at_accessor == true) || (P_is_vec == false) ) ? P.at(i,i) : P[i];
+    if(Proxy<T1>::prefer_at_accessor == false)
+      {
+      return P_is_vec ? P[i] : P.at(i,i);
+      }
+    else
+      {
+      if(P_is_vec)
+        {
+        return (P_is_col) ? P.at(i,0) : P.at(0,i);
+        }
+      else
+        {
+        return P.at(i,i);
+        }
+      }
     }
   
   
@@ -56,7 +69,21 @@ class diagmat_proxy_default
     {
     if(row == col)
       {
-      return ( (Proxy<T1>::prefer_at_accessor == true) || (P_is_vec == false) ) ? P.at(row,row) : P[row];
+      if(Proxy<T1>::prefer_at_accessor == false)
+        {
+        return (P_is_vec) ? P[row] : P.at(row,row);
+        }
+      else
+        {
+        if(P_is_vec)
+          {
+          return (P_is_col) ? P.at(row,0) : P.at(0,row);
+          }
+        else
+          {
+          return P.at(row,row);
+          }
+        }
       }
     else
       {
@@ -67,6 +94,7 @@ class diagmat_proxy_default
   
   const Proxy<T1> P;
   const bool      P_is_vec;
+  const bool      P_is_col;
   const uword     n_elem;
   };
 
@@ -80,7 +108,8 @@ class diagmat_proxy_fixed
   typedef typename T1::elem_type                   elem_type;
   typedef typename get_pod_type<elem_type>::result pod_type;
   
-  inline diagmat_proxy_fixed(const T1& X)
+  inline
+  diagmat_proxy_fixed(const T1& X)
     : P(X)
     {
     arma_extra_debug_sigprint();
@@ -97,7 +126,7 @@ class diagmat_proxy_fixed
   elem_type
   operator[](const uword i) const
     {
-    return (P_is_vec == false) ? P.at(i,i) : P[i];
+    return (P_is_vec) ? P[i] : P.at(i,i);
     }
   
   
@@ -107,7 +136,7 @@ class diagmat_proxy_fixed
     {
     if(row == col)
       {
-      return (P_is_vec == false) ? P.at(row,row) : P[row];
+      return (P_is_vec) ? P[row] : P.at(row,row);
       }
     else
       {
@@ -315,6 +344,9 @@ class diagmat_proxy_check
   const uword          n_elem;
   };
 
+
+
+// TODO: handling of fixed size matrices
 
 
 template<typename eT>
