@@ -21,53 +21,29 @@
 template<typename eT>
 arma_hot
 arma_pure
-inline
+arma_inline
 eT
 op_dot::direct_dot_arma(const uword n_elem, const eT* const A, const eT* const B)
   {
   arma_extra_debug_sigprint();
   
-  if(n_elem <= 10)
+  eT val1 = eT(0);
+  eT val2 = eT(0);
+  
+  uword i, j;
+  
+  for(i=0, j=1; j<n_elem; i+=2, j+=2)
     {
-    eT val = eT(0);
-    
-    switch(n_elem)
-      {
-      case 10: val  = A[9] * B[9];
-      case  9: val += A[8] * B[8];
-      case  8: val += A[7] * B[7];
-      case  7: val += A[6] * B[6];
-      case  6: val += A[5] * B[5];
-      case  5: val += A[4] * B[4];
-      case  4: val += A[3] * B[3];
-      case  3: val += A[2] * B[2];
-      case  2: val += A[1] * B[1];
-      case  1: val += A[0] * B[0];
-      default: 
-      
-      return val;
-      }
+    val1 += A[i] * B[i];
+    val2 += A[j] * B[j];
     }
-  else
+  
+  if(i < n_elem)
     {
-    eT val1 = eT(0);
-    eT val2 = eT(0);
-    
-    uword i, j;
-    
-    for(i=0, j=1; j<n_elem; i+=2, j+=2)
-      {
-      val1 += A[i] * B[i];
-      val2 += A[j] * B[j];
-      }
-    
-    if(i < n_elem)
-      {
-      val1 += A[i] * B[i];
-      }
-    
-    return val1 + val2;
+    val1 += A[i] * B[i];
     }
+  
+  return val1 + val2;
   }
 
 
