@@ -1162,22 +1162,19 @@ auxlib::eig_sym(Col<eT>& eigval, const Base<eT,T1>& X)
       return true;
       }
     
-    // rudimentary "better-than-nothing" test for symmetry
-    //arma_debug_check( (A.at(A.n_rows-1, 0) != A.at(0, A.n_cols-1)), "auxlib::eig(): given matrix is not symmetric" );
+    eigval.set_size(A.n_rows);
     
     char jobz  = 'N';
     char uplo  = 'U';
     
-    blas_int n_rows = A.n_rows;
-    blas_int lwork  = (std::max)(blas_int(1), 3*n_rows-1) + 2;  // +2 for paranoia: some versions of Lapack might be trashing memory
+    blas_int N     = blas_int(A.n_rows);
+    blas_int lwork = 2*((std::max)(blas_int(1), 3*N-1));
+    blas_int info  = 0;
     
-    eigval.set_size( static_cast<uword>(n_rows) );
     podarray<eT> work( static_cast<uword>(lwork) );
     
-    blas_int info = 0;
-    
     arma_extra_debug_print("lapack::syev()");
-    lapack::syev(&jobz, &uplo, &n_rows, A.memptr(), &n_rows, eigval.memptr(), work.memptr(), &lwork, &info);
+    lapack::syev(&jobz, &uplo, &N, A.memptr(), &N, eigval.memptr(), work.memptr(), &lwork, &info);
     
     return (info == 0);
     }
@@ -1186,68 +1183,6 @@ auxlib::eig_sym(Col<eT>& eigval, const Base<eT,T1>& X)
     arma_ignore(eigval);
     arma_ignore(X);
     arma_stop("eig_sym(): use of LAPACK needs to be enabled");
-    return false;
-    }
-  #endif
-  }
-
-
-
-// EJS Edit!!!
-//! immediate eigenvalues of a symmetric real matrix using LAPACK dsyevd (Divide and conquer)
-template<typename eT, typename T1>
-inline
-bool
-auxlib::eig_symd(Col<eT>& eigval, const Base<eT,T1>& X)
-  {
-  arma_extra_debug_sigprint();
-  
-  #if defined(ARMA_USE_LAPACK)
-    {
-    Mat<eT> A(X.get_ref());
-    
-    arma_debug_check( (A.is_square() == false), "eig_symd(): given matrix is not square");
-    
-    if(A.is_empty())
-      {
-      eigval.reset();
-      return true;
-      }
-    
-    // rudimentary "better-than-nothing" test for symmetry
-    //arma_debug_check( (A.at(A.n_rows-1, 0) != A.at(0, A.n_cols-1)), "auxlib::eig(): given matrix is not symmetric" );
-    
-    char jobz  = 'N';
-    char uplo  = 'U';
-
-    blas_int n_rows = A.n_rows;
-    eigval.set_size( static_cast<uword>(n_rows) );
-    blas_int info;
-
-    //Let's probe lapack for optimal work arrays
-    podarray<eT> twork(3);
-    podarray<blas_int> tiwork(3); 
-    blas_int lwork  = -1;
-    blas_int liwork = -1;
-    lapack::syevd(&jobz, &uplo, &n_rows, A.memptr(), &n_rows, eigval.memptr(), twork.memptr(), &lwork, tiwork.memptr(), &liwork, &info);
-
-    lwork = (blas_int) twork[0];
-    liwork = (blas_int) tiwork[0];
-    
-    podarray<eT> work( static_cast<uword>(lwork) );
-    podarray<blas_int> iwork( static_cast<uword>(liwork) ); 
-    
-    
-    arma_extra_debug_print("lapack::syevd()");
-    lapack::syevd(&jobz, &uplo, &n_rows, A.memptr(), &n_rows, eigval.memptr(), work.memptr(), &lwork, iwork.memptr(), &liwork, &info);
-    
-    return (info == 0);
-    }
-  #else
-    {
-    arma_ignore(eigval);
-    arma_ignore(X);
-    arma_stop("eig_symd(): use of LAPACK needs to be enabled");
     return false;
     }
   #endif
@@ -1268,7 +1203,8 @@ auxlib::eig_sym(Col<T>& eigval, const Base<std::complex<T>,T1>& X)
   #if defined(ARMA_USE_LAPACK)
     {
     Mat<eT> A(X.get_ref());
-    arma_debug_check( (A.is_square() == false), "eig_sym(): given matrix is not hermitian");
+    
+    arma_debug_check( (A.is_square() == false), "eig_sym(): given matrix is not square");
     
     if(A.is_empty())
       {
@@ -1276,89 +1212,20 @@ auxlib::eig_sym(Col<T>& eigval, const Base<std::complex<T>,T1>& X)
       return true;
       }
     
+    eigval.set_size(A.n_rows);
+    
     char jobz  = 'N'; 
     char uplo  = 'U';
     
-    blas_int n_rows = A.n_rows;
-    blas_int lda    = A.n_rows;
-    blas_int lwork  = (std::max)(blas_int(1), 2*n_rows - 1) + 2;  // +2 for paranoia: some versions of Lapack might be trashing memory
-    // TODO: automatically find best size of lwork
-    
-    eigval.set_size( static_cast<uword>(n_rows) );
+    blas_int N     = blas_int(A.n_rows);
+    blas_int lwork = 2*((std::max)(blas_int(1), 2*N-1));
+    blas_int info  = 0;
     
     podarray<eT>  work( static_cast<uword>(lwork) );
-    podarray<T>  rwork( static_cast<uword>((std::max)(blas_int(1), 3*n_rows - 2)) );
-    
-    blas_int info = 0;
+    podarray<T>  rwork( static_cast<uword>( (std::max)(blas_int(1), 3*N-2) ) );
     
     arma_extra_debug_print("lapack::heev()");
-    lapack::heev(&jobz, &uplo, &n_rows, A.memptr(), &lda, eigval.memptr(), work.memptr(), &lwork, rwork.memptr(), &info);
-    
-    return (info == 0);
-    }
-  #else
-    {
-    arma_ignore(eigval);
-    arma_ignore(X);
-    arma_stop("eig_sym(): use of LAPACK needs to be enabled");
-    return false;
-    }
-  #endif
-  }
-
-
-
-//EJS Edit 
-//! immediate eigenvalues of a hermitian complex matrix using LAPACK (divide and conquer)
-template<typename T, typename T1>
-inline
-bool
-auxlib::eig_symd(Col<T>& eigval, const Base<std::complex<T>,T1>& X)
-  {
-  arma_extra_debug_sigprint();
-  
-  typedef typename std::complex<T> eT;
-  
-  #if defined(ARMA_USE_LAPACK)
-    {
-    Mat<eT> A(X.get_ref());
-    arma_debug_check( (A.is_square() == false), "eig_symd(): given matrix is not hermitian");
-    
-    if(A.is_empty())
-      {
-      eigval.reset();
-      return true;
-      }
-    
-    char jobz  = 'N'; 
-    char uplo  = 'U';
-    
-    blas_int n_rows = A.n_rows;
-    blas_int lda    = A.n_rows;
-    //blas_int lwork  = (std::max)(blas_int(1), 2*n_rows - 1);  // TODO: automatically find best size of lwork
-    eigval.set_size( static_cast<uword>(n_rows) );
-    blas_int info;
-    
-    //Let's probe lapack for optimal work arrays
-    podarray<eT> twork(3);
-    podarray<T>  trwork(3);
-    podarray<blas_int> tiwork(3); 
-    blas_int lwork  = -1;
-    blas_int lrwork = -1;
-    blas_int liwork = -1;
-    lapack::heevd(&jobz, &uplo, &n_rows, A.memptr(), &lda, eigval.memptr(), twork.memptr(), &lwork, trwork.memptr(), &lrwork, tiwork.memptr(), &liwork, &info);
-    
-    lwork = (blas_int) std::real(twork[0]);
-    lrwork = (blas_int) trwork[0];
-    liwork = (blas_int) tiwork[0];
-    
-    podarray<eT> work( static_cast<uword>(lwork) );
-    podarray<T>  rwork( static_cast<uword>(lrwork) );
-    podarray<blas_int> iwork( static_cast<uword>(liwork) ); 
-    
-    
-    arma_extra_debug_print("lapack::heevd()");
-    lapack::heevd(&jobz, &uplo, &n_rows, A.memptr(), &lda, eigval.memptr(), work.memptr(), &lwork, rwork.memptr(), &lrwork, iwork.memptr(), &liwork, &info);
+    lapack::heev(&jobz, &uplo, &N, A.memptr(), &N, eigval.memptr(), work.memptr(), &lwork, rwork.memptr(), &info);
     
     return (info == 0);
     }
@@ -1395,22 +1262,19 @@ auxlib::eig_sym(Col<eT>& eigval, Mat<eT>& eigvec, const Base<eT,T1>& X)
       return true;
       }
     
-    // rudimentary "better-than-nothing" test for symmetry
-    //arma_debug_check( (A.at(A.n_rows-1, 0) != A.at(0, A.n_cols-1)), "auxlib::eig(): given matrix is not symmetric" );
+    eigval.set_size(eigvec.n_rows);
     
     char jobz  = 'V';
     char uplo  = 'U';
     
-    blas_int n_rows = eigvec.n_rows;
-    blas_int lwork  = (std::max)(blas_int(1), 3*n_rows-1) + 2;  // +2 for paranoia: some versions of Lapack might be trashing memory
+    blas_int N     = blas_int(eigvec.n_rows);
+    blas_int lwork = 2*((std::max)(blas_int(1), 3*N-1));
+    blas_int info  = 0;
     
-    eigval.set_size( static_cast<uword>(n_rows) );
     podarray<eT> work( static_cast<uword>(lwork) );
     
-    blas_int info = 0;
-    
     arma_extra_debug_print("lapack::syev()");
-    lapack::syev(&jobz, &uplo, &n_rows, eigvec.memptr(), &n_rows, eigval.memptr(), work.memptr(), &lwork, &info);
+    lapack::syev(&jobz, &uplo, &N, eigvec.memptr(), &N, eigval.memptr(), work.memptr(), &lwork, &info);
     
     return (info == 0);
     }
@@ -1419,74 +1283,12 @@ auxlib::eig_sym(Col<eT>& eigval, Mat<eT>& eigvec, const Base<eT,T1>& X)
     arma_ignore(eigval);
     arma_ignore(eigvec);
     arma_ignore(X);
-    
     arma_stop("eig_sym(): use of LAPACK needs to be enabled");
-    
     return false;
     }
   #endif
   }
 
-
-
-//EJS Edit!!!
-//! immediate eigenvalues and eigenvectors of a symmetric real matrix using LAPACK dsyevd (Divide and conquer)
-template<typename eT, typename T1>
-inline
-bool
-auxlib::eig_symd(Col<eT>& eigval, Mat<eT>& eigvec, const Base<eT,T1>& X)
-  {
-  arma_extra_debug_sigprint();
-  
-  #if defined(ARMA_USE_LAPACK)
-    {
-    eigvec = X.get_ref();
-    
-    arma_debug_check( (eigvec.is_square() == false), "eig_symd(): given matrix is not square" );
-    if(eigvec.is_empty())
-      {
-      eigval.reset();
-      eigvec.reset();
-      return true;
-      }
-    
-    // rudimentary "better-than-nothing" test for symmetry
-    //arma_debug_check( (A.at(A.n_rows-1, 0) != A.at(0, A.n_cols-1)), "auxlib::eig(): given matrix is not symmetric" );
-    
-    char jobz  = 'V';
-    char uplo  = 'U';
-    
-    blas_int n_rows = eigvec.n_rows;
-    eigval.set_size( static_cast<uword>(n_rows) );
-    blas_int info;
-
-    //Let's probe lapack for optimal work arrays
-    podarray<eT> twork(3);
-    podarray<blas_int> tiwork(3); 
-    blas_int lwork  = -1;
-    blas_int liwork = -1;
-    lapack::syevd(&jobz, &uplo, &n_rows, eigvec.memptr(), &n_rows, eigval.memptr(), twork.memptr(), &lwork, tiwork.memptr(), &liwork, &info);
-
-    lwork = (blas_int) twork[0];
-    liwork = (blas_int) tiwork[0];
-    
-    podarray<eT> work( static_cast<uword>(lwork) );
-    podarray<blas_int> iwork( static_cast<uword>(liwork) ); 
-    
-    arma_extra_debug_print("lapack::syevd()");
-    lapack::syevd(&jobz, &uplo, &n_rows, eigvec.memptr(), &n_rows, eigval.memptr(), work.memptr(), &lwork, iwork.memptr(), &liwork, &info);
-    
-    return (info == 0);
-    }
-  #else
-    {
-    arma_ignore(eigval);
-    arma_ignore(eigvec);
-    arma_stop("eig_symd(): use of LAPACK needs to be enabled");
-    return false;
-    }
-  #endif
-  }
 
 
 //! immediate eigenvalues and eigenvectors of a hermitian complex matrix using LAPACK
@@ -1512,23 +1314,20 @@ auxlib::eig_sym(Col<T>& eigval, Mat< std::complex<T> >& eigvec, const Base<std::
       return true;
       }
     
+    eigval.set_size(eigvec.n_rows);
+    
     char jobz  = 'V';
     char uplo  = 'U';
     
-    blas_int n_rows = eigvec.n_rows;
-    blas_int lda    = eigvec.n_rows;
-    blas_int lwork  = (std::max)(blas_int(1), 2*n_rows - 1) + 2;  // +2 for paranoia: some versions of Lapack might be trashing memory
-    // TODO: automatically find best size of lwork
+    blas_int N     = blas_int(eigvec.n_rows);
+    blas_int lwork = 2*((std::max)(blas_int(1), 2*N-1));
+    blas_int info  = 0;
     
-    eigval.set_size( static_cast<uword>(n_rows) );
-    
-    podarray<eT> work( static_cast<uword>(lwork) );
-    podarray<T>  rwork( static_cast<uword>((std::max)(blas_int(1), 3*n_rows - 2)) );
-    
-    blas_int info = 0;
+    podarray<eT>  work( static_cast<uword>(lwork) );
+    podarray<T>  rwork( static_cast<uword>((std::max)(blas_int(1), 3*N-2)) );
     
     arma_extra_debug_print("lapack::heev()");
-    lapack::heev(&jobz, &uplo, &n_rows, eigvec.memptr(), &lda, eigval.memptr(), work.memptr(), &lwork, rwork.memptr(), &info);
+    lapack::heev(&jobz, &uplo, &N, eigvec.memptr(), &N, eigval.memptr(), work.memptr(), &lwork, rwork.memptr(), &info);
     
     return (info == 0);
     }
@@ -1545,12 +1344,62 @@ auxlib::eig_sym(Col<T>& eigval, Mat< std::complex<T> >& eigvec, const Base<std::
 
 
 
-//EJS Edit 
-//! immediate eigenvalues and eigenvectors of a hermitian complex matrix using LAPACK (divide and conquer)
+//! immediate eigenvalues and eigenvectors of a symmetric real matrix using LAPACK (divide and conquer algorithm)
+template<typename eT, typename T1>
+inline
+bool
+auxlib::eig_sym_dc(Col<eT>& eigval, Mat<eT>& eigvec, const Base<eT,T1>& X)
+  {
+  arma_extra_debug_sigprint();
+  
+  #if defined(ARMA_USE_LAPACK)
+    {
+    eigvec = X.get_ref();
+    
+    arma_debug_check( (eigvec.is_square() == false), "eig_sym(): given matrix is not square" );
+    
+    if(eigvec.is_empty())
+      {
+      eigval.reset();
+      eigvec.reset();
+      return true;
+      }
+    
+    eigval.set_size(eigvec.n_rows);
+    
+    char jobz = 'V';
+    char uplo = 'U';
+    
+    blas_int N      = blas_int(eigvec.n_rows);
+    blas_int lwork  = 2*(1 + 6*N + 2*(N*N));
+    blas_int liwork = 2*(3 + 5*N + 2);
+    blas_int info   = 0;
+    
+    podarray<eT>        work( static_cast<uword>( lwork) );
+    podarray<blas_int> iwork( static_cast<uword>(liwork) ); 
+    
+    arma_extra_debug_print("lapack::syevd()");
+    lapack::syevd(&jobz, &uplo, &N, eigvec.memptr(), &N, eigval.memptr(), work.memptr(), &lwork, iwork.memptr(), &liwork, &info);
+    
+    return (info == 0);
+    }
+  #else
+    {
+    arma_ignore(eigval);
+    arma_ignore(eigvec);
+    arma_stop("eig_sym(): use of LAPACK needs to be enabled");
+    return false;
+    }
+  #endif
+  }
+
+
+
+//! immediate eigenvalues and eigenvectors of a hermitian complex matrix using LAPACK (divide and conquer algorithm)
 template<typename T, typename T1>
 inline
 bool
-auxlib::eig_symd(Col<T>& eigval, Mat< std::complex<T> >& eigvec, const Base<std::complex<T>,T1>& X)
+auxlib::eig_sym_dc(Col<T>& eigval, Mat< std::complex<T> >& eigvec, const Base<std::complex<T>,T1>& X)
   {
   arma_extra_debug_sigprint();
   
@@ -1569,35 +1418,23 @@ auxlib::eig_symd(Col<T>& eigval, Mat< std::complex<T> >& eigvec, const Base<std:
       return true;
       }
     
+    eigval.set_size(eigvec.n_rows);
+    
     char jobz  = 'V';
     char uplo  = 'U';
     
-    blas_int n_rows = eigvec.n_rows;
-    blas_int lda    = eigvec.n_rows;
-    //blas_int lwork  = (std::max)(blas_int(1), 2*n_rows - 1);  // TODO: automatically find best size of lwork
-    eigval.set_size( static_cast<uword>(n_rows) );
-    blas_int info;
+    blas_int N      = blas_int(eigvec.n_rows);
+    blas_int lwork  = 2*(2*N + N*N);
+    blas_int lrwork = 2*(1 + 5*N + 2*(N*N));
+    blas_int liwork = 2*(3 + 5*N);
+    blas_int info   = 0;
     
-    //Let's probe lapack for optimal work arrays
-    podarray<eT> twork(3);
-    podarray<T>  trwork(3);
-    podarray<blas_int> tiwork(3); 
-    blas_int lwork  = -1;
-    blas_int lrwork = -1;
-    blas_int liwork = -1;
-    lapack::heevd(&jobz, &uplo, &n_rows, eigvec.memptr(), &lda, eigval.memptr(), twork.memptr(), &lwork, trwork.memptr(), &lrwork, tiwork.memptr(), &liwork, &info);
-    
-    lwork = (blas_int) std::real(twork[0]);
-    lrwork = (blas_int) trwork[0];
-    liwork = (blas_int) tiwork[0];
-
-    
-    podarray<eT> work( static_cast<uword>(lwork) );
-    podarray<T>  rwork( static_cast<uword>(lrwork) );
+    podarray<eT>        work( static_cast<uword>(lwork)  );
+    podarray<T>        rwork( static_cast<uword>(lrwork) );
     podarray<blas_int> iwork( static_cast<uword>(liwork) ); 
     
     arma_extra_debug_print("lapack::heevd()");
-    lapack::heevd(&jobz, &uplo, &n_rows, eigvec.memptr(), &lda, eigval.memptr(), work.memptr(), &lwork, rwork.memptr(), &lrwork, iwork.memptr(), &liwork, &info);
+    lapack::heevd(&jobz, &uplo, &N, eigvec.memptr(), &N, eigval.memptr(), work.memptr(), &lwork, rwork.memptr(), &lrwork, iwork.memptr(), &liwork, &info);
     
     return (info == 0);
     }

@@ -2,7 +2,6 @@
 // Copyright (C) 2008-2012 Conrad Sanderson
 // Copyright (C) 2009 Edmund Highcock
 // Copyright (C) 2011 Stanislav Funiak
-// Copyright (C) 2012 Eric Jon Sundstrom
 // 
 // This file is part of the Armadillo C++ library.
 // It is provided without any warranty of fitness
@@ -89,15 +88,16 @@ eig_sym
          Col<typename T1::pod_type>&     eigval,
          Mat<typename T1::elem_type>&    eigvec,
   const Base<typename T1::elem_type,T1>& X,
+  const bool use_divide_and_conquer = false,
   const typename arma_blas_type_only<typename T1::elem_type>::result* junk = 0
   )
   {
   arma_extra_debug_sigprint();
   arma_ignore(junk);
   
-  arma_debug_check( ( ((void*)(&eigval)) == ((void*)(&eigvec)) ), "eig_sym(): eigval is an alias of eigvec" );
+  arma_debug_check( void_ptr(&eigval) == void_ptr(&eigvec), "eig_sym(): eigval is an alias of eigvec" );
   
-  const bool status = auxlib::eig_sym(eigval, eigvec, X);
+  const bool status = (use_divide_and_conquer == false) ? auxlib::eig_sym(eigval, eigvec, X) : auxlib::eig_sym_dc(eigval, eigvec, X);
   
   if(status == false)
     {
@@ -109,96 +109,6 @@ eig_sym
   return status;
   }
 
-
-
-//EJS Edit
-//! Eigenvalues of real/complex symmetric/hermitian matrix X (Divide and conquer)
-template<typename T1>
-inline
-bool
-eig_symd
-  (
-         Col<typename T1::pod_type>&     eigval,
-  const Base<typename T1::elem_type,T1>& X,
-  const typename arma_blas_type_only<typename T1::elem_type>::result* junk = 0
-  )
-  {
-  arma_extra_debug_sigprint();
-  
-  arma_ignore(junk);
-  
-  // unwrap_check not used as T1::elem_type and T1::pod_type may not be the same.
-  // furthermore, it doesn't matter if X is an alias of eigval, as auxlib::eig_sym() makes a copy of X
-  
-  const bool status = auxlib::eig_symd(eigval, X);
-  
-  if(status == false)
-    {
-    arma_bad("eig_symd(): failed to converge",false);
-    eigval.reset();
-    }
-  
-  return status;
-  }
-
-
-
-//! Eigenvalues of real/complex symmetric/hermitian matrix X (Divide and conquer)
-template<typename T1>
-inline
-Col<typename T1::pod_type>
-eig_symd
-  (
-  const Base<typename T1::elem_type,T1>& X,
-  const typename arma_blas_type_only<typename T1::elem_type>::result* junk = 0
-  )
-  {
-  arma_extra_debug_sigprint();
-  arma_ignore(junk);
-  
-  Col<typename T1::pod_type> out;
-  const bool status = auxlib::eig_symd(out, X);
-  
-  if(status == false)
-    {
-    out.reset();
-    arma_bad("eig_symd(): failed to converge");
-    }
-  
-  return out;
-  }
-
-
-
-//! Eigenvalues and eigenvectors of real/complex symmetric/hermitian matrix X (Divide and conquer)
-template<typename T1> 
-inline
-bool
-eig_symd
-  (
-         Col<typename T1::pod_type>&     eigval,
-         Mat<typename T1::elem_type>&    eigvec,
-  const Base<typename T1::elem_type,T1>& X,
-  const typename arma_blas_type_only<typename T1::elem_type>::result* junk = 0
-  )
-  {
-  arma_extra_debug_sigprint();
-  
-  arma_ignore(junk);
-  
-  arma_debug_check( ( ((void*)(&eigval)) == ((void*)(&eigvec)) ), "eig_symd(): eigval is an alias of eigvec" );
-  
-  const bool status = auxlib::eig_symd(eigval, eigvec, X);
-  
-  if(status == false)
-    {
-    eigval.reset();
-    eigvec.reset();
-    arma_bad("eig_symd(): failed to converge",false);
-    }
-  
-  return status;
-  }
 
 
 //
