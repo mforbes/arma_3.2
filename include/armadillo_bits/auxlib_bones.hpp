@@ -1,7 +1,8 @@
-// Copyright (C) 2008-2011 NICTA (www.nicta.com.au)
-// Copyright (C) 2008-2011 Conrad Sanderson
-// Copyright (C)      2009 Edmund Highcock
-// Copyright (C)      2011 James Sanders
+// Copyright (C) 2008-2012 NICTA (www.nicta.com.au)
+// Copyright (C) 2008-2012 Conrad Sanderson
+// Copyright (C) 2009 Edmund Highcock
+// Copyright (C) 2011 James Sanders
+// Copyright (C) 2012 Eric Jon Sundstrom
 // 
 // This file is part of the Armadillo C++ library.
 // It is provided without any warranty of fitness
@@ -111,14 +112,30 @@ class auxlib
   template<typename eT, typename T1> 
   inline static bool eig_sym(Col<eT>& eigval, const Base<eT,T1>& X);
   
+  //EJS Edit
+  template<typename eT, typename T1> 
+  inline static bool eig_symd(Col<eT>& eigval, const Base<eT,T1>& X);
+  
   template<typename T, typename T1> 
   inline static bool eig_sym(Col<T>& eigval, const Base<std::complex<T>,T1>& X);
+  
+  //EJS Edit
+  template<typename T, typename T1> 
+  inline static bool eig_symd(Col<T>& eigval, const Base<std::complex<T>,T1>& X);
   
   template<typename eT, typename T1>
   inline static bool eig_sym(Col<eT>& eigval, Mat<eT>& eigvec, const Base<eT,T1>& X);
   
+  //EJS Edit
+  template<typename eT, typename T1>
+  inline static bool eig_symd(Col<eT>& eigval, Mat<eT>& eigvec, const Base<eT,T1>& X);
+  
   template<typename T, typename T1>
   inline static bool eig_sym(Col<T>& eigval, Mat< std::complex<T> >& eigvec, const Base<std::complex<T>,T1>& X);
+  
+  //EJS Edit
+  template<typename T, typename T1>
+  inline static bool eig_symd(Col<T>& eigval, Mat< std::complex<T> >& eigvec, const Base<std::complex<T>,T1>& X);
   
   template<typename T, typename T1>
   inline static bool eig_gen(Col< std::complex<T> >& eigval, Mat<T>& l_eigvec, Mat<T>& r_eigvec, const Base<T,T1>& X, const char side);
