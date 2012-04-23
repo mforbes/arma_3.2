@@ -112,30 +112,20 @@ class auxlib
   template<typename eT, typename T1> 
   inline static bool eig_sym(Col<eT>& eigval, const Base<eT,T1>& X);
   
-  //EJS Edit
-  template<typename eT, typename T1> 
-  inline static bool eig_symd(Col<eT>& eigval, const Base<eT,T1>& X);
-  
   template<typename T, typename T1> 
   inline static bool eig_sym(Col<T>& eigval, const Base<std::complex<T>,T1>& X);
-  
-  //EJS Edit
-  template<typename T, typename T1> 
-  inline static bool eig_symd(Col<T>& eigval, const Base<std::complex<T>,T1>& X);
   
   template<typename eT, typename T1>
   inline static bool eig_sym(Col<eT>& eigval, Mat<eT>& eigvec, const Base<eT,T1>& X);
   
-  //EJS Edit
-  template<typename eT, typename T1>
-  inline static bool eig_symd(Col<eT>& eigval, Mat<eT>& eigvec, const Base<eT,T1>& X);
-  
   template<typename T, typename T1>
   inline static bool eig_sym(Col<T>& eigval, Mat< std::complex<T> >& eigvec, const Base<std::complex<T>,T1>& X);
   
-  //EJS Edit
+  template<typename eT, typename T1>
+  inline static bool eig_sym_dc(Col<eT>& eigval, Mat<eT>& eigvec, const Base<eT,T1>& X);
+  
   template<typename T, typename T1>
-  inline static bool eig_symd(Col<T>& eigval, Mat< std::complex<T> >& eigvec, const Base<std::complex<T>,T1>& X);
+  inline static bool eig_sym_dc(Col<T>& eigval, Mat< std::complex<T> >& eigvec, const Base<std::complex<T>,T1>& X);
   
   template<typename T, typename T1>
   inline static bool eig_gen(Col< std::complex<T> >& eigval, Mat<T>& l_eigvec, Mat<T>& r_eigvec, const Base<T,T1>& X, const char side);
