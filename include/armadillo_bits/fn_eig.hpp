@@ -88,7 +88,7 @@ eig_sym
          Col<typename T1::pod_type>&     eigval,
          Mat<typename T1::elem_type>&    eigvec,
   const Base<typename T1::elem_type,T1>& X,
-  const bool use_divide_and_conquer = false,
+  const char* method =                   "",
   const typename arma_blas_type_only<typename T1::elem_type>::result* junk = 0
   )
   {
@@ -96,6 +96,27 @@ eig_sym
   arma_ignore(junk);
   
   arma_debug_check( void_ptr(&eigval) == void_ptr(&eigvec), "eig_sym(): eigval is an alias of eigvec" );
+  
+  bool use_divide_and_conquer = false;
+  
+  const char sig = method[0];
+  
+  switch(sig)
+    {
+    case '\0':
+    case 's':
+      break;
+      
+    case 'd':
+      use_divide_and_conquer = true;
+      break;
+    
+    default:
+      {
+      arma_stop("eig_sym(): unknown method specified");
+      return false;
+      }
+    }
   
   const bool status = (use_divide_and_conquer == false) ? auxlib::eig_sym(eigval, eigvec, X) : auxlib::eig_sym_dc(eigval, eigvec, X);
   
