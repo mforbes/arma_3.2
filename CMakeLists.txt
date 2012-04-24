@@ -1,7 +1,8 @@
 
-# Copyright (C) 2008-2011 NICTA (www.nicta.com.au)
-# Copyright (C) 2008-2011 Conrad Sanderson
-# Copyright (C)      2011 Clement Creusot
+# Copyright (C) 2008-2012 NICTA (www.nicta.com.au)
+# Copyright (C) 2008-2012 Conrad Sanderson
+# Copyright (C) 2011 Clement Creusot
+# Copyright (C) 2012 Matthew Amidon
 # 
 # This file is part of the Armadillo C++ library.
 # It is provided without any warranty of fitness
@@ -39,6 +40,7 @@ set(ARMA_USE_LAPACK  false)
 set(ARMA_USE_BLAS    false)
 set(ARMA_USE_ATLAS   false)
 set(ARMA_USE_BOOST   false)
+set(ARMA_USE_HDF5    false)
 set(ARMA_USE_WRAPPER true )
 
 
@@ -177,6 +179,16 @@ endif()
 if(APPLE)
   set(ARMA_LIBS ${ARMA_LIBS} "-framework Accelerate")  # or "-framework accelerate" ?
   message(STATUS "MacOS X detected. Added '-framework Accelerate' to compiler flags")
+endif()
+
+
+find_package(HDF5)
+message(STATUS "HDF5_FOUND   = ${HDF5_FOUND}")
+
+if(HDF5_FOUND)
+  set(ARMA_USE_HDF5 true)
+  set(CMAKE_REQUIRED_INCLUDES ${CMAKE_REQUIRED_INCLUDES} ${HDF5_INCLUDE_DIRS})
+  set(ARMA_LIBS ${ARMA_LIBS} ${HDF5_LIBRARIES})
 endif()
 
 message(STATUS "*** ")
