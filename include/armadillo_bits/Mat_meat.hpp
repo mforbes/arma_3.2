@@ -5009,6 +5009,10 @@ Mat<eT>::save(const std::string name, const file_type type, const bool print_sta
       save_okay = diskio::save_pgm_binary(*this, name);
       break;
     
+    case hdf5_binary:
+      save_okay = diskio::save_hdf5_binary(*this, name);
+      break;
+    
     default:
       arma_warn(print_status, "Mat::save(): unsupported file type");
       save_okay = false;
@@ -5110,6 +5114,10 @@ Mat<eT>::load(const std::string name, const file_type type, const bool print_sta
       load_okay = diskio::load_pgm_binary(*this, name, err_msg);
       break;
     
+    case hdf5_binary:
+      load_okay = diskio::load_hdf5_binary(*this, name, err_msg);
+      break;
+
     default:
       arma_warn(print_status, "Mat::load(): unsupported file type");
       load_okay = false;

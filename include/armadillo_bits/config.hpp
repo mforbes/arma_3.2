@@ -48,14 +48,6 @@
 // #define ARMA_BLAS_CAPITALS
 //// Uncomment the above line if your BLAS and LAPACK libraries have capitalised function names (eg. ACML on 64-bit Windows)
 
-#if !defined(ARMA_MAT_PREALLOC)
-  #define ARMA_MAT_PREALLOC 16
-#endif
-//// This is the number of preallocated elements used by matrices and vectors;
-//// it must be an integer that is at least 1.
-//// If you mainly use lots of very small vectors (eg. <= 4 elements),
-//// change the number to the size of your vectors.
-
 // #define ARMA_USE_TBB_ALLOC
 //// Uncomment the above line if you want to use Intel TBB scalable_malloc() and scalable_free() instead of standard new[] and delete[]
 
@@ -67,6 +59,9 @@
 //// If you're using ATLAS and the compiler can't find cblas.h and/or clapack.h
 //// uncomment the above define and specify the appropriate include directory.
 //// Make sure the directory has a trailing /
+
+// #define ARMA_USE_HDF5
+//// Uncomment the above line if you have the HDF5 library
 
 // #define ARMA_USE_BOOST
 // #define ARMA_USE_BOOST_DATE
@@ -89,6 +84,14 @@
 
 // #define ARMA_EXTRA_DEBUG
 // #define ARMA_NO_DEBUG
+
+#if !defined(ARMA_MAT_PREALLOC)
+  #define ARMA_MAT_PREALLOC 16
+#endif
+//// This is the number of preallocated elements used by matrices and vectors;
+//// it must be an integer that is at least 1.
+//// If you mainly use lots of very small vectors (eg. <= 4 elements),
+//// change the number to the size of your vectors.
 
 #if defined(ARMA_DONT_USE_ATLAS)
   #undef ARMA_USE_ATLAS

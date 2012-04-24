@@ -167,7 +167,8 @@ enum file_type
   raw_binary,   //!< raw binary format, without any other information.
   arma_binary,  //!< Armadillo binary format, with information about matrix type and size
   pgm_binary,   //!< Portable Grey Map (greyscale image)
-  ppm_binary    //!< Portable Pixel Map (colour image), used by the field and cube classes
+  ppm_binary,   //!< Portable Pixel Map (colour image), used by the field and cube classes
+  hdf5_binary   //!< Open binary format, not specific to Armadillo, which can store arbitrary data
   };
 
 
