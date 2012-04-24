@@ -87,6 +87,12 @@
 #include "armadillo_bits/include_atlas.hpp"
 
 
+#if defined(ARMA_USE_HDF5)
+  #include <hdf5.h>
+#endif
+
+
+
 //! \namespace arma namespace for Armadillo classes and functions
 namespace arma
   {
