@@ -1812,6 +1812,8 @@ Member function of any matrix expression
 Provides an inverse of the matrix expression
 </li>
 <br>
+<li>the <i>slow</i> argument is optional</li>
+<br>
 <li>
 If the matrix expression is not square, a <i>std::logic_error</i> exception is thrown
 </li>
@@ -7243,13 +7245,13 @@ which is faster (but slightly less accurate) for matrices with a size &geq; 50x5
 Examples:
 <ul>
 <pre>
-mat A = randu&lt;mat&gt;(10,10);
+mat A = randu&lt;mat&gt;(50,50);
 mat B = trans(A)*A;  // generate a symmetric matrix
 
 vec eigval;
 mat eigvec;
 
-// use standard algorithm
+// use standard algorithm by default
 eig_sym(eigval, eigvec, B);
 
 // use divide &amp; conquer algorithm
@@ -7336,6 +7338,8 @@ See also:
 <li>
 Inverse of square matrix <i>A</i>
 </li>
+<br>
+<li>the <i>slow</i> argument is optional</li>
 <br>
 <li>
 If <i>A</i> is known to be a triangular matrix,
@@ -7476,6 +7480,8 @@ See also:
 <ul>
 <li>Moore-Penrose pseudo-inverse of matrix <i>A</i></li>
 <br>
+<li>The <i>tolerance</i> argument is optional</li>
+<br>
 <li>The computation is based on singular value decomposition;
 if the decomposition fails, <i>B</i> is reset and:
 <ul>
@@ -7483,7 +7489,7 @@ if the decomposition fails, <i>B</i> is reset and:
 <li><i>pinv(B,A)</i> returns a bool set to <i>false</i></li>
 </ul>
 <br>
-<li>Any singular values less than <i>tol</i> are treated as zero</li>
+<li>Any singular values less than <i>tolerance</i> are treated as zero</li>
 <br>
 <li>For matrix <i>A</i> with <i>m</i> rows and <i>n</i> columns,
 the default tolerance is <i>max(m,n)*norm(A)*datum::eps</i>,
@@ -7617,6 +7623,8 @@ See also:
 <br><b>solve(X, A, B, </b><i>slow=false</i><b>)</b>
 <ul>
 <li>Solve a system of linear equations, ie., <i>A*X = B</i>, where <i>X</i> is unknown</li>
+<br>
+<li>The <i>slow</i> argument is optional</li>
 <br>
 <li>For a square matrix <i>A</i>, this function is conceptually the same as <i>X = inv(A)*B</i>, but is more efficient</li>
 <br>
@@ -9659,6 +9667,13 @@ Below is a list of deprecated functionality; this functionality will be <b>remov
 Below is a list of additions and changes since prior versions of Armadillo:
 <br>
 <br>
+<a name="added_in_32"></a>
+<li>Added in 3.2:
+<ul>
+<li>optional use of a "divide and conquer" algorithm for eigen decomposition by <a href="#eig_sym">eig_sym()</a></li>
+</ul>
+<br>
+</li>
 <a name="added_in_30"></a>
 <li>Added in 3.0:
 <ul>
