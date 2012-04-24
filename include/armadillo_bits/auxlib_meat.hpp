@@ -1305,7 +1305,7 @@ auxlib::eig_sym(Col<T>& eigval, Mat< std::complex<T> >& eigvec, const Base<std::
     {
     eigvec = X.get_ref();
     
-    arma_debug_check( (eigvec.is_square() == false), "eig_sym(): given matrix is not hermitian" );
+    arma_debug_check( (eigvec.is_square() == false), "eig_sym(): given matrix is not square" );
     
     if(eigvec.is_empty())
       {
@@ -1409,7 +1409,7 @@ auxlib::eig_sym_dc(Col<T>& eigval, Mat< std::complex<T> >& eigvec, const Base<st
     {
     eigvec = X.get_ref();
     
-    arma_debug_check( (eigvec.is_square() == false), "eig_sym(): given matrix is not hermitian" );
+    arma_debug_check( (eigvec.is_square() == false), "eig_sym(): given matrix is not square" );
     
     if(eigvec.is_empty())
       {
@@ -1459,11 +1459,11 @@ inline
 bool
 auxlib::eig_gen
   (
-  Col< std::complex<T> >& eigval,
-  Mat<T>& l_eigvec,
-  Mat<T>& r_eigvec,
-  const Base<T,T1>& X,
-  const char side
+  Col< std::complex<T> >&   eigval,
+  Mat<T>&                 l_eigvec,
+  Mat<T>&                 r_eigvec,
+  const Base<T,T1>&       X,
+  const char              side
   )
   {
   arma_extra_debug_sigprint();
@@ -1511,29 +1511,24 @@ auxlib::eig_gen
       return true;
       }
     
-    uword A_n_rows = A.n_rows;
-    
-    blas_int n_rows = A_n_rows;
-    blas_int lda    = A_n_rows;
-    blas_int lwork  = (std::max)(blas_int(1), 4*n_rows) + 2;  // +2 for paranoia: some versions of Lapack might be trashing memory
-    // TODO: automatically find best size of lwork
+    const uword A_n_rows = A.n_rows;
     
     eigval.set_size(A_n_rows);
+    
     l_eigvec.set_size(A_n_rows, A_n_rows);
     r_eigvec.set_size(A_n_rows, A_n_rows);
     
-    podarray<T>  work( static_cast<uword>(lwork) );
-    podarray<T> rwork( static_cast<uword>((std::max)(blas_int(1), 3*n_rows)) );
+    blas_int N     = blas_int(A_n_rows);
+    blas_int lwork = 2*((std::max)(blas_int(1), 4*N));
+    blas_int info  = 0;
+    
+    podarray<T> work( static_cast<uword>(lwork) );
     
     podarray<T> wr(A_n_rows);
     podarray<T> wi(A_n_rows);
     
-    Mat<T> A_copy = A;
-    blas_int info = 0;
-    
     arma_extra_debug_print("lapack::geev()");
-    lapack::geev(&jobvl, &jobvr, &n_rows, A_copy.memptr(), &lda, wr.memptr(), wi.memptr(), l_eigvec.memptr(), &n_rows, r_eigvec.memptr(), &n_rows, work.memptr(), &lwork, &info);
-    
+    lapack::geev(&jobvl, &jobvr, &N, A.memptr(), &N, wr.memptr(), wi.memptr(), l_eigvec.memptr(), &N, r_eigvec.memptr(), &N, work.memptr(), &lwork, &info);
     
     eigval.set_size(A_n_rows);
     for(uword i=0; i<A_n_rows; ++i)
@@ -1568,11 +1563,11 @@ inline
 bool
 auxlib::eig_gen
   (
-  Col< std::complex<T> >& eigval,
-  Mat< std::complex<T> >& l_eigvec, 
-  Mat< std::complex<T> >& r_eigvec, 
+  Col< std::complex<T> >&              eigval,
+  Mat< std::complex<T> >&            l_eigvec, 
+  Mat< std::complex<T> >&            r_eigvec, 
   const Base< std::complex<T>, T1 >& X, 
-  const char side
+  const char                         side
   )
   {
   arma_extra_debug_sigprint();
@@ -1622,24 +1617,22 @@ auxlib::eig_gen
       return true;
       }
     
-    uword A_n_rows = A.n_rows;
-       
-    blas_int n_rows = A_n_rows;
-    blas_int lda    = A_n_rows;
-    blas_int lwork  = (std::max)(blas_int(1), 4*n_rows) + 2;  // +2 for paranoia: some versions of Lapack might be trashing memory
-    // TODO: automatically find best size of lwork
+    const uword A_n_rows = A.n_rows;
     
     eigval.set_size(A_n_rows);
+    
     l_eigvec.set_size(A_n_rows, A_n_rows);
     r_eigvec.set_size(A_n_rows, A_n_rows);
     
-    podarray<eT> work( static_cast<uword>(lwork) );
-    podarray<T>  rwork( static_cast<uword>((std::max)(blas_int(1), 3*n_rows)) );  // was 2,3
+    blas_int N     = blas_int(A_n_rows);
+    blas_int lwork = 2*((std::max)(blas_int(1), 2*N));
+    blas_int info  = 0;
     
-    blas_int info = 0;
+    podarray<eT>  work( static_cast<uword>(lwork) );
+    podarray<T>  rwork( static_cast<uword>(2*N)   );
     
     arma_extra_debug_print("lapack::cx_geev()");
-    lapack::cx_geev(&jobvl, &jobvr, &n_rows, A.memptr(), &lda, eigval.memptr(), l_eigvec.memptr(), &n_rows, r_eigvec.memptr(), &n_rows, work.memptr(), &lwork, rwork.memptr(), &info);
+    lapack::cx_geev(&jobvl, &jobvr, &N, A.memptr(), &N, eigval.memptr(), l_eigvec.memptr(), &N, r_eigvec.memptr(), &N, work.memptr(), &lwork, rwork.memptr(), &info);
     
     return (info == 0);
     }
