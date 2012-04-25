@@ -497,12 +497,14 @@ class diagmat_proxy_check< subview_col<eT> >
     arma_extra_debug_sigprint();
     }
   
+  inline ~diagmat_proxy_check() { arma_ignore(X_ref); }
+  
   arma_inline elem_type operator[] (const uword i)                    const { return P[i];                                 }
   arma_inline elem_type at         (const uword row, const uword col) const { return (row == col) ? P[row] : elem_type(0); }
   
   static const bool P_is_vec = true;
   
-  const subview_col<eT>& X_ref;   // prevents the compiler from deleting X before we're done with it
+  const subview_col<eT>& X_ref;   // prevents the compiler from potentially deleting X before we're done with it
   const Col<eT>          P;
   const uword            n_elem;
   };
