@@ -22,33 +22,23 @@
 
 #define arma_applier_1(operatorA) \
   {\
-  if( (is_fixed == true) && (n_elem <= 16) )\
+  uword i,j;\
+  \
+  for(i=0, j=1; j<n_elem; i+=2, j+=2)\
     {\
-    for(uword i=0; i<n_elem; ++i)\
-      {\
-      out_mem[i] operatorA eop_core<eop_type>::process(P[i], k);\
-      }\
+    eT tmp_i = P[i];\
+    eT tmp_j = P[j];\
+    \
+    tmp_i = eop_core<eop_type>::process(tmp_i, k);\
+    tmp_j = eop_core<eop_type>::process(tmp_j, k);\
+    \
+    out_mem[i] operatorA tmp_i;\
+    out_mem[j] operatorA tmp_j;\
     }\
-  else\
+  \
+  if(i < n_elem)\
     {\
-    uword i,j;\
-    \
-    for(i=0, j=1; j<n_elem; i+=2, j+=2)\
-      {\
-      eT tmp_i = P[i];\
-      eT tmp_j = P[j];\
-      \
-      tmp_i = eop_core<eop_type>::process(tmp_i, k);\
-      tmp_j = eop_core<eop_type>::process(tmp_j, k);\
-      \
-      out_mem[i] operatorA tmp_i;\
-      out_mem[j] operatorA tmp_j;\
-      }\
-    \
-    if(i < n_elem)\
-      {\
-      out_mem[i] operatorA eop_core<eop_type>::process(P[i], k);\
-      }\
+    out_mem[i] operatorA eop_core<eop_type>::process(P[i], k);\
     }\
   }
 
@@ -150,8 +140,8 @@ eop_core<eop_type>::apply(Mat<typename T1::elem_type>& out, const eOp<T1, eop_ty
   
   if(Proxy<T1>::prefer_at_accessor == false)
     {
-    const bool  is_fixed = Proxy<T1>::is_fixed;
-    const uword n_elem   = x.get_n_elem();
+    const uword n_elem = out.n_elem;
+    //const uword n_elem = x.get_n_elem(); // for fixed-sized matrices this causes a mis-optimisation (slowdown) of the loop under GCC 4.4
     
     typename Proxy<T1>::ea_type P = x.P.get_ea();
     
@@ -191,8 +181,8 @@ eop_core<eop_type>::apply_inplace_plus(Mat<typename T1::elem_type>& out, const e
   
   if(Proxy<T1>::prefer_at_accessor == false)
     {
-    const bool  is_fixed = Proxy<T1>::is_fixed;
-    const uword n_elem   = x.get_n_elem();
+    const uword n_elem = out.n_elem;
+    //const uword n_elem = x.get_n_elem(); // for fixed-sized matrices this causes a mis-optimisation (slowdown) of the loop under GCC 4.4
     
     typename Proxy<T1>::ea_type P = x.P.get_ea();
     
@@ -229,8 +219,8 @@ eop_core<eop_type>::apply_inplace_minus(Mat<typename T1::elem_type>& out, const 
   
   if(Proxy<T1>::prefer_at_accessor == false)
     {
-    const bool  is_fixed = Proxy<T1>::is_fixed;
-    const uword n_elem   = x.get_n_elem();
+    const uword n_elem = out.n_elem;
+    //const uword n_elem = x.get_n_elem(); // for fixed-sized matrices this causes a mis-optimisation (slowdown) of the loop under GCC 4.4
     
     typename Proxy<T1>::ea_type P = x.P.get_ea();
     
@@ -267,8 +257,8 @@ eop_core<eop_type>::apply_inplace_schur(Mat<typename T1::elem_type>& out, const 
   
   if(Proxy<T1>::prefer_at_accessor == false)
     {
-    const bool  is_fixed = Proxy<T1>::is_fixed;
-    const uword n_elem   = x.get_n_elem();
+    const uword n_elem = out.n_elem;
+    //const uword n_elem = x.get_n_elem(); // for fixed-sized matrices this causes a mis-optimisation (slowdown) of the loop under GCC 4.4
     
     typename Proxy<T1>::ea_type P = x.P.get_ea();
     
@@ -305,8 +295,8 @@ eop_core<eop_type>::apply_inplace_div(Mat<typename T1::elem_type>& out, const eO
   
   if(Proxy<T1>::prefer_at_accessor == false)
     {
-    const bool  is_fixed = Proxy<T1>::is_fixed;
-    const uword n_elem   = x.get_n_elem();
+    const uword n_elem = out.n_elem;
+    //const uword n_elem = x.get_n_elem(); // for fixed-sized matrices this causes a mis-optimisation (slowdown) of the loop under GCC 4.4
     
     typename Proxy<T1>::ea_type P = x.P.get_ea();
     
@@ -346,8 +336,7 @@ eop_core<eop_type>::apply(Cube<typename T1::elem_type>& out, const eOpCube<T1, e
   
   if(ProxyCube<T1>::prefer_at_accessor == false)
     {
-    const bool  is_fixed = false;
-    const uword n_elem   = x.get_n_elem();
+    const uword n_elem = out.n_elem;
     
     typename ProxyCube<T1>::ea_type P = x.P.get_ea();
     
@@ -389,8 +378,7 @@ eop_core<eop_type>::apply_inplace_plus(Cube<typename T1::elem_type>& out, const 
   
   if(ProxyCube<T1>::prefer_at_accessor == false)
     {
-    const bool  is_fixed = false;
-    const uword n_elem   = x.get_n_elem();
+    const uword n_elem = out.n_elem;
     
     typename ProxyCube<T1>::ea_type P = x.P.get_ea();
     
@@ -428,8 +416,7 @@ eop_core<eop_type>::apply_inplace_minus(Cube<typename T1::elem_type>& out, const
   
   if(ProxyCube<T1>::prefer_at_accessor == false)
     {
-    const bool  is_fixed = false;
-    const uword n_elem   = x.get_n_elem();
+    const uword n_elem = out.n_elem;
     
     typename ProxyCube<T1>::ea_type P = x.P.get_ea();
     
@@ -467,8 +454,7 @@ eop_core<eop_type>::apply_inplace_schur(Cube<typename T1::elem_type>& out, const
   
   if(ProxyCube<T1>::prefer_at_accessor == false)
     {
-    const bool  is_fixed = false;
-    const uword n_elem   = x.get_n_elem();
+    const uword n_elem = out.n_elem;
     
     typename ProxyCube<T1>::ea_type P = x.P.get_ea();
     
@@ -506,8 +492,7 @@ eop_core<eop_type>::apply_inplace_div(Cube<typename T1::elem_type>& out, const e
   
   if(ProxyCube<T1>::prefer_at_accessor == false)
     {
-    const bool  is_fixed = false;
-    const uword n_elem   = x.get_n_elem();
+    const uword n_elem = out.n_elem;
     
     typename ProxyCube<T1>::ea_type P = x.P.get_ea();
     
@@ -534,11 +519,8 @@ arma_hot
 arma_pure
 arma_inline
 eT
-eop_core<eop_type>::process(const eT val, const eT k)
+eop_core<eop_type>::process(const eT, const eT)
   {
-  arma_ignore(val);
-  arma_ignore(k);
-  
   arma_stop("eop_core::process(): unhandled eop_type");
   return eT(0);
   }
