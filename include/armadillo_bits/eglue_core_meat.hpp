@@ -60,23 +60,33 @@ class eglue_schur : public eglue_core<eglue_schur>
 
 #define arma_applier_1(operatorA, operatorB) \
   {\
-  uword i,j;\
-  \
-  for(i=0, j=1; j<n_elem; i+=2, j+=2)\
+  if( (is_fixed == true) && (n_elem <= 16) ) \
     {\
-    eT tmp_i = P1[i];\
-    eT tmp_j = P1[j];\
-    \
-    tmp_i operatorB##= P2[i];\
-    tmp_j operatorB##= P2[j];\
-    \
-    out_mem[i] operatorA tmp_i;\
-    out_mem[j] operatorA tmp_j;\
+    for(uword i=0; i<n_elem; ++i)\
+      {\
+      out_mem[i] operatorA P1[i] operatorB P2[i];\
+      }\
     }\
-  \
-  if(i < n_elem)\
+  else \
     {\
-    out_mem[i] operatorA P1[i] operatorB P2[i];\
+    uword i,j;\
+    \
+    for(i=0, j=1; j<n_elem; i+=2, j+=2)\
+      {\
+      eT tmp_i = P1[i];\
+      eT tmp_j = P1[j];\
+      \
+      tmp_i operatorB##= P2[i];\
+      tmp_j operatorB##= P2[j];\
+      \
+      out_mem[i] operatorA tmp_i;\
+      out_mem[j] operatorA tmp_j;\
+      }\
+    \
+    if(i < n_elem)\
+      {\
+      out_mem[i] operatorA P1[i] operatorB P2[i];\
+      }\
     }\
   }
   
