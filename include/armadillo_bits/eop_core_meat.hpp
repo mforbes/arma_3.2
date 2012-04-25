@@ -22,23 +22,33 @@
 
 #define arma_applier_1(operatorA) \
   {\
-  uword i,j;\
-  \
-  for(i=0, j=1; j<n_elem; i+=2, j+=2)\
+  if( (is_fixed == true) && (n_elem <= 16) )\
     {\
-    eT tmp_i = P[i];\
-    eT tmp_j = P[j];\
-    \
-    tmp_i = eop_core<eop_type>::process(tmp_i, k);\
-    tmp_j = eop_core<eop_type>::process(tmp_j, k);\
-    \
-    out_mem[i] operatorA tmp_i;\
-    out_mem[j] operatorA tmp_j;\
+    for(uword i=0; i<n_elem; ++i)\
+      {\
+      out_mem[i] operatorA eop_core<eop_type>::process(P[i], k);\
+      }\
     }\
-  \
-  if(i < n_elem)\
+  else\
     {\
-    out_mem[i] operatorA eop_core<eop_type>::process(P[i], k);\
+    uword i,j;\
+    \
+    for(i=0, j=1; j<n_elem; i+=2, j+=2)\
+      {\
+      eT tmp_i = P[i];\
+      eT tmp_j = P[j];\
+      \
+      tmp_i = eop_core<eop_type>::process(tmp_i, k);\
+      tmp_j = eop_core<eop_type>::process(tmp_j, k);\
+      \
+      out_mem[i] operatorA tmp_i;\
+      out_mem[j] operatorA tmp_j;\
+      }\
+    \
+    if(i < n_elem)\
+      {\
+      out_mem[i] operatorA eop_core<eop_type>::process(P[i], k);\
+      }\
     }\
   }
 
