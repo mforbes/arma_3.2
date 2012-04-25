@@ -497,8 +497,6 @@ class diagmat_proxy_check< subview_col<eT> >
     arma_extra_debug_sigprint();
     }
   
-  inline ~diagmat_proxy_check() { arma_ignore(X_ref); }
-  
   arma_inline elem_type operator[] (const uword i)                    const { return P[i];                                 }
   arma_inline elem_type at         (const uword row, const uword col) const { return (row == col) ? P[row] : elem_type(0); }
   
