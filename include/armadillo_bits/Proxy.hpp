@@ -21,7 +21,18 @@
 
 
 template<typename T1>
-struct Proxy_Mat_fixed
+struct Proxy_default
+  {
+  inline Proxy_default(const T1&)
+    {
+    arma_type_check(( is_arma_type<T1>::value == false ));
+    }
+  };
+
+
+
+template<typename T1>
+struct Proxy_fixed
   {
   typedef typename T1::elem_type                   elem_type;
   typedef typename get_pod_type<elem_type>::result pod_type;
@@ -30,13 +41,14 @@ struct Proxy_Mat_fixed
   
   static const bool prefer_at_accessor = false;
   static const bool has_subview        = false;
+  static const bool is_fixed           = true;
   
   static const bool is_row = T1::is_row;
   static const bool is_col = T1::is_col;
   
   arma_aligned const T1& Q;
   
-  inline explicit Proxy_Mat_fixed(const T1& A)
+  inline explicit Proxy_fixed(const T1& A)
     : Q(A)
     {
     arma_extra_debug_sigprint();
@@ -57,32 +69,23 @@ struct Proxy_Mat_fixed
 
 
 
-template<typename T1>
-struct Proxy_extra_empty
-  {
-  inline Proxy_extra_empty(const T1&)
-    {
-    arma_type_check(( is_arma_type<T1>::value == false ));
-    }
-  };
-
-
 template<typename T1, bool condition>
-struct Proxy_extra {};
+struct Proxy_redirect {};
 
 template<typename T1>
-struct Proxy_extra<T1, true>  { typedef Proxy_Mat_fixed<T1>   result; };
+struct Proxy_redirect<T1, false> { typedef Proxy_default<T1> result; };
 
 template<typename T1>
-struct Proxy_extra<T1, false> { typedef Proxy_extra_empty<T1> result; };
+struct Proxy_redirect<T1, true>  { typedef Proxy_fixed<T1>   result; };
+
 
 
 template<typename T1>
-class Proxy : public Proxy_extra<T1, is_Mat_fixed<T1>::value >::result
+class Proxy : public Proxy_redirect<T1, is_Mat_fixed<T1>::value >::result
   {
   public:
   inline Proxy(const T1& A)
-    : Proxy_extra<T1, is_Mat_fixed<T1>::value >::result(A)
+    : Proxy_redirect< T1, is_Mat_fixed<T1>::value >::result(A)
     {
     }
   };
@@ -101,6 +104,7 @@ class Proxy< Mat<eT> >
   
   static const bool prefer_at_accessor = false;
   static const bool has_subview        = false;
+  static const bool is_fixed           = false;
   
   static const bool is_row = false;
   static const bool is_col = false;
@@ -140,6 +144,7 @@ class Proxy< Col<eT> >
   
   static const bool prefer_at_accessor = false;
   static const bool has_subview        = false;
+  static const bool is_fixed           = false;
   
   static const bool is_row = false;
   static const bool is_col = true;
@@ -179,6 +184,7 @@ class Proxy< Row<eT> >
   
   static const bool prefer_at_accessor = false;
   static const bool has_subview        = false;
+  static const bool is_fixed           = false;
   
   static const bool is_row = true;
   static const bool is_col = false;
@@ -218,6 +224,7 @@ class Proxy< Gen<T1, gen_type > >
   
   static const bool prefer_at_accessor = Gen<T1, gen_type>::prefer_at_accessor;
   static const bool has_subview        = false;
+  static const bool is_fixed           = false;
   
   static const bool is_row = Gen<T1, gen_type>::is_row;
   static const bool is_col = Gen<T1, gen_type>::is_col;
@@ -230,9 +237,9 @@ class Proxy< Gen<T1, gen_type > >
     arma_extra_debug_sigprint();
     }
   
-  arma_inline uword get_n_rows() const { return is_row ? 1 : Q.n_rows;  }
-  arma_inline uword get_n_cols() const { return is_col ? 1 : Q.n_cols;  }
-  arma_inline uword get_n_elem() const { return Q.n_rows*Q.n_cols;      }
+  arma_inline uword get_n_rows() const { return (is_row ? 1 : Q.n_rows);                           }
+  arma_inline uword get_n_cols() const { return (is_col ? 1 : Q.n_cols);                           }
+  arma_inline uword get_n_elem() const { return (is_row ? 1 : Q.n_rows) * (is_col ? 1 : Q.n_cols); }
   
   arma_inline elem_type operator[] (const uword i)                    const { return Q[i];           }
   arma_inline elem_type at         (const uword row, const uword col) const { return Q.at(row, col); }
@@ -257,6 +264,7 @@ class Proxy< Op<T1, op_type> >
   
   static const bool prefer_at_accessor = false;
   static const bool has_subview        = false;
+  static const bool is_fixed           = false;
   
   static const bool is_row = Op<T1, op_type>::is_row;
   static const bool is_col = Op<T1, op_type>::is_col;
@@ -296,6 +304,7 @@ class Proxy< Glue<T1, T2, glue_type> >
   
   static const bool prefer_at_accessor = false;
   static const bool has_subview        = false;
+  static const bool is_fixed           = false;
   
   static const bool is_row = Glue<T1, T2, glue_type>::is_row;
   static const bool is_col = Glue<T1, T2, glue_type>::is_col;
@@ -335,6 +344,7 @@ class Proxy< subview<eT> >
   
   static const bool prefer_at_accessor = true;
   static const bool has_subview        = true;
+  static const bool is_fixed           = false;
   
   static const bool is_row = false;
   static const bool is_col = false;
@@ -374,6 +384,7 @@ class Proxy< subview_col<eT> >
   
   static const bool prefer_at_accessor = false;
   static const bool has_subview        = true;
+  static const bool is_fixed           = false;
   
   static const bool is_row = false;
   static const bool is_col = true;
@@ -413,6 +424,7 @@ class Proxy< subview_row<eT> >
   
   static const bool prefer_at_accessor = false;
   static const bool has_subview        = true;
+  static const bool is_fixed           = false;
   
   static const bool is_row = true;
   static const bool is_col = false;
@@ -452,6 +464,7 @@ class Proxy< subview_elem1<eT,T1> >
   
   static const bool prefer_at_accessor = false;
   static const bool has_subview        = false;
+  static const bool is_fixed           = false;
   
   static const bool is_row = false;
   static const bool is_col = true;
@@ -491,6 +504,7 @@ class Proxy< subview_elem2<eT,T1,T2> >
   
   static const bool prefer_at_accessor = false;
   static const bool has_subview        = false;
+  static const bool is_fixed           = false;
   
   static const bool is_row = false;
   static const bool is_col = false;
@@ -530,6 +544,7 @@ class Proxy< diagview<eT> >
   
   static const bool prefer_at_accessor = false;
   static const bool has_subview        = true;
+  static const bool is_fixed           = false;
   
   static const bool is_row = false;
   static const bool is_col = true;
@@ -570,6 +585,7 @@ class Proxy< eOp<T1, eop_type > >
   
   static const bool prefer_at_accessor = eOp<T1, eop_type>::prefer_at_accessor;
   static const bool has_subview        = eOp<T1, eop_type>::has_subview;
+  static const bool is_fixed           = eOp<T1, eop_type>::is_fixed;
   
   static const bool is_row = eOp<T1, eop_type>::is_row;
   static const bool is_col = eOp<T1, eop_type>::is_col;
@@ -609,6 +625,7 @@ class Proxy< eGlue<T1, T2, eglue_type > >
   
   static const bool prefer_at_accessor = eGlue<T1, T2, eglue_type>::prefer_at_accessor;
   static const bool has_subview        = eGlue<T1, T2, eglue_type>::has_subview;
+  static const bool is_fixed           = eGlue<T1, T2, eglue_type>::is_fixed;
   
   static const bool is_row = eGlue<T1, T2, eglue_type>::is_row;
   static const bool is_col = eGlue<T1, T2, eglue_type>::is_col;
@@ -648,6 +665,7 @@ class Proxy< mtOp<out_eT, T1, op_type> >
   
   static const bool prefer_at_accessor = false;
   static const bool has_subview        = false;
+  static const bool is_fixed           = false;
   
   static const bool is_row = mtOp<out_eT, T1, op_type>::is_row;
   static const bool is_col = mtOp<out_eT, T1, op_type>::is_col;
@@ -687,6 +705,7 @@ class Proxy< mtGlue<out_eT, T1, T2, glue_type > >
   
   static const bool prefer_at_accessor = false;
   static const bool has_subview        = false;
+  static const bool is_fixed           = false;
   
   static const bool is_row = mtGlue<out_eT, T1, T2, glue_type>::is_row;
   static const bool is_col = mtGlue<out_eT, T1, T2, glue_type>::is_col;
