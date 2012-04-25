@@ -346,7 +346,7 @@ class diagmat_proxy_check
 
 
 
-// TODO: handling of fixed size matrices
+// TODO: handling of fixed size matrices.  Store matrix as Mat (ie. not as a reference), but initialise with auxiliary memory; copy memory if aliasing
 
 
 template<typename eT>
@@ -490,7 +490,8 @@ class diagmat_proxy_check< subview_col<eT> >
   typedef typename get_pod_type<elem_type>::result pod_type;
   
   inline diagmat_proxy_check(const subview_col<eT>& X, const Mat<eT>& out)
-    : P     ( const_cast<eT*>(X.colptr(0)), X.n_rows, (&(X.m) == &out), false )
+    : X_ref ( X )
+    , P     ( const_cast<eT*>(X.colptr(0)), X.n_rows, (&(X.m) == &out), false )
     , n_elem( X.n_elem )
     {
     arma_extra_debug_sigprint();
@@ -501,8 +502,9 @@ class diagmat_proxy_check< subview_col<eT> >
   
   static const bool P_is_vec = true;
   
-  const Col<eT> P;
-  const uword   n_elem;
+  const subview_col<eT>& X_ref;   // prevents the compiler from deleting X before we're done with it
+  const Col<eT>          P;
+  const uword            n_elem;
   };
 
 
