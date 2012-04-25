@@ -125,11 +125,16 @@ class unwrap< subview_col<eT> >
   public:
   
   inline unwrap(const subview_col<eT>& A)
-    : M( const_cast<eT*>( A.colptr(0) ), A.n_rows, 1, false, false )
+    : A_ref( A )
+    , M    ( const_cast<eT*>( A.colptr(0) ), A.n_rows, 1, false, false )
     {
     arma_extra_debug_sigprint();
     }
-
+  
+  inline ~unwrap() { arma_ignore(A_ref); }
+  
+  const subview_col<eT>& A_ref;  // prevents the compiler from potentially deleting A before we're done with it
+  
   const Mat<eT> M;
   };
 
@@ -288,10 +293,15 @@ class unwrap_check< subview_col<eT> >
   
   inline
   unwrap_check(const subview_col<eT>& A, const Mat<eT>& B)
-    : M( const_cast<eT*>( A.colptr(0) ), A.n_rows, 1, (&(A.m) == &B), false )
+    : A_ref( A )
+    , M    ( const_cast<eT*>( A.colptr(0) ), A.n_rows, 1, (&(A.m) == &B), false )
     {
     arma_extra_debug_sigprint();
     }
+  
+  inline ~unwrap_check() { arma_ignore(A_ref); }
+  
+  const subview_col<eT>& A_ref;  // prevents the compiler from potentially deleting A before we're done with it
   
   const Mat<eT> M;
   };
@@ -557,15 +567,20 @@ class partial_unwrap< subview_col<eT> >
   
   inline
   partial_unwrap(const subview_col<eT>& A)
-    : M( const_cast<eT*>( A.colptr(0) ), A.n_rows, 1, false, false )
+    : A_ref( A )
+    , M    ( const_cast<eT*>( A.colptr(0) ), A.n_rows, 1, false, false )
     {
     arma_extra_debug_sigprint();
     }
+  
+  inline ~partial_unwrap() { arma_ignore(A_ref); }
   
   inline eT get_val() const { return eT(1); }
   
   static const bool do_trans = false;
   static const bool do_times = false;
+  
+  const subview_col<eT>& A_ref;  // prevents the compiler from potentially deleting A before we're done with it
   
   const Mat<eT> M;
   };
@@ -708,15 +723,20 @@ class partial_unwrap< Op< subview_col<eT>, op_htrans> >
   
   inline
   partial_unwrap(const Op< subview_col<eT>, op_htrans>& A)
-    : M( const_cast<eT*>( A.m.colptr(0) ), A.m.n_rows, 1, false, false )
+    : subview_ref(A.m)
+    , M          ( const_cast<eT*>( A.m.colptr(0) ), A.m.n_rows, 1, false, false )
     {
     arma_extra_debug_sigprint();
     }
+  
+  inline ~partial_unwrap() { arma_ignore(subview_ref); }
   
   arma_inline eT get_val() const { return eT(1); }
   
   static const bool do_trans = true;
   static const bool do_times = false;
+  
+  const subview_col<eT>& subview_ref;  // prevents the compiler from potentially deleting the subview object before we're done with it
   
   const Mat<eT> M;
   };
