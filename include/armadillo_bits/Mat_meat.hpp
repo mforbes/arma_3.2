@@ -2589,15 +2589,13 @@ Mat<eT>::swap_rows(const uword in_row1, const uword in_row2)
     "Mat::swap_rows(): out of bounds"
     );
   
-  for(uword col=0; col<n_cols; ++col)
+  for(uword col=0; col < n_cols; ++col)
     {
     const uword offset = col*n_rows;
     const uword pos1   = in_row1 + offset;
     const uword pos2   = in_row2 + offset;
     
-    const eT tmp          = mem[pos1];
-    access::rw(mem[pos1]) = mem[pos2];
-    access::rw(mem[pos2]) = tmp;
+    std::swap( access::rw(mem[pos1]), access::rw(mem[pos2]) );
     }
   
   }
@@ -2622,11 +2620,9 @@ Mat<eT>::swap_cols(const uword in_col1, const uword in_col2)
     eT* ptr1 = colptr(in_col1);
     eT* ptr2 = colptr(in_col2);
     
-    for(uword row=0; row<n_rows; ++row)
+    for(uword row=0; row < n_rows; ++row)
       {
-      const eT tmp = ptr1[row];
-      ptr1[row]    = ptr2[row];
-      ptr2[row]    = tmp;
+      std::swap( ptr1[row], ptr2[row] );
       }
     }
   }
