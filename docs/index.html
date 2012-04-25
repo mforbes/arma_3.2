@@ -6438,20 +6438,18 @@ See also:
 <hr class="greyline"><br>
 
 <a name="diagmat"></a>
-<b>diagmat(mat)</b>
-<br><b>diagmat(rowvec)</b>
-<br><b>diagmat(colvec)</b>
+<b>diagmat(X)</b>
 <ul>
 <li>
-Interpret a matrix or vector as a diagonal matrix
+Interpret a matrix or vector <i>X</i> as a diagonal matrix
 </li>
 <br>
 <li>
-For <i>mat</i>, given matrix must be square; the main diagonal is copied and all other elements in the generated matrix are set to zero
+If <i>X</i> is a matrix, the matrix must be square; the main diagonal is copied and all other elements in the generated matrix are set to zero
 </li>
 <br>
 <li>
-For <i>colvec</i> and <i>rowvec</i>, elements of the vector are placed on the main diagonal in the generated matrix and all other elements are set to zero
+If <i>X</i> is a vector, elements of the vector are placed on the main diagonal in the generated matrix and all other elements are set to zero
 </li>
 <br>
 <li>
@@ -6473,6 +6471,7 @@ mat    X = diagmat(q)*diagmat(r);
 See also:
 <ul>
 <li><a href="#diagvec">diagvec()</a></li>
+<li><a href="#diag">.diag()</a></li>
 <li><a href="#trimat">trimatu() / trimatl()</a></li>
 <li><a href="#symmat">symmatu() / symmatl()</a></li>
 <li><a href="#reshape">reshape()</a></li>
