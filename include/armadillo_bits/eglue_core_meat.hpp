@@ -193,7 +193,8 @@ eglue_core<eglue_type>::apply(Mat<typename T1::elem_type>& out, const eGlue<T1, 
   
   if(prefer_at_accessor == false)
     {
-    const uword n_elem = out.n_elem;
+    const bool  is_fixed = (Proxy<T1>::is_fixed) || (Proxy<T2>::is_fixed);
+    const uword n_elem   = x.get_n_elem();
     
     typename Proxy<T1>::ea_type P1 = x.P1.get_ea();
     typename Proxy<T2>::ea_type P2 = x.P2.get_ea();
@@ -242,7 +243,8 @@ eglue_core<eglue_type>::apply_inplace_plus(Mat<typename T1::elem_type>& out, con
   
   if(prefer_at_accessor == false)
     {
-    const uword n_elem = out.n_elem;
+    const bool  is_fixed = (Proxy<T1>::is_fixed) || (Proxy<T2>::is_fixed);
+    const uword n_elem   = x.get_n_elem();
     
     typename Proxy<T1>::ea_type P1 = x.P1.get_ea();
     typename Proxy<T2>::ea_type P2 = x.P2.get_ea();
@@ -288,7 +290,8 @@ eglue_core<eglue_type>::apply_inplace_minus(Mat<typename T1::elem_type>& out, co
   
   if(prefer_at_accessor == false)
     {
-    const uword n_elem = out.n_elem;
+    const bool  is_fixed = (Proxy<T1>::is_fixed) || (Proxy<T2>::is_fixed);
+    const uword n_elem   = x.get_n_elem();
     
     typename Proxy<T1>::ea_type P1 = x.P1.get_ea();
     typename Proxy<T2>::ea_type P2 = x.P2.get_ea();
@@ -334,7 +337,8 @@ eglue_core<eglue_type>::apply_inplace_schur(Mat<typename T1::elem_type>& out, co
   
   if(prefer_at_accessor == false)
     {
-    const uword n_elem = out.n_elem;
+    const bool  is_fixed = (Proxy<T1>::is_fixed) || (Proxy<T2>::is_fixed);
+    const uword n_elem   = x.get_n_elem();
     
     typename Proxy<T1>::ea_type P1 = x.P1.get_ea();
     typename Proxy<T2>::ea_type P2 = x.P2.get_ea();
@@ -380,7 +384,8 @@ eglue_core<eglue_type>::apply_inplace_div(Mat<typename T1::elem_type>& out, cons
   
   if(prefer_at_accessor == false)
     {
-    const uword n_elem = out.n_elem;
+    const bool  is_fixed = (Proxy<T1>::is_fixed) || (Proxy<T2>::is_fixed);
+    const uword n_elem   = x.get_n_elem();
     
     typename Proxy<T1>::ea_type P1 = x.P1.get_ea();
     typename Proxy<T2>::ea_type P2 = x.P2.get_ea();
@@ -430,11 +435,12 @@ eglue_core<eglue_type>::apply(Cube<typename T1::elem_type>& out, const eGlueCube
   
   if(prefer_at_accessor == false)
     {
-    const uword n_elem = out.n_elem;
+    const bool  is_fixed = false;
+    const uword n_elem   = out.n_elem;
     
     typename ProxyCube<T1>::ea_type P1 = x.P1.get_ea();
     typename ProxyCube<T2>::ea_type P2 = x.P2.get_ea();
-  
+    
          if(is_same_type<eglue_type, eglue_plus >::value == true) { arma_applier_1(=, +); }
     else if(is_same_type<eglue_type, eglue_minus>::value == true) { arma_applier_1(=, -); }
     else if(is_same_type<eglue_type, eglue_div  >::value == true) { arma_applier_1(=, /); }
@@ -481,7 +487,8 @@ eglue_core<eglue_type>::apply_inplace_plus(Cube<typename T1::elem_type>& out, co
   
   if(prefer_at_accessor == false)
     {
-    const uword n_elem  = out.n_elem;
+    const bool  is_fixed = false;
+    const uword n_elem   = out.n_elem;
     
     typename ProxyCube<T1>::ea_type P1 = x.P1.get_ea();
     typename ProxyCube<T2>::ea_type P2 = x.P2.get_ea();
@@ -528,7 +535,8 @@ eglue_core<eglue_type>::apply_inplace_minus(Cube<typename T1::elem_type>& out, c
   
   if(prefer_at_accessor == false)
     {
-    const uword n_elem  = out.n_elem;
+    const bool  is_fixed = false;
+    const uword n_elem   = out.n_elem;
     
     typename ProxyCube<T1>::ea_type P1 = x.P1.get_ea();
     typename ProxyCube<T2>::ea_type P2 = x.P2.get_ea();
@@ -575,7 +583,8 @@ eglue_core<eglue_type>::apply_inplace_schur(Cube<typename T1::elem_type>& out, c
   
   if(prefer_at_accessor == false)
     {
-    const uword n_elem  = out.n_elem;
+    const bool  is_fixed = false;
+    const uword n_elem   = out.n_elem;
     
     typename ProxyCube<T1>::ea_type P1 = x.P1.get_ea();
     typename ProxyCube<T2>::ea_type P2 = x.P2.get_ea();
@@ -622,7 +631,8 @@ eglue_core<eglue_type>::apply_inplace_div(Cube<typename T1::elem_type>& out, con
   
   if(prefer_at_accessor == false)
     {
-    const uword n_elem  = out.n_elem;
+    const bool  is_fixed = false;
+    const uword n_elem   = out.n_elem;
     
     typename ProxyCube<T1>::ea_type P1 = x.P1.get_ea();
     typename ProxyCube<T2>::ea_type P2 = x.P2.get_ea();
