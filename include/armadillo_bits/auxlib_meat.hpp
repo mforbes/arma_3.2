@@ -2552,13 +2552,13 @@ auxlib::solve(Mat<eT>& out, Mat<eT>& A, const Mat<eT>& B, const bool slow)
         }
       #elif defined(ARMA_USE_LAPACK)
         {
+        out = B;
+        
         blas_int n    = blas_int(A_n_rows);  // assuming A is square
         blas_int lda  = blas_int(A_n_rows);
         blas_int ldb  = blas_int(A_n_rows);
         blas_int nrhs = blas_int(B_n_cols);
         blas_int info = 0;
-        
-        out = B;
         
         podarray<blas_int> ipiv(A_n_rows + 2);  // +2 for paranoia: some versions of Lapack might be trashing memory
         
@@ -2610,11 +2610,11 @@ auxlib::solve_od(Mat<eT>& out, Mat<eT>& A, const Mat<eT>& B)
     
     char trans = 'N';
     
-    blas_int  m     = A_n_rows;
-    blas_int  n     = A_n_cols;
-    blas_int  lda   = A_n_rows;
-    blas_int  ldb   = A_n_rows;
-    blas_int  nrhs  = B_n_cols;
+    blas_int  m     = blas_int(A_n_rows);
+    blas_int  n     = blas_int(A_n_cols);
+    blas_int  lda   = blas_int(A_n_rows);
+    blas_int  ldb   = blas_int(A_n_rows);
+    blas_int  nrhs  = blas_int(B_n_cols);
     blas_int  lwork = 2*((std::max)(blas_int(1), n + (std::max)(n, nrhs)));
     blas_int  info  = 0;
     
@@ -2675,11 +2675,11 @@ auxlib::solve_ud(Mat<eT>& out, Mat<eT>& A, const Mat<eT>& B)
     
     char trans = 'N';
     
-    blas_int  m     = A_n_rows;
-    blas_int  n     = A_n_cols;
-    blas_int  lda   = A_n_rows;
-    blas_int  ldb   = A_n_cols;
-    blas_int  nrhs  = B_n_cols;
+    blas_int  m     = blas_int(A_n_rows);
+    blas_int  n     = blas_int(A_n_cols);
+    blas_int  lda   = blas_int(A_n_rows);
+    blas_int  ldb   = blas_int(A_n_cols);
+    blas_int  nrhs  = blas_int(B_n_cols);
     blas_int  lwork = 2*((std::max)(blas_int(1), m + (std::max)(m,nrhs)));
     blas_int  info  = 0;
     
