@@ -1673,7 +1673,7 @@ auxlib::chol(Mat<eT>& out, const Base<eT,T1>& X)
     
     char      uplo = 'U';
     blas_int  n    = out_n_rows;
-    blas_int  info;
+    blas_int  info = 0;
     
     lapack::potrf(&uplo, &n, out.memptr(), &n, &info);
     
@@ -1936,8 +1936,8 @@ auxlib::svd(Col<T>& S, const Base<std::complex<T>, T1>& X, uword& X_n_rows, uwor
     
     S.set_size( static_cast<uword>((std::min)(m,n)) );
     
-    podarray<eT> work( static_cast<uword>(lwork) );
-    podarray<T>  rwork( static_cast<uword>(5*(std::min)(m,n)) );
+    podarray<eT>   work( static_cast<uword>(lwork)             );
+    podarray< T>  rwork( static_cast<uword>(5*(std::min)(m,n)) );
     
     // let gesvd_() calculate the optimum size of the workspace
     blas_int lwork_tmp = -1;
@@ -2046,11 +2046,11 @@ auxlib::svd(Mat<eT>& U, Col<eT>& S, Mat<eT>& V, const Base<eT,T1>& X)
     char jobu  = 'A';
     char jobvt = 'A';
     
-    blas_int  m     = A.n_rows;
-    blas_int  n     = A.n_cols;
-    blas_int  lda   = A.n_rows;
-    blas_int  ldu   = U.n_rows;
-    blas_int  ldvt  = V.n_rows;
+    blas_int  m     = blas_int(A.n_rows);
+    blas_int  n     = blas_int(A.n_cols);
+    blas_int  lda   = blas_int(A.n_rows);
+    blas_int  ldu   = blas_int(U.n_rows);
+    blas_int  ldvt  = blas_int(V.n_rows);
     blas_int  lwork = 2 * (std::max)(blas_int(1), (std::max)( (3*(std::min)(m,n) + (std::max)(m,n)), 5*(std::min)(m,n) ) );
     blas_int  info  = 0;
     
@@ -2140,11 +2140,11 @@ auxlib::svd(Mat< std::complex<T> >& U, Col<T>& S, Mat< std::complex<T> >& V, con
     char jobu  = 'A';
     char jobvt = 'A';
     
-    blas_int  m     = A.n_rows;
-    blas_int  n     = A.n_cols;
-    blas_int  lda   = A.n_rows;
-    blas_int  ldu   = U.n_rows;
-    blas_int  ldvt  = V.n_rows;
+    blas_int  m     = blas_int(A.n_rows);
+    blas_int  n     = blas_int(A.n_cols);
+    blas_int  lda   = blas_int(A.n_rows);
+    blas_int  ldu   = blas_int(U.n_rows);
+    blas_int  ldvt  = blas_int(V.n_rows);
     blas_int  lwork = 2 * (std::max)(blas_int(1), 2*(std::min)(m,n)+(std::max)(m,n) );
     blas_int  info  = 0;
     
@@ -2221,9 +2221,9 @@ auxlib::svd_econ(Mat<eT>& U, Col<eT>& S, Mat<eT>& V, const Base<eT,T1>& X, const
     {
     Mat<eT> A(X.get_ref());
     
-    blas_int m    = A.n_rows;
-    blas_int n    = A.n_cols;
-    blas_int lda  = A.n_rows;
+    blas_int m    = blas_int(A.n_rows);
+    blas_int n    = blas_int(A.n_cols);
+    blas_int lda  = blas_int(A.n_rows);
     
     S.set_size( static_cast<uword>((std::min)(m,n)) );
     
@@ -2366,9 +2366,9 @@ auxlib::svd_econ(Mat< std::complex<T> >& U, Col<T>& S, Mat< std::complex<T> >& V
     {
     Mat<eT> A(X.get_ref());
     
-    blas_int m    = A.n_rows;
-    blas_int n    = A.n_cols;
-    blas_int lda  = A.n_rows;
+    blas_int m    = blas_int(A.n_rows);
+    blas_int n    = blas_int(A.n_cols);
+    blas_int lda  = blas_int(A.n_rows);
     
     S.set_size( static_cast<uword>((std::min)(m,n)) );
     
@@ -2510,15 +2510,16 @@ auxlib::solve(Mat<eT>& out, Mat<eT>& A, const Mat<eT>& B, const bool slow)
   {
   arma_extra_debug_sigprint();
   
+  const uword A_n_rows = A.n_rows;
+  const uword B_n_cols = B.n_cols;
+  
   if(A.is_empty() || B.is_empty())
     {
-    out.zeros(A.n_cols, B.n_cols);
+    out.zeros(A.n_cols, B_n_cols);
     return true;
     }
   else
     {
-    const uword A_n_rows = A.n_rows;
-    
     bool status = false;
     
     if( (A_n_rows <= 4) && (slow == false) )
@@ -2529,7 +2530,7 @@ auxlib::solve(Mat<eT>& out, Mat<eT>& A, const Mat<eT>& B, const bool slow)
       
       if(status == true)
         {
-        out.set_size(A_n_rows, B.n_cols);
+        out.set_size(A_n_rows, B_n_cols);
         
         gemm_emul<false,false,false,false>::apply(out, A_inv, B);
         
@@ -2545,23 +2546,26 @@ auxlib::solve(Mat<eT>& out, Mat<eT>& A, const Mat<eT>& B, const bool slow)
         
         podarray<int> ipiv(A_n_rows + 2);  // +2 for paranoia: old versions of Atlas might be trashing memory
         
-        int info = atlas::clapack_gesv<eT>(atlas::CblasColMajor, A_n_rows, B.n_cols, A.memptr(), A_n_rows, ipiv.memptr(), out.memptr(), A_n_rows);
+        int info = atlas::clapack_gesv<eT>(atlas::CblasColMajor, A_n_rows, B_n_cols, A.memptr(), A_n_rows, ipiv.memptr(), out.memptr(), A_n_rows);
         
         return (info == 0);
         }
       #elif defined(ARMA_USE_LAPACK)
         {
-        blas_int n    = A_n_rows;  // assuming A is square
-        blas_int lda  = A_n_rows;
-        blas_int ldb  = A_n_rows;
-        blas_int nrhs = B.n_cols;
+        blas_int n    = blas_int(A_n_rows);  // assuming A is square
+        blas_int lda  = blas_int(A_n_rows);
+        blas_int ldb  = blas_int(A_n_rows);
+        blas_int nrhs = blas_int(B_n_cols);
         blas_int info = 0;
         
         out = B;
         
         podarray<blas_int> ipiv(A_n_rows + 2);  // +2 for paranoia: some versions of Lapack might be trashing memory
         
+        arma_extra_debug_print("lapack::gesv()");
         lapack::gesv<eT>(&n, &nrhs, A.memptr(), &lda, ipiv.memptr(), out.memptr(), &ldb, &info);
+        
+        arma_extra_debug_print("lapack::gesv() -- finished");
         
         return (info == 0);
         }
@@ -2590,46 +2594,43 @@ auxlib::solve_od(Mat<eT>& out, Mat<eT>& A, const Mat<eT>& B)
   
   #if defined(ARMA_USE_LAPACK)
     {
+    const uword A_n_rows = A.n_rows;
+    const uword A_n_cols = A.n_cols;
+    
+    const uword B_n_rows = B.n_rows;
+    const uword B_n_cols = B.n_cols;
+    
+    out.set_size(A_n_cols, B_n_cols);
+    
     if(A.is_empty() || B.is_empty())
       {
-      out.zeros(A.n_cols, B.n_cols);
+      out.zeros();
       return true;
       }
     
     char trans = 'N';
     
-    blas_int  m     = A.n_rows;
-    blas_int  n     = A.n_cols;
-    blas_int  lda   = A.n_rows;
-    blas_int  ldb   = A.n_rows;
-    blas_int  nrhs  = B.n_cols;
-    blas_int  lwork = n + (std::max)(n, nrhs) + 2;  // +2 for paranoia: some versions of Lapack might be trashing memory
+    blas_int  m     = A_n_rows;
+    blas_int  n     = A_n_cols;
+    blas_int  lda   = A_n_rows;
+    blas_int  ldb   = A_n_rows;
+    blas_int  nrhs  = B_n_cols;
+    blas_int  lwork = 2*((std::max)(blas_int(1), n + (std::max)(n, nrhs)));
     blas_int  info  = 0;
     
     Mat<eT> tmp = B;
     
     podarray<eT> work( static_cast<uword>(lwork) );
     
-    arma_extra_debug_print("lapack::gels()");
-    
     // NOTE: the dgels() function in the lapack library supplied by ATLAS 3.6 seems to have problems
-    
-    lapack::gels<eT>
-      (
-      &trans, &m, &n, &nrhs,
-      A.memptr(), &lda,
-      tmp.memptr(), &ldb,
-      work.memptr(), &lwork,
-      &info
-      );
+    arma_extra_debug_print("lapack::gels()");
+    lapack::gels<eT>( &trans, &m, &n, &nrhs, A.memptr(), &lda, tmp.memptr(), &ldb, work.memptr(), &lwork, &info );
     
     arma_extra_debug_print("lapack::gels() -- finished");
     
-    out.set_size(A.n_cols, B.n_cols);
-    
-    for(uword col=0; col<B.n_cols; ++col)
+    for(uword col=0; col<B_n_cols; ++col)
       {
-      arrayops::copy( out.colptr(col), tmp.colptr(col), A.n_cols );
+      arrayops::copy( out.colptr(col), tmp.colptr(col), A_n_cols );
       }
     
     return (info == 0);
@@ -2658,33 +2659,40 @@ auxlib::solve_ud(Mat<eT>& out, Mat<eT>& A, const Mat<eT>& B)
   
   #if defined(ARMA_USE_LAPACK)
     {
+    const uword A_n_rows = A.n_rows;
+    const uword A_n_cols = A.n_cols;
+    
+    const uword B_n_rows = B.n_rows;
+    const uword B_n_cols = B.n_cols;
+    
+    out.set_size(A_n_cols, B_n_cols);
+    
     if(A.is_empty() || B.is_empty())
       {
-      out.zeros(A.n_cols, B.n_cols);
+      out.zeros();
       return true;
       }
     
     char trans = 'N';
     
-    blas_int  m     = A.n_rows;
-    blas_int  n     = A.n_cols;
-    blas_int  lda   = A.n_rows;
-    blas_int  ldb   = A.n_cols;
-    blas_int  nrhs  = B.n_cols;
-    blas_int  lwork = m + (std::max)(m,nrhs) + 2;  // +2 for paranoia: some versions of Lapack might be trashing memory
+    blas_int  m     = A_n_rows;
+    blas_int  n     = A_n_cols;
+    blas_int  lda   = A_n_rows;
+    blas_int  ldb   = A_n_cols;
+    blas_int  nrhs  = B_n_cols;
+    blas_int  lwork = 2*((std::max)(blas_int(1), m + (std::max)(m,nrhs)));
     blas_int  info  = 0;
     
+    Mat<eT> tmp(A_n_cols, B_n_cols);
+    tmp.zeros();
     
-    Mat<eT> tmp;
-    tmp.zeros(A.n_cols, B.n_cols);
-    
-    for(uword col=0; col<B.n_cols; ++col)
+    for(uword col=0; col<B_n_cols; ++col)
       {
       eT* tmp_colmem = tmp.colptr(col);
       
-      arrayops::copy( tmp_colmem, B.colptr(col), B.n_rows );
+      arrayops::copy( tmp_colmem, B.colptr(col), B_n_rows );
       
-      for(uword row=B.n_rows; row<A.n_cols; ++row)
+      for(uword row=B_n_rows; row<A_n_cols; ++row)
         {
         tmp_colmem[row] = eT(0);
         }
@@ -2692,26 +2700,15 @@ auxlib::solve_ud(Mat<eT>& out, Mat<eT>& A, const Mat<eT>& B)
     
     podarray<eT> work( static_cast<uword>(lwork) );
     
-    arma_extra_debug_print("lapack::gels()");
-    
     // NOTE: the dgels() function in the lapack library supplied by ATLAS 3.6 seems to have problems
-    
-    lapack::gels<eT>
-      (
-      &trans, &m, &n, &nrhs,
-      A.memptr(), &lda,
-      tmp.memptr(), &ldb,
-      work.memptr(), &lwork,
-      &info
-      );
+    arma_extra_debug_print("lapack::gels()");
+    lapack::gels<eT>( &trans, &m, &n, &nrhs, A.memptr(), &lda, tmp.memptr(), &ldb, work.memptr(), &lwork, &info );
     
     arma_extra_debug_print("lapack::gels() -- finished");
     
-    out.set_size(A.n_cols, B.n_cols);
-    
-    for(uword col=0; col<B.n_cols; ++col)
+    for(uword col=0; col<B_n_cols; ++col)
       {
-      arrayops::copy( out.colptr(col), tmp.colptr(col), A.n_cols );
+      arrayops::copy( out.colptr(col), tmp.colptr(col), A_n_cols );
       }
     
     return (info == 0);
@@ -2797,21 +2794,19 @@ auxlib::schur_dec(Mat<eT>& Z, Mat<eT>& T, const Mat<eT>& A)
     
     const uword A_n_rows = A.n_rows;
     
+    Z.set_size(A_n_rows, A_n_rows);
+    T = A;
+    
     char    jobvs    = 'V';                // get Schur vectors (Z)
     char     sort    = 'N';                // do not sort eigenvalues/vectors
     blas_int* select = 0;                  // pointer to sorting function
     blas_int    n    = blas_int(A_n_rows);
     blas_int sdim    = 0;                  // output for sorting
-    
-    blas_int lwork = 3 * n;                // workspace must be at least 3 * n (if set to -1, optimal size is output in work(0) and nothing else is done
+    blas_int lwork   = 2*((std::max)(blas_int(1), 3*n));
+    blas_int info    = 0;
     
     podarray<eT>       work( static_cast<uword>(lwork) );
     podarray<blas_int> bwork(A_n_rows);
-    
-    blas_int info = 0;
-    
-    Z.set_size(A_n_rows, A_n_rows);
-    T = A;
     
     podarray<eT> wr(A_n_rows);             // output for eigenvalues
     podarray<eT> wi(A_n_rows);             // output for eigenvalues
@@ -2856,21 +2851,19 @@ auxlib::schur_dec(Mat<std::complex<cT> >& Z, Mat<std::complex<cT> >& T, const Ma
     
     const uword A_n_rows = A.n_rows;
     
+    Z.set_size(A_n_rows, A_n_rows);
+    T = A;
+    
     char        jobvs = 'V';                // get Schur vectors (Z)
     char         sort = 'N';                // do not sort eigenvalues/vectors
     blas_int*  select = 0;                  // pointer to sorting function
     blas_int        n = blas_int(A_n_rows);
     blas_int     sdim = 0;                  // output for sorting
-    
-    blas_int lwork = 3 * n;                 // workspace must be at least 3 * n (if set to -1, optimal size is output in work(0) and nothing else is done
+    blas_int lwork    = 2*((std::max)(blas_int(1), 2*n));
+    blas_int info     = 0;
     
     podarray<eT>       work( static_cast<uword>(lwork) );
     podarray<blas_int> bwork(A_n_rows);
-    
-    blas_int info = 0;
-    
-    Z.set_size(A_n_rows, A_n_rows);
-    T = A;
     
     podarray<eT>     w(A_n_rows);           // output for eigenvalues
     podarray<cT> rwork(A_n_rows);
