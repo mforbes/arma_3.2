@@ -125,16 +125,16 @@ class unwrap< subview_col<eT> >
   public:
   
   inline unwrap(const subview_col<eT>& A)
-    : ref( A )
-    , M  ( const_cast<eT*>( A.colptr(0) ), A.n_rows, 1, false, false )
+    : M  ( const_cast<eT*>( A.colptr(0) ), A.n_rows, 1, false, false )
+    //, ref( A )
     {
     arma_extra_debug_sigprint();
     }
   
-  // prevents the compiler from potentially deleting the subview object before we're done with it
-  arma_aligned const subview_col<eT>& ref;
+  const Mat<eT> M;
   
-  arma_aligned const Mat<eT> M;
+  //// prevents the compiler from potentially deleting the subview object before we're done with it
+  //const subview_col<eT>& ref;
   };
 
 
@@ -152,6 +152,7 @@ class unwrap< mtGlue<out_eT, T1, T2, glue_type> >
   
   const Mat<out_eT> M;
   };
+
 
 
 template<typename out_eT, typename T1, typename op_type>
@@ -292,16 +293,16 @@ class unwrap_check< subview_col<eT> >
   
   inline
   unwrap_check(const subview_col<eT>& A, const Mat<eT>& B)
-    : ref( A )
-    , M  ( const_cast<eT*>( A.colptr(0) ), A.n_rows, 1, (&(A.m) == &B), false )
+    : M  ( const_cast<eT*>( A.colptr(0) ), A.n_rows, 1, (&(A.m) == &B), false )
+    //, ref( A )
     {
     arma_extra_debug_sigprint();
     }
   
-  // prevents the compiler from potentially deleting the subview object before we're done with it
-  arma_aligned const subview_col<eT>& ref;
+  const Mat<eT> M;
   
-  arma_aligned const Mat<eT> M;
+  //// prevents the compiler from potentially deleting the subview object before we're done with it
+  //const subview_col<eT>& ref;
   };
 
 
@@ -565,8 +566,8 @@ class partial_unwrap< subview_col<eT> >
   
   inline
   partial_unwrap(const subview_col<eT>& A)
-    : ref( A )
-    , M  ( const_cast<eT*>( A.colptr(0) ), A.n_rows, 1, false, false )
+    : M  ( const_cast<eT*>( A.colptr(0) ), A.n_rows, 1, false, false )
+    //, ref( A )
     {
     arma_extra_debug_sigprint();
     }
@@ -576,10 +577,10 @@ class partial_unwrap< subview_col<eT> >
   static const bool do_trans = false;
   static const bool do_times = false;
   
-  // prevents the compiler from potentially deleting the subview object before we're done with it
-  arma_aligned const subview_col<eT>& ref;
+  const Mat<eT> M;
   
-  arma_aligned const Mat<eT> M;
+  //// prevents the compiler from potentially deleting the subview object before we're done with it
+  //const subview_col<eT>& ref;
   };
 
 
@@ -720,8 +721,8 @@ class partial_unwrap< Op< subview_col<eT>, op_htrans> >
   
   inline
   partial_unwrap(const Op< subview_col<eT>, op_htrans>& A)
-    : ref( A )
-    , M  ( const_cast<eT*>( A.m.colptr(0) ), A.m.n_rows, 1, false, false )
+    : M  ( const_cast<eT*>( A.m.colptr(0) ), A.m.n_rows, 1, false, false )
+    //, ref( A )
     {
     arma_extra_debug_sigprint();
     }
@@ -731,10 +732,10 @@ class partial_unwrap< Op< subview_col<eT>, op_htrans> >
   static const bool do_trans = true;
   static const bool do_times = false;
   
-  // prevents the compiler from potentially deleting the subview object before we're done with it
-  arma_aligned const Op< subview_col<eT>, op_htrans>& ref;
+  const Mat<eT> M;
   
-  arma_aligned const Mat<eT> M;
+  //// prevents the compiler from potentially deleting the subview object before we're done with it
+  //const Op< subview_col<eT>, op_htrans>& ref;
   };
 
 
@@ -885,9 +886,9 @@ class partial_unwrap< Op< subview_col<eT>, op_htrans2> >
   
   inline
   partial_unwrap(const Op< subview_col<eT>, op_htrans2>& A)
-    : ref( A     )
-    , val( A.aux )
+    : val( A.aux )
     , M  ( const_cast<eT*>( A.m.colptr(0) ), A.m.n_rows, 1, false, false )
+    //, ref( A )
     {
     arma_extra_debug_sigprint();
     }
@@ -897,11 +898,11 @@ class partial_unwrap< Op< subview_col<eT>, op_htrans2> >
   static const bool do_trans = true;
   static const bool do_times = true;
   
-  // prevents the compiler from potentially deleting the subview object before we're done with it
-  arma_aligned const Op< subview_col<eT>, op_htrans2>& ref;
-  
-  arma_aligned const eT      val;
-  arma_aligned const Mat<eT> M;
+  const eT      val;
+  const Mat<eT> M;
+
+  //// prevents the compiler from potentially deleting the subview object before we're done with it
+  //const Op< subview_col<eT>, op_htrans2>& ref;
   };
 
 
@@ -1235,8 +1236,8 @@ class partial_unwrap_check< subview_col<eT> >
   
   arma_hot inline
   partial_unwrap_check(const subview_col<eT>& A, const Mat<eT>& B)
-    : ref( A )
-    , M  ( const_cast<eT*>( A.colptr(0) ), A.n_rows, 1, (&(A.m) == &B), false )
+    : M  ( const_cast<eT*>( A.colptr(0) ), A.n_rows, 1, (&(A.m) == &B), false )
+    //, ref( A )
     {
     arma_extra_debug_sigprint();
     }
@@ -1246,10 +1247,10 @@ class partial_unwrap_check< subview_col<eT> >
   static const bool do_trans = false;
   static const bool do_times = false;
   
-  // prevents the compiler from potentially deleting the subview object before we're done with it
-  arma_aligned const subview_col<eT>& ref;
-  
-  arma_aligned const Mat<eT> M;
+  const Mat<eT> M;
+
+  //// prevents the compiler from potentially deleting the subview object before we're done with it
+  //const subview_col<eT>& ref;
   };
 
 
@@ -1435,8 +1436,8 @@ class partial_unwrap_check< Op< subview_col<eT>, op_htrans> >
   
   arma_hot inline
   partial_unwrap_check(const Op< subview_col<eT>, op_htrans>& A, const Mat<eT>& B)
-    : ref( A )
-    , M  ( const_cast<eT*>( A.m.colptr(0) ), A.m.n_rows, 1, (&(A.m.m) == &B), false )
+    : M  ( const_cast<eT*>( A.m.colptr(0) ), A.m.n_rows, 1, (&(A.m.m) == &B), false )
+    //, ref( A )
     {
     arma_extra_debug_sigprint();
     }
@@ -1446,10 +1447,10 @@ class partial_unwrap_check< Op< subview_col<eT>, op_htrans> >
   static const bool do_trans = true;
   static const bool do_times = false;
   
-  // prevents the compiler from potentially deleting the subview object before we're done with it
-  arma_aligned const Op< subview_col<eT>, op_htrans>& ref;
+  const Mat<eT> M;
   
-  arma_aligned const Mat<eT> M;
+  //// prevents the compiler from potentially deleting the subview object before we're done with it
+  //const Op< subview_col<eT>, op_htrans>& ref;
   };
 
 
@@ -1646,9 +1647,9 @@ class partial_unwrap_check< Op< subview_col<eT>, op_htrans2> >
   
   arma_hot inline
   partial_unwrap_check(const Op< subview_col<eT>, op_htrans2>& A, const Mat<eT>& B)
-    : ref( A     )
-    , val( A.aux )
+    : val( A.aux )
     , M  ( const_cast<eT*>( A.m.colptr(0) ), A.m.n_rows, 1, (&(A.m.m) == &B), false )
+    //, ref( A )
     {
     arma_extra_debug_sigprint();
     }
@@ -1658,11 +1659,11 @@ class partial_unwrap_check< Op< subview_col<eT>, op_htrans2> >
   static const bool do_trans = true;
   static const bool do_times = true;
   
-  // prevents the compiler from potentially deleting the subview object before we're done with it
-  arma_aligned const Op< subview_col<eT>, op_htrans2>& ref;
-  
-  arma_aligned const eT      val;
-  arma_aligned const Mat<eT> M;
+  const eT      val;
+  const Mat<eT> M;
+
+  //// prevents the compiler from potentially deleting the subview object before we're done with it
+  //const Op< subview_col<eT>, op_htrans2>& ref;
   };
 
 
@@ -1856,9 +1857,9 @@ class partial_unwrap_check< eOp<subview_col<eT>, eop_scalar_times> >
   
   arma_hot inline
   partial_unwrap_check(const eOp<subview_col<eT>,eop_scalar_times>& A, const Mat<eT>& B)
-    : ref( A     )
-    , val( A.aux )
+    : val( A.aux )
     , M  ( const_cast<eT*>( A.P.Q.colptr(0) ), A.P.Q.n_rows, 1, (&(A.P.Q.m) == &B), false )
+    //, ref( A )
     {
     arma_extra_debug_sigprint();
     }
@@ -1868,11 +1869,11 @@ class partial_unwrap_check< eOp<subview_col<eT>, eop_scalar_times> >
   static const bool do_trans = false;
   static const bool do_times = true;
   
-  // prevents the compiler from potentially deleting the subview object before we're done with it
-  arma_aligned const eOp<subview_col<eT>,eop_scalar_times>& ref;
-  
-  arma_aligned const eT      val;
-  arma_aligned const Mat<eT> M;
+  const eT      val;
+  const Mat<eT> M;
+
+  //// prevents the compiler from potentially deleting the subview object before we're done with it
+  //const eOp<subview_col<eT>,eop_scalar_times>& ref;
   };
 
 
