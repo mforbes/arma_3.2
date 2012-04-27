@@ -2583,15 +2583,18 @@ Mat<eT>::swap_rows(const uword in_row1, const uword in_row2)
   {
   arma_extra_debug_sigprint();
   
+  const uword local_n_rows = n_rows;
+  const uword local_n_cols = n_cols;
+  
   arma_debug_check
     (
-    (in_row1 >= n_rows) || (in_row2 >= n_rows),
+    (in_row1 >= local_n_rows) || (in_row2 >= local_n_rows),
     "Mat::swap_rows(): out of bounds"
     );
   
-  for(uword col=0; col < n_cols; ++col)
+  for(uword col=0; col < local_n_cols; ++col)
     {
-    const uword offset = col*n_rows;
+    const uword offset = col * local_n_rows;
     const uword pos1   = in_row1 + offset;
     const uword pos2   = in_row2 + offset;
     
@@ -2605,24 +2608,43 @@ Mat<eT>::swap_rows(const uword in_row1, const uword in_row2)
 template<typename eT>
 inline
 void
-Mat<eT>::swap_cols(const uword in_col1, const uword in_col2)
+Mat<eT>::swap_cols(const uword in_colA, const uword in_colB)
   {
   arma_extra_debug_sigprint();
   
+  const uword local_n_rows = n_rows;
+  const uword local_n_cols = n_cols;
+  
   arma_debug_check
     (
-    (in_col1 >= n_cols) || (in_col2 >= n_cols),
+    (in_colA >= local_n_cols) || (in_colB >= local_n_cols),
     "Mat::swap_cols(): out of bounds"
     );
   
   if(n_elem > 0)
     {
-    eT* ptr1 = colptr(in_col1);
-    eT* ptr2 = colptr(in_col2);
+    eT* ptrA = colptr(in_colA);
+    eT* ptrB = colptr(in_colB);
     
-    for(uword row=0; row < n_rows; ++row)
+    eT tmp_i;
+    eT tmp_j;
+    
+    uword i,j;
+    for(i=0, j=1; j < local_n_rows; i+=2, j+=2)
       {
-      std::swap( ptr1[row], ptr2[row] );
+      tmp_i = ptrA[i];
+      tmp_j = ptrA[j];
+      
+      ptrA[i] = ptrB[i];
+      ptrA[j] = ptrB[j];
+      
+      ptrB[i] = tmp_i;
+      ptrB[j] = tmp_j;
+      }
+    
+    if(i < local_n_rows)
+      {
+      std::swap( ptrA[i], ptrB[i] );
       }
     }
   }
