@@ -30,27 +30,32 @@ op_diagmat::apply(Mat<typename T1::elem_type>& out, const Op<T1, op_diagmat>& X)
   const uword n_rows = P.get_n_rows();
   const uword n_cols = P.get_n_cols();
   
+  const bool P_is_vec = (n_rows == 1) || (n_cols == 1);
+  
+  
   if(P.is_alias(out) == false)
     {
-    if( (n_rows == 1) || (n_cols == 1) )    // generate a diagonal matrix out of a vector
+    if(P_is_vec)    // generate a diagonal matrix out of a vector
       {
-      if(n_rows == 1)
+      const uword N = (n_rows == 1) ? n_cols : n_rows;
+      
+      out.zeros(N, N);
+      
+      if(Proxy<T1>::prefer_at_accessor == false)
         {
-        out.zeros(n_cols, n_cols);
+        typename Proxy<T1>::ea_type P_ea = P.get_ea();
         
-        for(uword i=0; i < n_cols; ++i)
-          {
-          out.at(i,i) = (Proxy<T1>::prefer_at_accessor == false) ? P[i] : P.at(0,i);
-          }
+        for(uword i=0; i < N; ++i) { out.at(i,i) = P_ea[i]; }
         }
       else
-      if(n_cols == 1)
         {
-        out.zeros(n_rows, n_rows);
-        
-        for(uword i=0; i < n_rows; ++i)
+        if(n_rows == 1)
           {
-          out.at(i,i) = (Proxy<T1>::prefer_at_accessor == false) ? P[i] : P.at(i,0);
+          for(uword i=0; i < N; ++i) { out.at(i,i) = P.at(0,i); }
+          }
+        else
+          {
+          for(uword i=0; i < N; ++i) { out.at(i,i) = P.at(i,0); }
           }
         }
       }
@@ -60,53 +65,39 @@ op_diagmat::apply(Mat<typename T1::elem_type>& out, const Op<T1, op_diagmat>& X)
       
       out.zeros(n_rows, n_rows);
       
-      for(uword i=0; i < n_rows; ++i)
-        {
-        out.at(i,i) = P.at(i,i);
-        }
+      for(uword i=0; i < n_rows; ++i) { out.at(i,i) = P.at(i,i); }
       }
     }
   else   // we have aliasing
     {
-    if( (n_rows == 1) || (n_cols == 1) )   // generate a diagonal matrix out of a vector
+    if(P_is_vec)   // generate a diagonal matrix out of a vector
       {
-      podarray<eT> tmp;
+      const uword N = (n_rows == 1) ? n_cols : n_rows;
       
-      eT* tmp_mem;
+      podarray<eT> tmp(N);
+      eT* tmp_mem = tmp.memptr();
       
-      if(n_rows == 1)
+      if(Proxy<T1>::prefer_at_accessor == false)
         {
-        tmp.set_size(n_cols);
+        typename Proxy<T1>::ea_type P_ea = P.get_ea();
         
-        tmp_mem = tmp.memptr();
-        
-        for(uword i=0; i < n_cols; ++i)
-          {
-          tmp_mem[i] = (Proxy<T1>::prefer_at_accessor == false) ? P[i] : P.at(0,i);
-          }
+        for(uword i=0; i < N; ++i) { tmp_mem[i] = P_ea[i]; }
         }
       else
-      if(n_cols == 1)
         {
-        tmp.set_size(n_rows);
-        
-        tmp_mem = tmp.memptr();
-        
-        for(uword i=0; i < n_rows; ++i)
+        if(n_rows == 1)
           {
-          tmp_mem[i] = (Proxy<T1>::prefer_at_accessor == false) ? P[i] : P.at(i,0);
+          for(uword i=0; i < N; ++i) { tmp_mem[i] = P.at(0,i); }
+          }
+        else
+          {
+          for(uword i=0; i < N; ++i) { tmp_mem[i] = P.at(i,0); }
           }
         }
       
+      out.zeros(N, N);
       
-      const uword n_elem = tmp.n_elem;
-      
-      out.zeros(n_elem, n_elem);
-      
-      for(uword i=0; i < n_elem; ++i)
-        {
-        out.at(i,i) = tmp_mem[i];
-        }
+      for(uword i=0; i < N; ++i) { out.at(i,i) = tmp_mem[i]; }
       }
     else   // generate a diagonal matrix out of a matrix
       {
