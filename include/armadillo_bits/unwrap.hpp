@@ -134,6 +134,11 @@ class unwrap< Col<eT> >
 
 
 
+// TODO: more efficient unwrap for Op<T1, op_htrans> and Op<T1, op_strans> when T1 is a vector expression
+
+
+
+
 template<typename eT>
 class unwrap< subview_col<eT> >
   {
