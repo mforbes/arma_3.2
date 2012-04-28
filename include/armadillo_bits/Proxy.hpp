@@ -292,6 +292,131 @@ class Proxy< Op<T1, op_type> >
 
 
 
+template<typename T1>
+struct Proxy_htrans_default
+  {
+  inline Proxy_htrans_default(const T1&) {}
+  };
+
+
+
+template<typename T1>
+struct Proxy_htrans_vector
+  {
+  inline Proxy_htrans_vector(const T1&) {}
+  };
+
+
+
+template<typename T1>
+struct Proxy_htrans_default< Op<T1, op_htrans> >
+  {
+  typedef typename T1::elem_type eT;
+  
+  arma_aligned const Mat<eT> Q;
+  
+  arma_hot
+  inline Proxy_htrans_default(const Op<T1, op_htrans>& A)
+    : Q(A)
+    {
+    arma_extra_debug_sigprint();
+    }
+  
+  template<typename eT2>
+  arma_inline bool is_alias(const Mat<eT2>&) const { return false; }
+  };
+
+
+
+template<typename T1>
+struct Proxy_htrans_vector< Op<T1, op_htrans> >
+  {
+  typedef typename T1::elem_type eT;
+  
+  arma_aligned const unwrap<T1> U; // avoid copy if T1 is a Row, Col or subview_col
+  arma_aligned const Mat<eT>    Q;
+  
+  inline Proxy_htrans_vector(const Op<T1, op_htrans>& A)
+    : U(A.m)
+    , Q(const_cast<eT*>(U.M.memptr()), U.M.n_cols, U.M.n_rows, false, false)
+    {
+    arma_extra_debug_sigprint();
+    }
+  
+  template<typename eT2>
+  arma_inline bool is_alias(const Mat<eT2>& X) const { return U.is_alias(X); }
+  };
+
+
+
+template<typename T1, bool condition>
+struct Proxy_htrans_redirect {};
+
+template<typename T1>
+struct Proxy_htrans_redirect<T1, false> { typedef Proxy_htrans_default<T1> result; };
+
+template<typename T1>
+struct Proxy_htrans_redirect<T1, true>  { typedef Proxy_htrans_vector<T1>  result; };
+
+
+
+template<typename T1>
+class Proxy< Op<T1, op_htrans> >
+  : public
+    Proxy_htrans_redirect
+      <
+      Op<T1, op_htrans>,
+      ((is_complex<typename T1::elem_type>::value == false) && ((Op<T1, op_htrans>::is_row) || (Op<T1, op_htrans>::is_col)) )
+      >::result
+  {
+  public:
+  
+  typedef typename T1::elem_type                   elem_type;
+  typedef typename get_pod_type<elem_type>::result pod_type;
+  typedef Mat<elem_type>                           stored_type;
+  typedef const elem_type*                         ea_type;
+  
+  static const bool prefer_at_accessor = false;
+  static const bool has_subview        = false;
+  static const bool is_fixed           = false;
+  
+  // NOTE: the Op class takes care of swapping row and col for op_htrans
+  static const bool is_row = Op<T1, op_htrans>::is_row;
+  static const bool is_col = Op<T1, op_htrans>::is_col;
+  
+  typedef
+  typename
+  Proxy_htrans_redirect
+    <
+    Op<T1, op_htrans>,
+    ((is_complex<typename T1::elem_type>::value == false) && ((Op<T1, op_htrans>::is_row) || (Op<T1, op_htrans>::is_col)) )
+    >::result
+  Proxy_htrans;
+  
+  arma_aligned const Mat<elem_type>& Q;
+
+  inline explicit Proxy(const Op<T1, op_htrans>& A)
+    : Proxy_htrans(A)
+    , Q( Proxy_htrans::Q )
+    {
+    arma_extra_debug_sigprint();
+    }
+  
+  arma_inline uword get_n_rows() const { return is_row ? 1 : Q.n_rows; }
+  arma_inline uword get_n_cols() const { return is_col ? 1 : Q.n_cols; }
+  arma_inline uword get_n_elem() const { return Q.n_elem;              }
+  
+  arma_inline elem_type operator[] (const uword i)                    const { return Q[i];           }
+  arma_inline elem_type at         (const uword row, const uword col) const { return Q.at(row, col); }
+  
+  arma_inline ea_type get_ea() const { return Q.memptr(); }
+  
+  template<typename eT2>
+  arma_inline bool is_alias(const Mat<eT2>& X) const { return Proxy_htrans::is_alias(X); }
+  };
+
+
+
 template<typename T1, typename T2, typename glue_type>
 class Proxy< Glue<T1, T2, glue_type> >
   {

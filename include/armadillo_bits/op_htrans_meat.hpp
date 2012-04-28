@@ -1,5 +1,5 @@
-// Copyright (C) 2008-2011 NICTA (www.nicta.com.au)
-// Copyright (C) 2008-2011 Conrad Sanderson
+// Copyright (C) 2008-2012 NICTA (www.nicta.com.au)
+// Copyright (C) 2008-2012 Conrad Sanderson
 // 
 // This file is part of the Armadillo C++ library.
 // It is provided without any warranty of fitness
@@ -110,7 +110,7 @@ op_htrans::apply(Mat<eT>& out, const Mat<eT>& A, const typename arma_cx_only<eT>
     else
       {
       Mat<eT> tmp;
-      op_strans::apply_noalias(tmp, A);
+      op_htrans::apply_noalias(tmp, A);
       
       out.steal_mem(tmp);
       }
@@ -156,6 +156,41 @@ op_htrans::apply(Mat<typename T1::elem_type>& out, const Op< Op<T1, op_trimat>, 
 
 
 
+//
+// op_htrans2
+
+
+
+template<typename eT>
+arma_inline
+void
+op_htrans2::apply(Mat<eT>& out, const Mat<eT>& A, const eT val, const typename arma_not_cx<eT>::result* junk)
+  {
+  arma_extra_debug_sigprint();
+  arma_ignore(junk);
+  
+  op_strans2::apply(out, A, val);
+  }
+
+
+
+template<typename eT>
+inline
+void
+op_htrans2::apply(Mat<eT>& out, const Mat<eT>& A, const eT val, const typename arma_cx_only<eT>::result* junk)
+  {
+  arma_extra_debug_sigprint();
+  arma_ignore(junk);
+  
+  // TODO: replace with specialised implementation
+  
+  op_htrans::apply(out, A);
+  
+  arrayops::inplace_mul( out.memptr(), val, out.n_elem );
+  }
+
+
+
 template<typename T1>
 inline
 void
@@ -167,9 +202,7 @@ op_htrans2::apply(Mat<typename T1::elem_type>& out, const Op<T1,op_htrans2>& in)
   
   const unwrap<T1> tmp(in.m);
   
-  op_htrans::apply(out, tmp.M);
-  
-  arrayops::inplace_mul( out.memptr(), in.aux, out.n_elem );
+  op_htrans2::apply(out, tmp.M, in.aux);
   }
 
 

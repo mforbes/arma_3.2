@@ -28,6 +28,9 @@ struct unwrap_default
     }
   
   const Mat<eT> M;
+  
+  template<typename eT2>
+  arma_inline bool is_alias(const Mat<eT2>&) const { return false; }
   };
 
 
@@ -44,6 +47,9 @@ struct unwrap_Mat_fixed
     }
   
   const Mat<eT>& M;
+  
+  template<typename eT2>
+  arma_inline bool is_alias(const Mat<eT2>& X) const { return (void_ptr(&M) == void_ptr(&X)); }
   };
 
 
@@ -81,8 +87,11 @@ class unwrap< Mat<eT> >
     {
     arma_extra_debug_sigprint();
     }
-
+  
   const Mat<eT>& M;
+  
+  template<typename eT2>
+  arma_inline bool is_alias(const Mat<eT2>& X) const { return (void_ptr(&M) == void_ptr(&X)); }
   };
 
 
@@ -97,8 +106,11 @@ class unwrap< Row<eT> >
     {
     arma_extra_debug_sigprint();
     }
-
+  
   const Row<eT>& M;
+  
+  template<typename eT2>
+  arma_inline bool is_alias(const Mat<eT2>& X) const { return (void_ptr(&M) == void_ptr(&X)); }
   };
 
 
@@ -113,8 +125,11 @@ class unwrap< Col<eT> >
     {
     arma_extra_debug_sigprint();
     }
-
+  
   const Col<eT>& M;
+  
+  template<typename eT2>
+  arma_inline bool is_alias(const Mat<eT2>& X) const { return (void_ptr(&M) == void_ptr(&X)); }
   };
 
 
@@ -126,15 +141,17 @@ class unwrap< subview_col<eT> >
   
   inline unwrap(const subview_col<eT>& A)
     : M  ( const_cast<eT*>( A.colptr(0) ), A.n_rows, 1, false, false )
-    //, ref( A )
+    , ref( A )
     {
     arma_extra_debug_sigprint();
     }
   
   const Mat<eT> M;
   
-  //// prevents the compiler from potentially deleting the subview object before we're done with it
-  //const subview_col<eT>& ref;
+  const subview_col<eT>& ref;
+  
+  template<typename eT2>
+  arma_inline bool is_alias(const Mat<eT2>& X) const { return (void_ptr(&(ref.m)) == void_ptr(&X)); }
   };
 
 
@@ -151,6 +168,9 @@ class unwrap< mtGlue<out_eT, T1, T2, glue_type> >
     }
   
   const Mat<out_eT> M;
+  
+  template<typename eT2>
+  arma_inline bool is_alias(const Mat<eT2>&) const { return false; }
   };
 
 
@@ -167,6 +187,9 @@ class unwrap< mtOp<out_eT, T1, op_type> >
     }
   
   const Mat<out_eT> M;
+  
+  template<typename eT2>
+  arma_inline bool is_alias(const Mat<eT2>&) const { return false; }
   };
 
 

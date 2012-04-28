@@ -1,5 +1,5 @@
-// Copyright (C) 2008-2011 NICTA (www.nicta.com.au)
-// Copyright (C) 2008-2011 Conrad Sanderson
+// Copyright (C) 2008-2012 NICTA (www.nicta.com.au)
+// Copyright (C) 2008-2012 Conrad Sanderson
 // 
 // This file is part of the Armadillo C++ library.
 // It is provided without any warranty of fitness
@@ -44,6 +44,30 @@ class op_strans
   
   // inline static void apply_inplace(mat &out);
   
+  };
+
+
+
+class op_strans2
+  {
+  public:
+  
+  template<const bool do_flip, const uword row, const uword col>
+  struct pos
+    {
+    static const uword n2 = (do_flip == false) ? (row + col*2) : (col + row*2);
+    static const uword n3 = (do_flip == false) ? (row + col*3) : (col + row*3);
+    static const uword n4 = (do_flip == false) ? (row + col*4) : (col + row*4);
+    };
+  
+  template<typename eT>
+  inline static void apply_noalias_tinysq(Mat<eT>& out, const Mat<eT>& A, const eT val);
+  
+  template<typename eT>
+  inline static void apply_noalias(Mat<eT>& out, const Mat<eT>& A, const eT val);
+  
+  template<typename eT>
+  inline static void apply(Mat<eT>& out, const Mat<eT>& A, const eT val);
   };
 
 
