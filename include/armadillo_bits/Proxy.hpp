@@ -417,6 +417,10 @@ class Proxy< Op<T1, op_htrans> >
 
 
 
+// TODO: Proxy< Op<T1, op_strans> >
+
+
+
 template<typename T1, typename T2, typename glue_type>
 class Proxy< Glue<T1, T2, glue_type> >
   {
