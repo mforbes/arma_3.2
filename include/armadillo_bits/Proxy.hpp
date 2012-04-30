@@ -293,23 +293,7 @@ class Proxy< Op<T1, op_type> >
 
 
 template<typename T1>
-struct Proxy_htrans_default
-  {
-  inline Proxy_htrans_default(const T1&) {}
-  };
-
-
-
-template<typename T1>
-struct Proxy_htrans_vector
-  {
-  inline Proxy_htrans_vector(const T1&) {}
-  };
-
-
-
-template<typename T1>
-struct Proxy_htrans_default< Op<T1, op_htrans> >
+struct Proxy_xtrans_default
   {
   typedef typename T1::elem_type eT;
   
@@ -317,11 +301,11 @@ struct Proxy_htrans_default< Op<T1, op_htrans> >
   static const bool has_subview        = false;
   static const bool is_fixed           = false;
   
-  arma_aligned const Mat<eT> R;
+  arma_aligned const Mat<eT> Q;
   
   arma_hot
-  inline Proxy_htrans_default(const Op<T1, op_htrans>& A)
-    : R(A)
+  inline Proxy_xtrans_default(const T1& A)
+    : Q(A)
     {
     arma_extra_debug_sigprint();
     }
@@ -333,7 +317,15 @@ struct Proxy_htrans_default< Op<T1, op_htrans> >
 
 
 template<typename T1>
-struct Proxy_htrans_vector< Op<T1, op_htrans> >
+struct Proxy_xtrans_vector
+  {
+  inline Proxy_xtrans_vector(const T1&) {}
+  };
+
+
+
+template<typename T1>
+struct Proxy_xtrans_vector< Op<T1, op_htrans> >
   {
   typedef typename T1::elem_type eT;
   
@@ -342,11 +334,36 @@ struct Proxy_htrans_vector< Op<T1, op_htrans> >
   static const bool is_fixed           = false;
   
   arma_aligned const unwrap<T1> U; // avoid copy if T1 is a Row, Col or subview_col
-  arma_aligned const Mat<eT>    R;
+  arma_aligned const Mat<eT>    Q;
   
-  inline Proxy_htrans_vector(const Op<T1, op_htrans>& A)
+  inline Proxy_xtrans_vector(const Op<T1, op_htrans>& A)
     : U(A.m)
-    , R(const_cast<eT*>(U.M.memptr()), U.M.n_cols, U.M.n_rows, false, false)
+    , Q(const_cast<eT*>(U.M.memptr()), U.M.n_cols, U.M.n_rows, false, false)
+    {
+    arma_extra_debug_sigprint();
+    }
+  
+  template<typename eT2>
+  arma_inline bool is_alias(const Mat<eT2>& X) const { return U.is_alias(X); }
+  };
+
+
+
+template<typename T1>
+struct Proxy_xtrans_vector< Op<T1, op_strans> >
+  {
+  typedef typename T1::elem_type eT;
+  
+  static const bool prefer_at_accessor = false;
+  static const bool has_subview        = unwrap<T1>::has_subview;
+  static const bool is_fixed           = false;
+  
+  arma_aligned const unwrap<T1> U; // avoid copy if T1 is a Row, Col or subview_col
+  arma_aligned const Mat<eT>    Q;
+  
+  inline Proxy_xtrans_vector(const Op<T1, op_strans>& A)
+    : U(A.m)
+    , Q(const_cast<eT*>(U.M.memptr()), U.M.n_cols, U.M.n_rows, false, false)
     {
     arma_extra_debug_sigprint();
     }
@@ -358,20 +375,20 @@ struct Proxy_htrans_vector< Op<T1, op_htrans> >
 
 
 template<typename T1, bool condition>
-struct Proxy_htrans_redirect {};
+struct Proxy_xtrans_redirect {};
 
 template<typename T1>
-struct Proxy_htrans_redirect<T1, false> { typedef Proxy_htrans_default<T1> result; };
+struct Proxy_xtrans_redirect<T1, false> { typedef Proxy_xtrans_default<T1> result; };
 
 template<typename T1>
-struct Proxy_htrans_redirect<T1, true>  { typedef Proxy_htrans_vector<T1>  result; };
+struct Proxy_xtrans_redirect<T1, true>  { typedef Proxy_xtrans_vector<T1>  result; };
 
 
 
 template<typename T1>
 class Proxy< Op<T1, op_htrans> >
   : public
-    Proxy_htrans_redirect
+    Proxy_xtrans_redirect
       <
       Op<T1, op_htrans>,
       ((is_complex<typename T1::elem_type>::value == false) && ((Op<T1, op_htrans>::is_row) || (Op<T1, op_htrans>::is_col)) )
@@ -381,31 +398,30 @@ class Proxy< Op<T1, op_htrans> >
   
   typedef
   typename
-  Proxy_htrans_redirect
+  Proxy_xtrans_redirect
     <
     Op<T1, op_htrans>,
     ((is_complex<typename T1::elem_type>::value == false) && ((Op<T1, op_htrans>::is_row) || (Op<T1, op_htrans>::is_col)) )
     >::result
-  Proxy_htrans;
+  Proxy_xtrans;
   
   typedef typename T1::elem_type                   elem_type;
   typedef typename get_pod_type<elem_type>::result pod_type;
   typedef Mat<elem_type>                           stored_type;
   typedef const elem_type*                         ea_type;
   
-  static const bool prefer_at_accessor = Proxy_htrans::prefer_at_accessor;
-  static const bool has_subview        = Proxy_htrans::has_subview;
-  static const bool is_fixed           = Proxy_htrans::is_fixed;
+  static const bool prefer_at_accessor = Proxy_xtrans::prefer_at_accessor;
+  static const bool has_subview        = Proxy_xtrans::has_subview;
+  static const bool is_fixed           = Proxy_xtrans::is_fixed;
   
   // NOTE: the Op class takes care of swapping row and col for op_htrans
   static const bool is_row = Op<T1, op_htrans>::is_row;
   static const bool is_col = Op<T1, op_htrans>::is_col;
   
-  arma_aligned const Mat<elem_type>& Q;
-
+  using Proxy_xtrans::Q;
+  
   inline explicit Proxy(const Op<T1, op_htrans>& A)
-    : Proxy_htrans(A)
-    , Q( Proxy_htrans::R )
+    : Proxy_xtrans(A)
     {
     arma_extra_debug_sigprint();
     }
@@ -420,12 +436,64 @@ class Proxy< Op<T1, op_htrans> >
   arma_inline ea_type get_ea() const { return Q.memptr(); }
   
   template<typename eT2>
-  arma_inline bool is_alias(const Mat<eT2>& X) const { return Proxy_htrans::is_alias(X); }
+  arma_inline bool is_alias(const Mat<eT2>& X) const { return Proxy_xtrans::is_alias(X); }
   };
 
 
 
-// TODO: Proxy< Op<T1, op_strans> >
+template<typename T1>
+class Proxy< Op<T1, op_strans> >
+  : public
+    Proxy_xtrans_redirect
+      <
+      Op<T1, op_strans>,
+      ( (Op<T1, op_strans>::is_row) || (Op<T1, op_strans>::is_col) )
+      >::result
+  {
+  public:
+  
+  typedef
+  typename
+  Proxy_xtrans_redirect
+    <
+    Op<T1, op_strans>,
+    ( (Op<T1, op_strans>::is_row) || (Op<T1, op_strans>::is_col) )
+    >::result
+  Proxy_xtrans;
+  
+  typedef typename T1::elem_type                   elem_type;
+  typedef typename get_pod_type<elem_type>::result pod_type;
+  typedef Mat<elem_type>                           stored_type;
+  typedef const elem_type*                         ea_type;
+  
+  static const bool prefer_at_accessor = Proxy_xtrans::prefer_at_accessor;
+  static const bool has_subview        = Proxy_xtrans::has_subview;
+  static const bool is_fixed           = Proxy_xtrans::is_fixed;
+  
+  // NOTE: the Op class takes care of swapping row and col for op_strans
+  static const bool is_row = Op<T1, op_strans>::is_row;
+  static const bool is_col = Op<T1, op_strans>::is_col;
+  
+  using Proxy_xtrans::Q;
+  
+  inline explicit Proxy(const Op<T1, op_strans>& A)
+    : Proxy_xtrans(A)
+    {
+    arma_extra_debug_sigprint();
+    }
+  
+  arma_inline uword get_n_rows() const { return is_row ? 1 : Q.n_rows; }
+  arma_inline uword get_n_cols() const { return is_col ? 1 : Q.n_cols; }
+  arma_inline uword get_n_elem() const { return Q.n_elem;              }
+  
+  arma_inline elem_type operator[] (const uword i)                    const { return Q[i];           }
+  arma_inline elem_type at         (const uword row, const uword col) const { return Q.at(row, col); }
+  
+  arma_inline ea_type get_ea() const { return Q.memptr(); }
+  
+  template<typename eT2>
+  arma_inline bool is_alias(const Mat<eT2>& X) const { return Proxy_xtrans::is_alias(X); }
+  };
 
 
 
