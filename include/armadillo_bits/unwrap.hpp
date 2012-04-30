@@ -142,11 +142,6 @@ class unwrap< Col<eT> >
 
 
 
-// TODO: more efficient unwrap for Op<T1, op_htrans> and Op<T1, op_strans> when T1 is a vector expression
-
-
-
-
 template<typename eT>
 class unwrap< subview_col<eT> >
   {
@@ -212,9 +207,166 @@ class unwrap< mtOp<out_eT, T1, op_type> >
 
 
 
+template<typename T1>
+struct unwrap_xtrans_default
+  {
+  typedef typename T1::elem_type eT;
+  
+  inline unwrap_xtrans_default(const T1& A)
+    : M(A)
+    {
+    arma_extra_debug_sigprint();
+    }
+  
+  arma_aligned const Mat<eT> M;
+  
+  template<typename eT2>
+  arma_inline bool is_alias(const Mat<eT2>&) const { return false; }
+  };
+
+
+
+template<typename T1>
+struct unwrap_xtrans_vector
+  {
+  inline unwrap_xtrans_vector(const T1&) {}
+  };
+
+
+
+template<typename T1>
+struct unwrap_xtrans_vector< Op<T1, op_htrans> >
+  {
+  typedef typename T1::elem_type eT;
+  
+  static const bool has_subview = unwrap<T1>::has_subview;
+  
+  inline unwrap_xtrans_vector(const Op<T1, op_htrans>& A)
+    : U(A.m)
+    , M(const_cast<eT*>(U.M.memptr()), U.M.n_cols, U.M.n_rows, false, false)
+    {
+    arma_extra_debug_sigprint();
+    }
+  
+  arma_aligned const unwrap<T1> U; // avoid copy if T1 is a Row, Col or subview_col
+  arma_aligned const Mat<eT>    M;
+  
+  template<typename eT2>
+  arma_inline bool is_alias(const Mat<eT2>& X) const { return U.is_alias(X); }
+  };
+
+
+
+template<typename T1>
+struct unwrap_xtrans_vector< Op<T1, op_strans> >
+  {
+  typedef typename T1::elem_type eT;
+  
+  static const bool has_subview = unwrap<T1>::has_subview;
+  
+  inline unwrap_xtrans_vector(const Op<T1, op_strans>& A)
+    : U(A.m)
+    , M(const_cast<eT*>(U.M.memptr()), U.M.n_cols, U.M.n_rows, false, false)
+    {
+    arma_extra_debug_sigprint();
+    }
+  
+  arma_aligned const unwrap<T1> U; // avoid copy if T1 is a Row, Col or subview_col
+  arma_aligned const Mat<eT>    M;
+  
+  template<typename eT2>
+  arma_inline bool is_alias(const Mat<eT2>& X) const { return U.is_alias(X); }
+  };
+
+
+
+template<typename T1, bool condition>
+struct unwrap_xtrans_redirect {};
+
+template<typename T1>
+struct unwrap_xtrans_redirect<T1, false> { typedef unwrap_xtrans_default<T1> result; };
+
+template<typename T1>
+struct unwrap_xtrans_redirect<T1, true>  { typedef unwrap_xtrans_vector<T1>  result; };
+
+
+
+template<typename T1>
+class unwrap< Op<T1, op_htrans> >
+  : public
+    unwrap_xtrans_redirect
+      <
+      Op<T1, op_htrans>,
+      ((is_complex<typename T1::elem_type>::value == false) && ((Op<T1, op_htrans>::is_row) || (Op<T1, op_htrans>::is_col)) )
+      >::result
+  {
+  public:
+  
+  typedef
+  typename
+  unwrap_xtrans_redirect
+    <
+    Op<T1, op_htrans>,
+    ((is_complex<typename T1::elem_type>::value == false) && ((Op<T1, op_htrans>::is_row) || (Op<T1, op_htrans>::is_col)) )
+    >::result
+  unwrap_xtrans;
+  
+  static const bool has_subview = unwrap_xtrans::has_subview;
+  
+  inline unwrap(const Op<T1, op_htrans>& A)
+    : unwrap_xtrans(A)
+    {
+    arma_extra_debug_sigprint();
+    }
+  
+  using unwrap_xtrans::M;
+  
+  template<typename eT2>
+  arma_inline bool is_alias(const Mat<eT2>& X) const { return unwrap_xtrans::is_alias(X); }
+  };
+
+
+
+template<typename T1>
+class unwrap< Op<T1, op_strans> >
+  : public
+    unwrap_xtrans_redirect
+      <
+      Op<T1, op_strans>,
+      ( (Op<T1, op_strans>::is_row) || (Op<T1, op_strans>::is_col) )
+      >::result
+  {
+  public:
+  
+  typedef
+  typename
+  unwrap_xtrans_redirect
+    <
+    Op<T1, op_strans>,
+    ( (Op<T1, op_strans>::is_row) || (Op<T1, op_strans>::is_col) )
+    >::result
+  unwrap_xtrans;
+  
+  static const bool has_subview = unwrap_xtrans::has_subview;
+  
+  inline unwrap(const Op<T1, op_strans>& A)
+    : unwrap_xtrans(A)
+    {
+    arma_extra_debug_sigprint();
+    }
+  
+  using unwrap_xtrans::M;
+  
+  template<typename eT2>
+  arma_inline bool is_alias(const Mat<eT2>& X) const { return unwrap_xtrans::is_alias(X); }
+  };
+
+
+
 //
 //
 //
+
 
 
 template<typename T1>
