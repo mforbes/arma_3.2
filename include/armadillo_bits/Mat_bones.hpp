@@ -507,10 +507,14 @@ class Mat : public Base< eT, Mat<eT> >
     inline fixed(const char*        text);
     inline fixed(const std::string& text);
     
-    // TODO: handling of initializer_list ?
-    
     using Mat<eT>::operator=;
     using Mat<eT>::operator();
+    
+    #if defined(ARMA_USE_CXX11)
+    inline                fixed(const std::initializer_list<eT>& list);
+    inline const Mat& operator=(const std::initializer_list<eT>& list);
+    #endif
+    
     
     arma_inline arma_warn_unused eT& operator[] (const uword i);
     arma_inline arma_warn_unused eT  operator[] (const uword i) const;

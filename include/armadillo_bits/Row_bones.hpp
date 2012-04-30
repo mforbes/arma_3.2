@@ -156,6 +156,11 @@ class Row : public Mat<eT>
     
     using Row<eT>::operator();
     
+    #if defined(ARMA_USE_CXX11)
+    inline                fixed(const std::initializer_list<eT>& list);
+    inline const Row& operator=(const std::initializer_list<eT>& list);
+    #endif
+    
     arma_inline arma_warn_unused eT& operator[] (const uword i);
     arma_inline arma_warn_unused eT  operator[] (const uword i) const;
     arma_inline arma_warn_unused eT& at         (const uword i);

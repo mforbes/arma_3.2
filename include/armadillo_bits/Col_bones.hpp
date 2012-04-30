@@ -157,6 +157,11 @@ class Col : public Mat<eT>
     
     using Col<eT>::operator();
     
+    #if defined(ARMA_USE_CXX11)
+    inline                fixed(const std::initializer_list<eT>& list);
+    inline const Col& operator=(const std::initializer_list<eT>& list);
+    #endif
+    
     arma_inline arma_warn_unused eT& operator[] (const uword i);
     arma_inline arma_warn_unused eT  operator[] (const uword i) const;
     arma_inline arma_warn_unused eT& at         (const uword i);
