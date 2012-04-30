@@ -460,27 +460,27 @@ Row<eT>::subvec(const span& col_span) const
 
 
 
-// template<typename eT>
-// arma_inline
-// subview_row<eT>
-// Row<eT>::operator()(const span& col_span)
-//   {
-//   arma_extra_debug_sigprint();
-//   
-//   return subvec(col_span);
-//   }
-// 
-// 
-// 
-// template<typename eT>
-// arma_inline
-// const subview_row<eT>
-// Row<eT>::operator()(const span& col_span) const
-//   {
-//   arma_extra_debug_sigprint();
-//   
-//   return subvec(col_span);
-//   }
+template<typename eT>
+arma_inline
+subview_row<eT>
+Row<eT>::operator()(const span& col_span)
+  {
+  arma_extra_debug_sigprint();
+  
+  return subvec(col_span);
+  }
+
+
+
+template<typename eT>
+arma_inline
+const subview_row<eT>
+Row<eT>::operator()(const span& col_span) const
+  {
+  arma_extra_debug_sigprint();
+  
+  return subvec(col_span);
+  }
 
 
 
@@ -830,19 +830,6 @@ Row<eT>::fixed<fixed_n_elem>::fixed(const std::string& text)
 
 template<typename eT>
 template<uword fixed_n_elem>
-inline
-subview_row<eT>
-Row<eT>::fixed<fixed_n_elem>::operator()(const uword row_num, const span& col_span)
-  {
-  arma_extra_debug_sigprint();
-  
-  return Mat<eT>::operator()(row_num, col_span);
-  }
-
-
-
-template<typename eT>
-template<uword fixed_n_elem>
 template<typename T1>
 const Row<eT>&
 Row<eT>::fixed<fixed_n_elem>::operator=(const Base<eT,T1>& A)
@@ -908,71 +895,6 @@ Row<eT>::fixed<fixed_n_elem>::operator=(const subview_cube<eT>& X)
   Row<eT>::operator=(X);
   
   return *this; 
-  }
-
-
-
-template<typename eT>
-template<uword fixed_n_elem>
-inline
-const subview_row<eT>
-Row<eT>::fixed<fixed_n_elem>::operator()(const uword row_num, const span& col_span) const
-  {
-  arma_extra_debug_sigprint();
-  
-  return Mat<eT>::operator()(row_num, col_span);
-  }
-
-
-
-template<typename eT>
-template<uword fixed_n_elem>
-inline
-subview_col<eT>
-Row<eT>::fixed<fixed_n_elem>::operator()(const span& row_span, const uword col_num)
-  {
-  arma_extra_debug_sigprint();
-  
-  return Mat<eT>::operator()(row_span, col_num);
-  }
-
-
-
-template<typename eT>
-template<uword fixed_n_elem>
-inline
-const subview_col<eT>
-Row<eT>::fixed<fixed_n_elem>::operator()(const span& row_span, const uword col_num) const
-  {
-  arma_extra_debug_sigprint();
-  
-  return Mat<eT>::operator()(row_span, col_num);
-  }
-
-
-
-template<typename eT>
-template<uword fixed_n_elem>
-inline
-subview<eT>
-Row<eT>::fixed<fixed_n_elem>::operator()(const span& row_span, const span& col_span)
-  {
-  arma_extra_debug_sigprint();
-  
-  return Mat<eT>::operator()(row_span, col_span);
-  }
-
-
-
-template<typename eT>
-template<uword fixed_n_elem>
-inline
-const subview<eT>
-Row<eT>::fixed<fixed_n_elem>::operator()(const span& row_span, const span& col_span) const
-  {
-  arma_extra_debug_sigprint();
-  
-  return Mat<eT>::operator()(row_span, col_span);
   }
 
 

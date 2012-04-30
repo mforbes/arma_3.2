@@ -509,22 +509,8 @@ class Mat : public Base< eT, Mat<eT> >
     
     // TODO: handling of initializer_list ?
     
-    template<typename T1> inline const Mat& operator=(const Base<eT,T1>& A);
-    
-    inline const Mat& operator=(const eT val);
-    inline const Mat& operator=(const char*        text);
-    inline const Mat& operator=(const std::string& text);
-    
-    
-    inline       subview_row<eT> operator()(const uword  row_num, const span& col_span);
-    inline const subview_row<eT> operator()(const uword  row_num, const span& col_span) const;
-    
-    inline       subview_col<eT> operator()(const span& row_span, const uword col_num);
-    inline const subview_col<eT> operator()(const span& row_span, const uword col_num) const;
-    
-    inline       subview<eT>     operator()(const span& row_span, const span& col_span);
-    inline const subview<eT>     operator()(const span& row_span, const span& col_span) const;
-    
+    using Mat<eT>::operator=;
+    using Mat<eT>::operator();
     
     arma_inline arma_warn_unused eT& operator[] (const uword i);
     arma_inline arma_warn_unused eT  operator[] (const uword i) const;
@@ -540,7 +526,7 @@ class Mat : public Base< eT, Mat<eT> >
     
     arma_inline arma_warn_unused       eT* memptr();
     arma_inline arma_warn_unused const eT* memptr() const;
-  
+    
     arma_hot inline const Mat<eT>& fill(const eT val);
     arma_hot inline const Mat<eT>& zeros();
     arma_hot inline const Mat<eT>& ones();

@@ -79,8 +79,10 @@ class Col : public Mat<eT>
   arma_inline       subview_col<eT> subvec(const span& row_span);
   arma_inline const subview_col<eT> subvec(const span& row_span) const;
   
-  //arma_inline       subview_col<eT> operator()(const span& row_span);
-  //arma_inline const subview_col<eT> operator()(const span& row_span) const;
+  using Mat<eT>::operator();
+  
+  arma_inline       subview_col<eT> operator()(const span& row_span);
+  arma_inline const subview_col<eT> operator()(const span& row_span) const;
   
   
   inline void shed_row (const uword row_num);
@@ -129,7 +131,7 @@ class Col : public Mat<eT>
     
     static const bool is_col = true;
     static const bool is_row = false;
-  
+    
     static const uword n_rows = fixed_n_elem;
     static const uword n_cols = 1;
     static const uword n_elem = fixed_n_elem;
@@ -153,14 +155,7 @@ class Col : public Mat<eT>
     inline const Col& operator=(const std::string& text);
     inline const Col& operator=(const subview_cube<eT>& X);
     
-    inline       subview_row<eT> operator()(const uword   row_num,  const span& col_span);
-    inline const subview_row<eT> operator()(const uword   row_num,  const span& col_span) const;
-    
-    inline       subview_col<eT> operator()(const span& row_span, const uword   col_num );
-    inline const subview_col<eT> operator()(const span& row_span, const uword   col_num ) const;
-    
-    inline       subview<eT>     operator()(const span& row_span, const span& col_span);
-    inline const subview<eT>     operator()(const span& row_span, const span& col_span) const;
+    using Col<eT>::operator();
     
     arma_inline arma_warn_unused eT& operator[] (const uword i);
     arma_inline arma_warn_unused eT  operator[] (const uword i) const;
