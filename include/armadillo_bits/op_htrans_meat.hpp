@@ -169,7 +169,7 @@ op_htrans2::apply(Mat<eT>& out, const Mat<eT>& A, const eT val, const bool is_al
   arma_extra_debug_sigprint();
   arma_ignore(junk);
   
-  op_strans2::apply(out, A, is_alias, val);
+  op_strans2::apply(out, A, val, is_alias);
   }
 
 
