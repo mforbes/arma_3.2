@@ -313,11 +313,15 @@ struct Proxy_htrans_default< Op<T1, op_htrans> >
   {
   typedef typename T1::elem_type eT;
   
-  arma_aligned const Mat<eT> Q;
+  static const bool prefer_at_accessor = false;
+  static const bool has_subview        = false;
+  static const bool is_fixed           = false;
+  
+  arma_aligned const Mat<eT> R;
   
   arma_hot
   inline Proxy_htrans_default(const Op<T1, op_htrans>& A)
-    : Q(A)
+    : R(A)
     {
     arma_extra_debug_sigprint();
     }
@@ -333,12 +337,16 @@ struct Proxy_htrans_vector< Op<T1, op_htrans> >
   {
   typedef typename T1::elem_type eT;
   
+  static const bool prefer_at_accessor = false;
+  static const bool has_subview        = unwrap<T1>::has_subview;
+  static const bool is_fixed           = false;
+  
   arma_aligned const unwrap<T1> U; // avoid copy if T1 is a Row, Col or subview_col
-  arma_aligned const Mat<eT>    Q;
+  arma_aligned const Mat<eT>    R;
   
   inline Proxy_htrans_vector(const Op<T1, op_htrans>& A)
     : U(A.m)
-    , Q(const_cast<eT*>(U.M.memptr()), U.M.n_cols, U.M.n_rows, false, false)
+    , R(const_cast<eT*>(U.M.memptr()), U.M.n_cols, U.M.n_rows, false, false)
     {
     arma_extra_debug_sigprint();
     }
@@ -371,19 +379,6 @@ class Proxy< Op<T1, op_htrans> >
   {
   public:
   
-  typedef typename T1::elem_type                   elem_type;
-  typedef typename get_pod_type<elem_type>::result pod_type;
-  typedef Mat<elem_type>                           stored_type;
-  typedef const elem_type*                         ea_type;
-  
-  static const bool prefer_at_accessor = false;
-  static const bool has_subview        = false;
-  static const bool is_fixed           = false;
-  
-  // NOTE: the Op class takes care of swapping row and col for op_htrans
-  static const bool is_row = Op<T1, op_htrans>::is_row;
-  static const bool is_col = Op<T1, op_htrans>::is_col;
-  
   typedef
   typename
   Proxy_htrans_redirect
@@ -393,11 +388,24 @@ class Proxy< Op<T1, op_htrans> >
     >::result
   Proxy_htrans;
   
+  typedef typename T1::elem_type                   elem_type;
+  typedef typename get_pod_type<elem_type>::result pod_type;
+  typedef Mat<elem_type>                           stored_type;
+  typedef const elem_type*                         ea_type;
+  
+  static const bool prefer_at_accessor = Proxy_htrans::prefer_at_accessor;
+  static const bool has_subview        = Proxy_htrans::has_subview;
+  static const bool is_fixed           = Proxy_htrans::is_fixed;
+  
+  // NOTE: the Op class takes care of swapping row and col for op_htrans
+  static const bool is_row = Op<T1, op_htrans>::is_row;
+  static const bool is_col = Op<T1, op_htrans>::is_col;
+  
   arma_aligned const Mat<elem_type>& Q;
 
   inline explicit Proxy(const Op<T1, op_htrans>& A)
     : Proxy_htrans(A)
-    , Q( Proxy_htrans::Q )
+    , Q( Proxy_htrans::R )
     {
     arma_extra_debug_sigprint();
     }

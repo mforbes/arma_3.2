@@ -69,6 +69,8 @@ class unwrap : public unwrap_redirect<T1, is_Mat_fixed<T1>::value >::result
   {
   public:
   
+  static const bool has_subview = false;
+  
   inline unwrap(const T1& A)
     : unwrap_redirect< T1, is_Mat_fixed<T1>::value >::result(A)
     {
@@ -81,6 +83,8 @@ template<typename eT>
 class unwrap< Mat<eT> >
   {
   public:
+  
+  static const bool has_subview = false;
   
   inline unwrap(const Mat<eT>& A)
     : M(A)
@@ -101,6 +105,8 @@ class unwrap< Row<eT> >
   {
   public:
   
+  static const bool has_subview = false;
+  
   inline unwrap(const Row<eT>& A)
     : M(A)
     {
@@ -119,6 +125,8 @@ template<typename eT>
 class unwrap< Col<eT> >
   {
   public:
+  
+  static const bool has_subview = false;
   
   inline unwrap(const Col<eT>& A)
     : M(A)
@@ -144,6 +152,8 @@ class unwrap< subview_col<eT> >
   {
   public:
   
+  static const bool has_subview = true;
+  
   inline unwrap(const subview_col<eT>& A)
     : M  ( const_cast<eT*>( A.colptr(0) ), A.n_rows, 1, false, false )
     , src( A.m )
@@ -165,6 +175,8 @@ class unwrap< mtGlue<out_eT, T1, T2, glue_type> >
   {
   public:
   
+  static const bool has_subview = false;
+  
   inline unwrap(const mtGlue<out_eT, T1, T2, glue_type>& A)
     : M(A)
     {
@@ -183,6 +195,8 @@ template<typename out_eT, typename T1, typename op_type>
 class unwrap< mtOp<out_eT, T1, op_type> >
   {
   public:
+  
+  static const bool has_subview = false;
   
   inline unwrap(const mtOp<out_eT, T1, op_type>& A)
     : M(A)

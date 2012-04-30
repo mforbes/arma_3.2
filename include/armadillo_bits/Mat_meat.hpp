@@ -3280,6 +3280,8 @@ Mat<eT>::operator=(const eOp<T1, eop_type>& X)
     }
   else
     {
+    arma_extra_debug_print("bad_alias = true");
+    
     Mat<eT> tmp(X);
     
     steal_mem(tmp);
@@ -3707,6 +3709,8 @@ Mat<eT>::operator=(const eGlue<T1, T2, eglue_type>& X)
     }
   else
     {
+    arma_extra_debug_print("bad_alias = true");
+    
     Mat<eT> tmp(X);
     
     steal_mem(tmp);
