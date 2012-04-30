@@ -361,6 +361,8 @@ op_cdot::apply(const Base<typename T1::elem_type,T1>& X, const Base<typename T1:
   const Proxy<T1> A(X.get_ref());
   const Proxy<T2> B(Y.get_ref());
   
+  // TODO: check for prefer_at_accessor == true;  if true, call itself with unwrapped versions of A.Q and B.Q
+  
   arma_debug_check( (A.get_n_elem() != B.get_n_elem()), "cdot(): objects must have the same number of elements" );
   
   const uword    N  = A.get_n_elem();

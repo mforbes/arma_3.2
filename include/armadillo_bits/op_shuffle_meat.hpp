@@ -1,5 +1,5 @@
-// Copyright (C) 2009-2011 NICTA (www.nicta.com.au)
-// Copyright (C) 2009-2011 Conrad Sanderson
+// Copyright (C) 2009-2012 NICTA (www.nicta.com.au)
+// Copyright (C) 2009-2012 Conrad Sanderson
 // Copyright (C) 2009-2010 Dimitrios Bouzas
 // 
 // This file is part of the Armadillo C++ library.
@@ -30,11 +30,7 @@ op_shuffle::apply(Mat<typename T1::elem_type>& out, const Op<T1,op_shuffle>& in)
   const unwrap<T1>   tmp(in.m);
   const Mat<eT>& X = tmp.M;
   
-  if(X.is_empty())
-    {
-    out.copy_size(X);
-    return;
-    }
+  if(X.is_empty()) { out.copy_size(X); return; }
   
   const uword dim = in.aux_uword_a;
   const uword N   = (dim == 0) ? X.n_rows : X.n_cols;
@@ -53,7 +49,7 @@ op_shuffle::apply(Mat<typename T1::elem_type>& out, const Op<T1,op_shuffle>& in)
   
   if(X.is_vec() == false)
     {
-    if(&out != &X)
+    if(tmp.is_alias(out) == false)
       {
       arma_extra_debug_print("op_shuffle::apply(): matrix");
       
@@ -61,17 +57,11 @@ op_shuffle::apply(Mat<typename T1::elem_type>& out, const Op<T1,op_shuffle>& in)
       
       if(dim == 0)
         {
-        for(uword i=0; i<N; ++i)
-          {
-          out.row(i) = X.row(packet_vec[i].index);
-          }
+        for(uword i=0; i<N; ++i) { out.row(i) = X.row(packet_vec[i].index); }
         }
       else
         {
-        for(uword i=0; i<N; ++i)
-          {
-          out.col(i) = X.col(packet_vec[i].index);
-          }
+        for(uword i=0; i<N; ++i) { out.col(i) = X.col(packet_vec[i].index); }
         }
       }
     else  // in-place shuffle
@@ -119,7 +109,7 @@ op_shuffle::apply(Mat<typename T1::elem_type>& out, const Op<T1,op_shuffle>& in)
     }
   else  // we're dealing with a vector
     {
-    if(&out != &X)
+    if(tmp.is_alias(out) == false)
       {
       arma_extra_debug_print("op_shuffle::apply(): vector");
       
@@ -129,10 +119,7 @@ op_shuffle::apply(Mat<typename T1::elem_type>& out, const Op<T1,op_shuffle>& in)
         {
         if(X.n_rows > 1)  // i.e. column vector
           {
-          for(uword i=0; i<N; ++i)
-            {
-            out[i] = X[ packet_vec[i].index ];
-            }
+          for(uword i=0; i<N; ++i) { out[i] = X[ packet_vec[i].index ]; }
           }
         else
           {
@@ -143,10 +130,7 @@ op_shuffle::apply(Mat<typename T1::elem_type>& out, const Op<T1,op_shuffle>& in)
         {
         if(X.n_cols > 1)  // i.e. row vector
           {
-          for(uword i=0; i<N; ++i)
-            {
-            out[i] = X[ packet_vec[i].index ];
-            }
+          for(uword i=0; i<N; ++i) { out[i] = X[ packet_vec[i].index ]; }
           }
         else
           {

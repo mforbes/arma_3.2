@@ -1,5 +1,5 @@
-// Copyright (C) 2010 NICTA (www.nicta.com.au)
-// Copyright (C) 2010 Conrad Sanderson
+// Copyright (C) 2010-2012 NICTA (www.nicta.com.au)
+// Copyright (C) 2010-2012 Conrad Sanderson
 // Copyright (C) 2011 Ryan Curtin
 // 
 // This file is part of the Armadillo C++ library.
@@ -35,10 +35,10 @@ class op_trimat
   //
   
   template<typename eT>
-  inline static void apply_htrans(Mat<eT>& out, const Mat<eT>& A, const bool upper, const typename arma_not_cx<eT>::result* junk = 0);
+  inline static void apply_htrans(Mat<eT>& out, const Mat<eT>& A, const bool upper, const bool is_alias, const typename arma_not_cx<eT>::result* junk = 0);
   
   template<typename eT>
-  inline static void apply_htrans(Mat<eT>& out, const Mat<eT>& A, const bool upper, const typename arma_cx_only<eT>::result* junk = 0);
+  inline static void apply_htrans(Mat<eT>& out, const Mat<eT>& A, const bool upper, const bool is_alias, const typename arma_cx_only<eT>::result* junk = 0);
   };
 
 

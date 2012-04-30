@@ -79,10 +79,27 @@
     }\
   else\
     {\
+    typedef typename T1::elem_type eT;\
+    \
     const unwrap<typename Proxy<T1>::stored_type> tmp1(P1.Q);\
     const unwrap<typename Proxy<T2>::stored_type> tmp2(P2.Q);\
     \
-    out = (tmp1.M) operator_rel (tmp2.M);\
+    const Mat<eT>& A = tmp1.M;\
+    const Mat<eT>& B = tmp2.M;\
+    \
+    const bool A_is_alias = tmp1.is_alias(out);\
+    const bool B_is_alias = tmp2.is_alias(out);\
+    \
+    const Mat<eT>* AA_ptr = A_is_alias ? new Mat<eT>(A) : 0;\
+    const Mat<eT>* BB_ptr = B_is_alias ? new Mat<eT>(B) : 0;\
+    \
+    const Mat<eT>& AA = A_is_alias ? *AA_ptr : A;\
+    const Mat<eT>& BB = B_is_alias ? *BB_ptr : B;\
+    \
+    out = (AA) operator_rel (BB);\
+    \
+    if(A_is_alias) { delete AA_ptr; }\
+    if(B_is_alias) { delete BB_ptr; }\
     }\
   }
 

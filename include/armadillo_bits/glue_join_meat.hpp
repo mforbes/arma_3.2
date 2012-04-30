@@ -1,5 +1,5 @@
-// Copyright (C) 2008-2011 NICTA (www.nicta.com.au)
-// Copyright (C) 2008-2011 Conrad Sanderson
+// Copyright (C) 2008-2012 NICTA (www.nicta.com.au)
+// Copyright (C) 2008-2012 Conrad Sanderson
 // 
 // This file is part of the Armadillo C++ library.
 // It is provided without any warranty of fitness
@@ -57,7 +57,7 @@ glue_join::apply(Mat<typename T1::elem_type>& out, const Glue<T1,T2,glue_join>& 
     }
   
   
-  if( (&out != &A) && (&out != &B) )
+  if( (A_tmp.is_alias(out) == false) && (B_tmp.is_alias(out) == false) )
     {
     if(join_type == 0)   // join columns (i.e. result matrix has more rows)
       {

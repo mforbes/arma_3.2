@@ -1,5 +1,5 @@
-// Copyright (C) 2011 NICTA (www.nicta.com.au)
-// Copyright (C) 2011 Conrad Sanderson
+// Copyright (C) 2011-2012 NICTA (www.nicta.com.au)
+// Copyright (C) 2011-2012 Conrad Sanderson
 // 
 // This file is part of the Armadillo C++ library.
 // It is provided without any warranty of fitness
@@ -37,7 +37,7 @@ op_resize::apply(Mat<typename T1::elem_type>& actual_out, const Op<T1,op_resize>
   
   Mat<eT> B;
   
-  const bool alias = (&actual_out == &A);
+  const bool alias = tmp.is_alias(actual_out);
   
   Mat<eT>& out = alias ? B : actual_out;
   
