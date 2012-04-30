@@ -5817,6 +5817,47 @@ Mat<eT>::fixed<fixed_n_rows, fixed_n_cols>::fixed(const std::string& text)
 
 
 
+#if defined(ARMA_USE_CXX11)
+
+template<typename eT>
+template<uword fixed_n_rows, uword fixed_n_cols>
+inline
+Mat<eT>::fixed<fixed_n_rows, fixed_n_cols>::fixed(const std::initializer_list<eT>& list)
+  {
+  arma_extra_debug_sigprint_this(this);
+  
+  mem_setup();
+  
+  (*this).operator=(list);
+  }
+
+
+
+template<typename eT>
+template<uword fixed_n_rows, uword fixed_n_cols>
+inline
+const Mat<eT>&
+Mat<eT>::fixed<fixed_n_rows, fixed_n_cols>::operator=(const std::initializer_list<eT>& list)
+  {
+  arma_extra_debug_sigprint();
+  
+  const uword N = list.size();
+  
+  arma_debug_check( (N > fixed_n_elem), "Mat::fixed: initialiser list is too long" );
+  
+  eT* this_mem = (*this).memptr();
+  
+  arrayops::copy( this_mem, list.begin(), N );
+  
+  for(uword i=N; i<fixed_n_elem; ++i) { this_mem[i] = eT(0); }
+  
+  return *this;
+  }
+  
+#endif
+  
+
+
 template<typename eT>
 template<uword fixed_n_rows, uword fixed_n_cols>
 arma_inline

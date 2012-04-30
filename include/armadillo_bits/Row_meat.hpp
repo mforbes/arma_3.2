@@ -899,6 +899,47 @@ Row<eT>::fixed<fixed_n_elem>::operator=(const subview_cube<eT>& X)
 
 
 
+#if defined(ARMA_USE_CXX11)
+
+template<typename eT>
+template<uword fixed_n_elem>
+inline
+Row<eT>::fixed<fixed_n_elem>::fixed(const std::initializer_list<eT>& list)
+  {
+  arma_extra_debug_sigprint();
+  
+  mem_setup();
+  
+  (*this).operator=(list);
+  }
+
+
+
+template<typename eT>
+template<uword fixed_n_elem>
+inline
+const Row<eT>&
+Row<eT>::fixed<fixed_n_elem>::operator=(const std::initializer_list<eT>& list)
+  {
+  arma_extra_debug_sigprint();
+  
+  const uword N = list.size();
+  
+  arma_debug_check( (N > fixed_n_elem), "Row::fixed: initialiser list is too long" );
+  
+  eT* this_mem = (*this).memptr();
+  
+  arrayops::copy( this_mem, list.begin(), N );
+  
+  for(uword i=N; i<fixed_n_elem; ++i) { this_mem[i] = eT(0); }
+  
+  return *this;
+  }
+
+#endif
+
+
+
 template<typename eT>
 template<uword fixed_n_elem>
 arma_inline
