@@ -84,7 +84,7 @@ op_cumsum_vec::apply(Mat<typename T1::elem_type>& out, const Op<T1,op_cumsum_vec
   
   typedef typename T1::elem_type eT;
   
-  const unwrap_check<T1>   tmp(in.m);
+  const unwrap_check<T1>   tmp(in.m, out);
   const Mat<eT>&       X = tmp.M;
   
   const uword n_elem = X.n_elem;
