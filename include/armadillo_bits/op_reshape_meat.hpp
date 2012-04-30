@@ -39,7 +39,7 @@ op_reshape::apply(Mat<typename T1::elem_type>& out, const Op<T1,op_reshape>& in)
     {
     if(in_dim == 0)
       {
-      if(&out != &A)
+      if(tmp.is_alias(out) == false)
         {
         out.set_size(in_n_rows, in_n_cols);
         arrayops::copy( out.memptr(), A.memptr(), out.n_elem );

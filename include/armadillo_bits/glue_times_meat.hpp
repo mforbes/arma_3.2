@@ -156,6 +156,9 @@ glue_times_redirect<3>::apply(Mat<typename T1::elem_type>& out, const Glue< Glue
   
   typedef typename T1::elem_type eT;
   
+  // TODO: investigate detecting inv(A)*B*C and replacing with solve(A,B)*C
+  // TODO: investigate detecting A*inv(B)*C and replacing with A*solve(B,C)
+  
   // there is exactly 3 objects
   // hence we can safely expand X as X.A.A, X.A.B and X.B
   

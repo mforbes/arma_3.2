@@ -36,11 +36,11 @@ struct unwrap_default
 
 
 template<typename T1>
-struct unwrap_Mat_fixed
+struct unwrap_fixed
   {
   typedef typename T1::elem_type eT;
   
-  inline explicit unwrap_Mat_fixed(const T1& A)
+  inline explicit unwrap_fixed(const T1& A)
     : M(A)
     {
     arma_extra_debug_sigprint();
@@ -58,10 +58,10 @@ template<typename T1, bool condition>
 struct unwrap_redirect {};
 
 template<typename T1>
-struct unwrap_redirect<T1, false> { typedef unwrap_default<T1>   result; };
+struct unwrap_redirect<T1, false> { typedef unwrap_default<T1> result; };
 
 template<typename T1>
-struct unwrap_redirect<T1, true>  { typedef unwrap_Mat_fixed<T1> result; };
+struct unwrap_redirect<T1, true>  { typedef unwrap_fixed<T1>   result; };
 
 
 template<typename T1>
@@ -146,17 +146,16 @@ class unwrap< subview_col<eT> >
   
   inline unwrap(const subview_col<eT>& A)
     : M  ( const_cast<eT*>( A.colptr(0) ), A.n_rows, 1, false, false )
-    , ref( A )
+    , src( A.m )
     {
     arma_extra_debug_sigprint();
     }
   
-  const Mat<eT> M;
-  
-  const subview_col<eT>& ref;
+  const Mat<eT>  M;
+  const Mat<eT>& src;
   
   template<typename eT2>
-  arma_inline bool is_alias(const Mat<eT2>& X) const { return (void_ptr(&(ref.m)) == void_ptr(&X)); }
+  arma_inline bool is_alias(const Mat<eT2>& X) const { return (void_ptr(&src) == void_ptr(&X)); }
   };
 
 

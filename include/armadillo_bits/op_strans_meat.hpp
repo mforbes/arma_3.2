@@ -145,11 +145,11 @@ op_strans::apply_noalias(Mat<eT>& out, const Mat<eT>& A)
 template<typename eT>
 inline
 void
-op_strans::apply(Mat<eT>& out, const Mat<eT>& A)
+op_strans::apply(Mat<eT>& out, const Mat<eT>& A, const bool is_alias)
   {
   arma_extra_debug_sigprint();
   
-  if(&out != &A)
+  if(is_alias == false)
     {
     op_strans::apply_noalias(out, A);
     }
@@ -206,52 +206,8 @@ op_strans::apply(Mat<typename T1::elem_type>& out, const Op<T1,op_strans>& in)
   const unwrap<T1>   tmp(in.m);
   const Mat<eT>& A = tmp.M;
   
-  op_strans::apply(out, A);
+  op_strans::apply(out, A, tmp.is_alias(out));
   }
-
-
-
-// inline void op_strans::apply_inplace(mat &X)
-//   {
-//   arma_extra_debug_sigprint();
-//   
-//   if((X.n_rows == 1) || (X.n_cols == 1))
-//     {
-//     const uword old_n_rows = X.n_rows;
-//     access::rw(X.n_rows) = X.n_cols;
-//     access::rw(X.n_cols) = old_n_rows;
-//     }
-//   else
-//   if(X.n_rows == X.n_cols)
-//     {
-//     for(uword col=0; col < X.n_cols; ++col)
-//       {
-//       double* X_coldata = X.colptr(col);
-//       
-//       for(uword row=(col+1); row < X.n_rows; ++row)
-//         {
-//         std::swap( A.at(col,row), A_coldata[row] );
-//         }
-//       }
-//     }
-//   else
-//     {
-//     mat tmp = trans(X);
-//     
-//     if(X.mem != X.mem_local)
-//       {
-//       double* old_mem = X.memptr();
-//       access::rw(X.mem) = tmp.memptr();
-//       access::rw(tmp.mem) = old_mem;
-//       }
-//     else
-//       {
-//       X = tmp;
-//       }
-//     }
-//   
-//   }
-
 
 
 
@@ -407,11 +363,11 @@ op_strans2::apply_noalias(Mat<eT>& out, const Mat<eT>& A, const eT val)
 template<typename eT>
 inline
 void
-op_strans2::apply(Mat<eT>& out, const Mat<eT>& A, const eT val)
+op_strans2::apply(Mat<eT>& out, const Mat<eT>& A, const eT val, const bool is_alias)
   {
   arma_extra_debug_sigprint();
   
-  if(&out != &A)
+  if(is_alias == false)
     {
     op_strans2::apply_noalias(out, A, val);
     }

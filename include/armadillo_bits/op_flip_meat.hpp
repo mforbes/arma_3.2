@@ -1,5 +1,5 @@
-// Copyright (C) 2010 NICTA (www.nicta.com.au)
-// Copyright (C) 2010 Conrad Sanderson
+// Copyright (C) 2010-2012 NICTA (www.nicta.com.au)
+// Copyright (C) 2010-2012 Conrad Sanderson
 // 
 // This file is part of the Armadillo C++ library.
 // It is provided without any warranty of fitness
@@ -28,7 +28,7 @@ op_flipud::apply(Mat<typename T1::elem_type>& out, const Op<T1,op_flipud>& in)
   const unwrap<T1>  tmp(in.m);
   const Mat<eT> X = tmp.M;
   
-  if(&out != &X)
+  if(tmp.is_alias(out) == false)
     {
     out.copy_size(X);
     
@@ -62,7 +62,7 @@ op_fliplr::apply(Mat<typename T1::elem_type>& out, const Op<T1,op_fliplr>& in)
   const unwrap<T1>  tmp(in.m);
   const Mat<eT> X = tmp.M;
   
-  if(&out != &X)
+  if(tmp.is_alias(out) == false)
     {
     out.copy_size(X);
     

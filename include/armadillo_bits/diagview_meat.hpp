@@ -179,10 +179,10 @@ diagview<eT>::operator= (const Base<eT,T1>& o)
   {
   arma_extra_debug_sigprint();
   
-  const unwrap<T1> tmp(o.get_ref());
-  const Mat<eT>& x = tmp.M;
-  
   diagview<eT>& t = *this;
+  
+  const unwrap_check<T1> tmp( o.get_ref(), t.m );
+  const Mat<eT>& x = tmp.M;
   
   arma_debug_check
     (
@@ -224,10 +224,10 @@ diagview<eT>::operator+=(const Base<eT,T1>& o)
   {
   arma_extra_debug_sigprint();
   
-  const unwrap<T1> tmp(o.get_ref());
-  const Mat<eT>& x = tmp.M;
-  
   diagview<eT>& t = *this;
+  
+  const unwrap_check<T1> tmp( o.get_ref(), t.m );
+  const Mat<eT>& x = tmp.M;
   
   arma_debug_check
     (
@@ -269,10 +269,10 @@ diagview<eT>::operator-=(const Base<eT,T1>& o)
   {
   arma_extra_debug_sigprint();
   
-  const unwrap<T1> tmp(o.get_ref());
-  const Mat<eT>& x = tmp.M;
-  
   diagview<eT>& t = *this;
+  
+  const unwrap_check<T1> tmp( o.get_ref(), t.m );
+  const Mat<eT>& x = tmp.M;
   
   arma_debug_check
     (
@@ -314,10 +314,10 @@ diagview<eT>::operator%=(const Base<eT,T1>& o)
   {
   arma_extra_debug_sigprint();
   
-  const unwrap<T1> tmp(o.get_ref());
-  const Mat<eT>& x = tmp.M;
-  
   diagview<eT>& t = *this;
+  
+  const unwrap_check<T1> tmp( o.get_ref(), t.m );
+  const Mat<eT>& x = tmp.M;
   
   arma_debug_check
     (
@@ -359,10 +359,10 @@ diagview<eT>::operator/=(const Base<eT,T1>& o)
   {
   arma_extra_debug_sigprint();
   
-  const unwrap<T1> tmp(o.get_ref());
-  const Mat<eT>& x = tmp.M;
-  
   diagview<eT>& t = *this;
+  
+  const unwrap_check<T1> tmp( o.get_ref(), t.m );
+  const Mat<eT>& x = tmp.M;
   
   arma_debug_check
     (
