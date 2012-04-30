@@ -66,8 +66,8 @@ op_trimat::apply(Mat<typename T1::elem_type>& out, const Op<T1,op_trimat>& in)
   
   arma_debug_check( (A.is_square() == false), "trimatu()/trimatl(): given matrix must be square" );
   
-  const uword  N     = A.n_rows;
-  const bool upper = (in.aux_uword_a == 0);
+  const uword N     = A.n_rows;
+  const bool  upper = (in.aux_uword_a == 0);
   
   if(tmp.is_alias(out) == false)
     {
