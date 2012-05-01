@@ -1,5 +1,5 @@
-// Copyright (C) 2008-2011 NICTA (www.nicta.com.au)
-// Copyright (C) 2008-2011 Conrad Sanderson
+// Copyright (C) 2008-2012 NICTA (www.nicta.com.au)
+// Copyright (C) 2008-2012 Conrad Sanderson
 // 
 // This file is part of the Armadillo C++ library.
 // It is provided without any warranty of fitness
@@ -63,7 +63,7 @@ op_reshape::apply(Mat<typename T1::elem_type>& out, const Op<T1,op_reshape>& in)
       }
     else
       {
-      unwrap_check< Mat<eT> > tmp(A, out);
+      unwrap_check< Mat<eT> > tmp(A, out);  // TODO: bug. assumes unwrap produces a fresh matrix
       const Mat<eT>& B      = tmp.M;
       
       out.set_size(in_n_rows, in_n_cols);
@@ -88,7 +88,7 @@ op_reshape::apply(Mat<typename T1::elem_type>& out, const Op<T1,op_reshape>& in)
   else
     {
     const unwrap_check< Mat<eT> > tmp(A, out);
-    const Mat<eT>& B            = tmp.M;
+    const Mat<eT>& B            = tmp.M;  // TODO: bug. assumes unwrap produces a fresh matrix
     
     const uword n_elem_to_copy = (std::min)(B.n_elem, in_n_elem);
     

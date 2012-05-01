@@ -230,7 +230,7 @@ subview<eT>::operator= (const Base<eT,T1>& in)
   
   if( (alias == true) || (is_Mat<typename Proxy<T1>::stored_type>::value == true) )
     {
-    const unwrap_check<typename Proxy<T1>::stored_type> tmp(P.Q, t.m);
+    const unwrap_check<typename Proxy<T1>::stored_type> tmp(P.Q, t.m);  // TODO: possible bug; what if P.Q is a fake matrix ?
     const Mat<eT>& x = tmp.M;
     
     if(t_n_rows == 1)
@@ -338,7 +338,7 @@ subview<eT>::operator+= (const Base<eT,T1>& in)
   
   if( (alias == true) || (is_Mat<typename Proxy<T1>::stored_type>::value == true) )
     {
-    const unwrap_check<typename Proxy<T1>::stored_type> tmp(P.Q, t.m);
+    const unwrap_check<typename Proxy<T1>::stored_type> tmp(P.Q, t.m);  // TODO: possible bug
     const Mat<eT>& x = tmp.M;
     
     if(t_n_rows == 1)
@@ -444,7 +444,7 @@ subview<eT>::operator-= (const Base<eT,T1>& in)
   
   if( (alias == true) || (is_Mat<typename Proxy<T1>::stored_type>::value == true) )
     {
-    const unwrap_check<typename Proxy<T1>::stored_type> tmp(P.Q, t.m);
+    const unwrap_check<typename Proxy<T1>::stored_type> tmp(P.Q, t.m);  // TODO: possible bug
     const Mat<eT>& x = tmp.M;
     
     if(t_n_rows == 1)
@@ -552,7 +552,7 @@ subview<eT>::operator%= (const Base<eT,T1>& in)
   
   if( (alias == true) || (is_Mat<typename Proxy<T1>::stored_type>::value == true) )
     {
-    const unwrap_check<typename Proxy<T1>::stored_type> tmp(P.Q, t.m);
+    const unwrap_check<typename Proxy<T1>::stored_type> tmp(P.Q, t.m); // TODO: possible bug
     const Mat<eT>& x = tmp.M;
     
     if(t_n_rows == 1)
@@ -660,7 +660,7 @@ subview<eT>::operator/= (const Base<eT,T1>& in)
   
   if( (alias == true) || (is_Mat<typename Proxy<T1>::stored_type>::value == true) )
     {
-    const unwrap_check<typename Proxy<T1>::stored_type> tmp(P.Q, t.m);
+    const unwrap_check<typename Proxy<T1>::stored_type> tmp(P.Q, t.m);  // TODO: possible bug
     const Mat<eT>& x = tmp.M;
     
     if(t_n_rows == 1)
