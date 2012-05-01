@@ -2094,7 +2094,7 @@ auxlib::svd(Mat<eT>& U, Col<eT>& S, Mat<eT>& V, const Base<eT,T1>& X)
         &info
         );
       
-      op_strans::apply(V,V,true);  // op_strans will work out that an in-place transpose can be done
+      op_strans::apply(V,V);  // op_strans will work out that an in-place transpose can be done
       }
     
     return (info == 0);
@@ -2190,7 +2190,7 @@ auxlib::svd(Mat< std::complex<T> >& U, Col<T>& S, Mat< std::complex<T> >& V, con
         &info
         );
       
-      op_htrans::apply(V,V,true);  // op_htrans will work out that an in-place transpose can be done
+      op_htrans::apply(V,V);  // op_htrans will work out that an in-place transpose can be done
       }
     
     return (info == 0);
@@ -2333,7 +2333,7 @@ auxlib::svd_econ(Mat<eT>& U, Col<eT>& S, Mat<eT>& V, const Base<eT,T1>& X, const
         &info
         );
       
-      op_strans::apply(V,V,true);  // op_strans will work out that an in-place transpose can be done
+      op_strans::apply(V,V);  // op_strans will work out that an in-place transpose can be done
       }
     
     return (info == 0);
@@ -2481,7 +2481,7 @@ auxlib::svd_econ(Mat< std::complex<T> >& U, Col<T>& S, Mat< std::complex<T> >& V
         &info
         );
       
-      op_htrans::apply(V,V,true);  // op_strans will work out that an in-place transpose can be done
+      op_htrans::apply(V,V);  // op_strans will work out that an in-place transpose can be done
       }
     
     return (info == 0);

@@ -27,29 +27,17 @@ glue_mixed_times::apply(Mat<typename eT_promoter<T1,T2>::eT>& out, const mtGlue<
   typedef typename T1::elem_type eT1;
   typedef typename T2::elem_type eT2;
   
-  const unwrap<T1> tmp1(X.A);
-  const unwrap<T2> tmp2(X.B);
+  const unwrap_check_mixed<T1> tmp1(X.A, out);
+  const unwrap_check_mixed<T2> tmp2(X.B, out);
   
   const Mat<eT1>& A = tmp1.M;
   const Mat<eT2>& B = tmp2.M;
   
-  const bool A_is_alias = tmp1.is_alias(out);
-  const bool B_is_alias = tmp2.is_alias(out);
+  arma_debug_assert_mul_size(A, B, "multiplication");
   
-  const Mat<eT1>* AA_ptr = A_is_alias ? new Mat<eT1>(A) : 0;
-  const Mat<eT2>* BB_ptr = B_is_alias ? new Mat<eT2>(B) : 0;
+  out.set_size(A.n_rows, B.n_cols);
   
-  const Mat<eT1>& AA = A_is_alias ? *AA_ptr : A;
-  const Mat<eT2>& BB = B_is_alias ? *BB_ptr : B;
-  
-  arma_debug_assert_mul_size(AA, BB, "multiplication");
-  
-  out.set_size(AA.n_rows, BB.n_cols);
-  
-  gemm_mixed<>::apply(out, AA, BB);
-  
-  if(A_is_alias) { delete AA_ptr; }
-  if(B_is_alias) { delete BB_ptr; }
+  gemm_mixed<>::apply(out, A, B);
   }
 
 

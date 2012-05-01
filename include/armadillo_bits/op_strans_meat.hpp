@@ -145,11 +145,11 @@ op_strans::apply_noalias(Mat<eT>& out, const Mat<eT>& A)
 template<typename eT>
 inline
 void
-op_strans::apply(Mat<eT>& out, const Mat<eT>& A, const bool is_alias)
+op_strans::apply(Mat<eT>& out, const Mat<eT>& A)
   {
   arma_extra_debug_sigprint();
   
-  if(is_alias == false)
+  if(&out != &A)
     {
     op_strans::apply_noalias(out, A);
     }
@@ -206,7 +206,7 @@ op_strans::apply(Mat<typename T1::elem_type>& out, const Op<T1,op_strans>& in)
   const unwrap<T1>   tmp(in.m);
   const Mat<eT>& A = tmp.M;
   
-  op_strans::apply(out, A, tmp.is_alias(out));
+  op_strans::apply(out, A);
   }
 
 
@@ -363,11 +363,11 @@ op_strans2::apply_noalias(Mat<eT>& out, const Mat<eT>& A, const eT val)
 template<typename eT>
 inline
 void
-op_strans2::apply(Mat<eT>& out, const Mat<eT>& A, const eT val, const bool is_alias)
+op_strans2::apply(Mat<eT>& out, const Mat<eT>& A, const eT val)
   {
   arma_extra_debug_sigprint();
   
-  if(is_alias == false)
+  if(&out != &A)
     {
     op_strans2::apply_noalias(out, A, val);
     }

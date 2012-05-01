@@ -57,7 +57,7 @@ glue_join::apply(Mat<typename T1::elem_type>& out, const Glue<T1,T2,glue_join>& 
     }
   
   
-  if( (A_tmp.is_alias(out) == false) && (B_tmp.is_alias(out) == false) )
+  if( (&out != &A) && (&out != &B) )
     {
     if(join_type == 0)   // join columns (i.e. result matrix has more rows)
       {

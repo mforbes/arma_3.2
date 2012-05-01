@@ -22,16 +22,13 @@ struct unwrap_default
   typedef typename T1::elem_type eT;
   
   inline
-  unwrap_default(const T1& A)   // TODO: change this to Base ?
+  unwrap_default(const T1& A)
     : M(A)
     {
     arma_extra_debug_sigprint();
     }
   
   const Mat<eT> M;
-  
-  template<typename eT2>
-  arma_inline bool is_alias(const Mat<eT2>&) const { return false; }
   };
 
 
@@ -49,9 +46,6 @@ struct unwrap_fixed
     }
   
   const Mat<eT>& M;
-  
-  template<typename eT2>
-  arma_inline bool is_alias(const Mat<eT2>& X) const { return (void_ptr(&M) == void_ptr(&X)); }
   };
 
 
@@ -69,8 +63,6 @@ struct unwrap_redirect<T1, true>  { typedef unwrap_fixed<T1>   result; };
 template<typename T1>
 struct unwrap : public unwrap_redirect<T1, is_Mat_fixed<T1>::value >::result
   {
-  static const bool has_subview = false;
-  
   inline
   unwrap(const T1& A)
     : unwrap_redirect< T1, is_Mat_fixed<T1>::value >::result(A)
@@ -83,10 +75,164 @@ struct unwrap : public unwrap_redirect<T1, is_Mat_fixed<T1>::value >::result
 template<typename eT>
 struct unwrap< Mat<eT> >
   {
+  inline
+  unwrap(const Mat<eT>& A)
+    : M(A)
+    {
+    arma_extra_debug_sigprint();
+    }
+  
+  const Mat<eT>& M;
+  };
+
+
+
+template<typename eT>
+struct unwrap< Row<eT> >
+  {
+  inline
+  unwrap(const Row<eT>& A)
+    : M(A)
+    {
+    arma_extra_debug_sigprint();
+    }
+  
+  const Row<eT>& M;
+  };
+
+
+
+template<typename eT>
+struct unwrap< Col<eT> >
+  {
+  inline
+  unwrap(const Col<eT>& A)
+    : M(A)
+    {
+    arma_extra_debug_sigprint();
+    }
+  
+  const Col<eT>& M;
+  };
+
+
+
+template<typename out_eT, typename T1, typename T2, typename glue_type>
+struct unwrap< mtGlue<out_eT, T1, T2, glue_type> >
+  {
+  inline
+  unwrap(const mtGlue<out_eT, T1, T2, glue_type>& A)
+    : M(A)
+    {
+    arma_extra_debug_sigprint();
+    }
+  
+  const Mat<out_eT> M;
+  };
+
+
+
+template<typename out_eT, typename T1, typename op_type>
+struct unwrap< mtOp<out_eT, T1, op_type> >
+  {
+  inline
+  unwrap(const mtOp<out_eT, T1, op_type>& A)
+    : M(A)
+    {
+    arma_extra_debug_sigprint();
+    }
+  
+  const Mat<out_eT> M;
+  };
+
+
+
+//
+//
+//
+
+
+
+template<typename T1>
+struct quasi_unwrap_default
+  {
+  typedef typename T1::elem_type eT;
+  
   static const bool has_subview = false;
   
   inline
-  unwrap(const Mat<eT>& A)
+  quasi_unwrap_default(const T1& A)
+    : M(A)
+    {
+    arma_extra_debug_sigprint();
+    }
+  
+  const Mat<eT> M;  // NOTE: DO NOT DIRECTLY CHECK FOR ALIASING BY TAKING THE ADDRESS OF THE "M" OBJECT IN ANY quasi_unwrap CLASS !!!
+  
+  template<typename eT2>
+  arma_inline bool is_alias(const Mat<eT2>&) const { return false; }
+  };
+
+
+
+template<typename T1>
+struct quasi_unwrap_fixed
+  {
+  typedef typename T1::elem_type eT;
+  
+  static const bool has_subview = false;
+  
+  inline explicit
+  quasi_unwrap_fixed(const T1& A)
+    : M(A)
+    {
+    arma_extra_debug_sigprint();
+    }
+  
+  const Mat<eT>& M;
+  
+  template<typename eT2>
+  arma_inline bool is_alias(const Mat<eT2>& X) const { return (void_ptr(&M) == void_ptr(&X)); }
+  };
+
+
+
+template<typename T1, bool condition>
+struct quasi_unwrap_redirect {};
+
+template<typename T1>
+struct quasi_unwrap_redirect<T1, false> { typedef quasi_unwrap_default<T1> result; };
+
+template<typename T1>
+struct quasi_unwrap_redirect<T1, true>  { typedef quasi_unwrap_fixed<T1>   result; };
+
+
+template<typename T1>
+struct quasi_unwrap : public quasi_unwrap_redirect<T1, is_Mat_fixed<T1>::value >::result
+  {
+  typedef typename quasi_unwrap_redirect<T1, is_Mat_fixed<T1>::value >::result quasi_unwrap_extra;
+  
+  static const bool has_subview = quasi_unwrap_extra::has_subview;
+  
+  inline
+  quasi_unwrap(const T1& A)
+    : quasi_unwrap_extra(A)
+    {
+    }
+  
+  using quasi_unwrap_extra::M;
+  using quasi_unwrap_extra::is_alias;
+  };
+
+
+
+template<typename eT>
+struct quasi_unwrap< Mat<eT> >
+  {
+  static const bool has_subview = false;
+  
+  inline
+  quasi_unwrap(const Mat<eT>& A)
     : M(A)
     {
     arma_extra_debug_sigprint();
@@ -101,12 +247,12 @@ struct unwrap< Mat<eT> >
 
 
 template<typename eT>
-struct unwrap< Row<eT> >
+struct quasi_unwrap< Row<eT> >
   {
   static const bool has_subview = false;
   
   inline
-  unwrap(const Row<eT>& A)
+  quasi_unwrap(const Row<eT>& A)
     : M(A)
     {
     arma_extra_debug_sigprint();
@@ -121,12 +267,12 @@ struct unwrap< Row<eT> >
 
 
 template<typename eT>
-struct unwrap< Col<eT> >
+struct quasi_unwrap< Col<eT> >
   {
   static const bool has_subview = false;
   
   inline
-  unwrap(const Col<eT>& A)
+  quasi_unwrap(const Col<eT>& A)
     : M(A)
     {
     arma_extra_debug_sigprint();
@@ -141,12 +287,12 @@ struct unwrap< Col<eT> >
 
 
 template<typename eT>
-struct unwrap< subview_col<eT> >
+struct quasi_unwrap< subview_col<eT> >
   {
   static const bool has_subview = true;
   
   inline
-  unwrap(const subview_col<eT>& A)
+  quasi_unwrap(const subview_col<eT>& A)
     : M  ( const_cast<eT*>( A.colptr(0) ), A.n_rows, 1, false, false )
     , src( A.m )
     {
@@ -163,12 +309,12 @@ struct unwrap< subview_col<eT> >
 
 
 template<typename out_eT, typename T1, typename T2, typename glue_type>
-struct unwrap< mtGlue<out_eT, T1, T2, glue_type> >
+struct quasi_unwrap< mtGlue<out_eT, T1, T2, glue_type> >
   {
   static const bool has_subview = false;
   
   inline
-  unwrap(const mtGlue<out_eT, T1, T2, glue_type>& A)
+  quasi_unwrap(const mtGlue<out_eT, T1, T2, glue_type>& A)
     : M(A)
     {
     arma_extra_debug_sigprint();
@@ -183,12 +329,12 @@ struct unwrap< mtGlue<out_eT, T1, T2, glue_type> >
 
 
 template<typename out_eT, typename T1, typename op_type>
-struct unwrap< mtOp<out_eT, T1, op_type> >
+struct quasi_unwrap< mtOp<out_eT, T1, op_type> >
   {
   static const bool has_subview = false;
   
   inline
-  unwrap(const mtOp<out_eT, T1, op_type>& A)
+  quasi_unwrap(const mtOp<out_eT, T1, op_type>& A)
     : M(A)
     {
     arma_extra_debug_sigprint();
@@ -202,170 +348,9 @@ struct unwrap< mtOp<out_eT, T1, op_type> >
 
 
 
-template<typename T1>
-struct unwrap_xtrans_default
-  {
-  typedef typename T1::elem_type eT;
-  
-  inline
-  unwrap_xtrans_default(const T1& A)
-    : M(A)
-    {
-    arma_extra_debug_sigprint();
-    }
-  
-  arma_aligned const Mat<eT> M;
-  
-  template<typename eT2>
-  arma_inline bool is_alias(const Mat<eT2>&) const { return false; }
-  };
-
-
-
-template<typename T1>
-struct unwrap_xtrans_vector
-  {
-  inline unwrap_xtrans_vector(const T1&) {}
-  };
-
-
-
-template<typename T1>
-struct unwrap_xtrans_vector< Op<T1, op_htrans> >
-  {
-  typedef typename T1::elem_type eT;
-  
-  static const bool has_subview = unwrap<T1>::has_subview;
-  
-  inline
-  unwrap_xtrans_vector(const Op<T1, op_htrans>& A)
-    : U(A.m)
-    , M(const_cast<eT*>(U.M.memptr()), U.M.n_cols, U.M.n_rows, false, false)
-    {
-    arma_extra_debug_sigprint();
-    }
-  
-  arma_aligned const unwrap<T1> U; // avoid copy if T1 is a Row, Col or subview_col
-  arma_aligned const Mat<eT>    M;
-  
-  template<typename eT2>
-  arma_inline bool is_alias(const Mat<eT2>& X) const { return U.is_alias(X); }
-  };
-
-
-
-template<typename T1>
-struct unwrap_xtrans_vector< Op<T1, op_strans> >
-  {
-  typedef typename T1::elem_type eT;
-  
-  static const bool has_subview = unwrap<T1>::has_subview;
-  
-  inline
-  unwrap_xtrans_vector(const Op<T1, op_strans>& A)
-    : U(A.m)
-    , M(const_cast<eT*>(U.M.memptr()), U.M.n_cols, U.M.n_rows, false, false)
-    {
-    arma_extra_debug_sigprint();
-    }
-  
-  arma_aligned const unwrap<T1> U; // avoid copy if T1 is a Row, Col or subview_col
-  arma_aligned const Mat<eT>    M;
-  
-  template<typename eT2>
-  arma_inline bool is_alias(const Mat<eT2>& X) const { return U.is_alias(X); }
-  };
-
-
-
-template<typename T1, bool condition>
-struct unwrap_xtrans_redirect {};
-
-template<typename T1>
-struct unwrap_xtrans_redirect<T1, false> { typedef unwrap_xtrans_default<T1> result; };
-
-template<typename T1>
-struct unwrap_xtrans_redirect<T1, true>  { typedef unwrap_xtrans_vector<T1>  result; };
-
-
-
-template<typename T1>
-struct unwrap< Op<T1, op_htrans> >
-  : public
-    unwrap_xtrans_redirect
-      <
-      Op<T1, op_htrans>,
-      ((is_complex<typename T1::elem_type>::value == false) && ((Op<T1, op_htrans>::is_row) || (Op<T1, op_htrans>::is_col)) )
-      >::result
-  {
-  typedef
-  typename
-  unwrap_xtrans_redirect
-    <
-    Op<T1, op_htrans>,
-    ((is_complex<typename T1::elem_type>::value == false) && ((Op<T1, op_htrans>::is_row) || (Op<T1, op_htrans>::is_col)) )
-    >::result
-  unwrap_xtrans;
-  
-  static const bool has_subview = unwrap_xtrans::has_subview;
-  
-  inline
-  unwrap(const Op<T1, op_htrans>& A)
-    : unwrap_xtrans(A)
-    {
-    arma_extra_debug_sigprint();
-    }
-  
-  using unwrap_xtrans::M;
-  
-  template<typename eT2>
-  arma_inline bool is_alias(const Mat<eT2>& X) const { return unwrap_xtrans::is_alias(X); }
-  };
-
-
-
-template<typename T1>
-struct unwrap< Op<T1, op_strans> >
-  : public
-    unwrap_xtrans_redirect
-      <
-      Op<T1, op_strans>,
-      ( (Op<T1, op_strans>::is_row) || (Op<T1, op_strans>::is_col) )
-      >::result
-  {
-  typedef
-  typename
-  unwrap_xtrans_redirect
-    <
-    Op<T1, op_strans>,
-    ( (Op<T1, op_strans>::is_row) || (Op<T1, op_strans>::is_col) )
-    >::result
-  unwrap_xtrans;
-  
-  static const bool has_subview = unwrap_xtrans::has_subview;
-  
-  inline
-  unwrap(const Op<T1, op_strans>& A)
-    : unwrap_xtrans(A)
-    {
-    arma_extra_debug_sigprint();
-    }
-  
-  using unwrap_xtrans::M;
-  
-  template<typename eT2>
-  arma_inline bool is_alias(const Mat<eT2>& X) const { return unwrap_xtrans::is_alias(X); }
-  };
-
-
-
 //
 //
 //
-
-
-
-// TODO: add handling of op_htrans and op_strans by unwrap_check
 
 
 
@@ -376,6 +361,13 @@ struct unwrap_check_default
   
   inline
   unwrap_check_default(const T1& A, const Mat<eT>&)
+    : M(A)
+    {
+    arma_extra_debug_sigprint();
+    }
+  
+  inline
+  unwrap_check_default(const T1& A, const bool)
     : M(A)
     {
     arma_extra_debug_sigprint();
@@ -393,12 +385,32 @@ struct unwrap_check_fixed
   
   inline
   unwrap_check_fixed(const T1& A, const Mat<eT>& B)
-    : M( const_cast<eT*>(A.memptr()), T1::n_rows, T1::n_cols, (&A == &B), false )  // the (&A == &B) aliasing test is currently sufficient
+    : M_local( (&A == &B) ? new Mat<eT>(A) : 0 )
+    , M      ( (&A == &B) ? *M_local       : A )
     {
     arma_extra_debug_sigprint();
     }
   
-  const Mat<eT> M;
+  inline
+  unwrap_check_fixed(const T1& A, const bool is_alias)
+    : M_local( is_alias ? new Mat<eT>(A) : 0 )
+    , M      ( is_alias ? *M_local       : A )
+    {
+    arma_extra_debug_sigprint();
+    }
+  
+  inline
+  ~unwrap_check_fixed()
+    {
+    arma_extra_debug_sigprint();
+    
+    if(M_local) { delete M_local; }
+    }
+  
+  
+  // the order below is important
+  const Mat<eT>* M_local;
+  const Mat<eT>& M;
   };
 
 
@@ -420,6 +432,11 @@ struct unwrap_check : public unwrap_check_redirect<T1, is_Mat_fixed<T1>::value >
     : unwrap_check_redirect< T1, is_Mat_fixed<T1>::value >::result(A, B)
     {
     }
+  
+  inline unwrap_check(const T1& A, const bool is_alias)
+    : unwrap_check_redirect< T1, is_Mat_fixed<T1>::value >::result(A, is_alias)
+    {
+    }
   };
 
 
@@ -435,6 +452,12 @@ struct unwrap_check< Mat<eT> >
     arma_extra_debug_sigprint();
     }
   
+  unwrap_check(const Mat<eT>& A, const bool is_alias)
+    : M_local( is_alias ? new Mat<eT>(A) : 0 )
+    , M      ( is_alias ? (*M_local)     : A )
+    {
+    arma_extra_debug_sigprint();
+    }
   
   inline
   ~unwrap_check()
@@ -457,12 +480,18 @@ struct unwrap_check< Row<eT> >
   {
   inline
   unwrap_check(const Row<eT>& A, const Mat<eT>& B)
-    : M_local( (&A == reinterpret_cast<const Row<eT>*>(&B)) ? new Row<eT>(A) : 0 )
-    , M      ( (&A == reinterpret_cast<const Row<eT>*>(&B)) ? (*M_local)     : A )
+    : M_local( (&A == &B) ? new Row<eT>(A) : 0 )
+    , M      ( (&A == &B) ? (*M_local)     : A )
     {
     arma_extra_debug_sigprint();
     }
   
+  unwrap_check(const Row<eT>& A, const bool is_alias)
+    : M_local( is_alias ? new Row<eT>(A) : 0 )
+    , M      ( is_alias ? (*M_local)     : A )
+    {
+    arma_extra_debug_sigprint();
+    }
   
   inline
   ~unwrap_check()
@@ -485,12 +514,18 @@ struct unwrap_check< Col<eT> >
   {
   inline
   unwrap_check(const Col<eT>& A, const Mat<eT>& B)
-    : M_local( (&A == reinterpret_cast<const Col<eT>*>(&B)) ? new Col<eT>(A) : 0 )
-    , M      ( (&A == reinterpret_cast<const Col<eT>*>(&B)) ? (*M_local)     : A )
+    : M_local( (&A == &B) ? new Col<eT>(A) : 0 )
+    , M      ( (&A == &B) ? (*M_local)     : A )
     {
     arma_extra_debug_sigprint();
     }
   
+  unwrap_check(const Col<eT>& A, const bool is_alias)
+    : M_local( is_alias ? new Col<eT>(A) : 0 )
+    , M      ( is_alias ? (*M_local)     : A )
+    {
+    arma_extra_debug_sigprint();
+    }
   
   inline
   ~unwrap_check()
@@ -504,173 +539,6 @@ struct unwrap_check< Col<eT> >
   // the order below is important
   const Col<eT>* M_local;
   const Col<eT>& M;
-  
-  };
-
-
-
-template<typename eT>
-struct unwrap_check< subview_col<eT> >
-  {
-  inline
-  unwrap_check(const subview_col<eT>& A, const Mat<eT>& B)
-    : M  ( const_cast<eT*>( A.colptr(0) ), A.n_rows, 1, (&(A.m) == &B), false )
-    //, ref( A )
-    {
-    arma_extra_debug_sigprint();
-    }
-  
-  const Mat<eT> M;
-  
-  //// prevents the compiler from potentially deleting the subview object before we're done with it
-  //const subview_col<eT>& ref;
-  };
-
-
-
-template<typename T1>
-struct unwrap_check_xtrans_default
-  {
-  typedef typename T1::elem_type eT;
-  
-  inline
-  unwrap_check_xtrans_default(const T1& A, const Mat<eT>&)
-    : M(A)
-    {
-    arma_extra_debug_sigprint();
-    }
-  
-  arma_aligned const Mat<eT> M;
-  };
-
-
-
-template<typename T1>
-struct unwrap_check_xtrans_vector
-  {
-  inline unwrap_check_xtrans_vector(const T1&) {}
-  };
-
-
-
-template<typename T1>
-struct unwrap_check_xtrans_vector< Op<T1, op_htrans> >
-  {
-  typedef typename T1::elem_type eT;
-  
-  inline
-  unwrap_check_xtrans_vector(const Op<T1, op_htrans>& A, const Mat<eT>& B)
-    : U(A.m, B)  // TODO: think about this more
-    , M(const_cast<eT*>(U.M.memptr()), U.M.n_cols, U.M.n_rows, false, false)
-    {
-    arma_extra_debug_sigprint();
-    }
-  
-  arma_aligned const unwrap_check<T1> U; // avoid copy if T1 is a Row, Col or subview_col
-  arma_aligned const Mat<eT>          M;
-  
-  // NOTE: unwrap_check would fail to detect aliasing if T1 is a matrix using external memory
-  // other objects that might be using external memory:
-  // - the result of unwrap< Op < op_xtrans, colvec > >
-  // - the result of unwrap< Op < op_xtrans, rowvec > >
-  // - the result of unwrap< Op < op_xtrans, subview_col > >
-  // - the result of unwrap< subview_col >
-  
-  // chaining unwrap_check operations may not work
-  };
-
-
-
-template<typename T1>
-struct unwrap_check_xtrans_vector< Op<T1, op_strans> >
-  {
-  typedef typename T1::elem_type eT;
-  
-  inline
-  unwrap_check_xtrans_vector(const Op<T1, op_strans>& A, const Mat<eT>& B)
-    : U(A.m, B)
-    , M(const_cast<eT*>(U.M.memptr()), U.M.n_cols, U.M.n_rows, false, false)
-    {
-    arma_extra_debug_sigprint();
-    }
-  
-  arma_aligned const unwrap_check<T1> U; // avoid copy if T1 is a Row, Col or subview_col
-  arma_aligned const Mat<eT>          M;
-  };
-
-
-
-template<typename T1, bool condition>
-struct unwrap_check_xtrans_redirect {};
-
-template<typename T1>
-struct unwrap_check_xtrans_redirect<T1, false> { typedef unwrap_check_xtrans_default<T1> result; };
-
-template<typename T1>
-struct unwrap_check_xtrans_redirect<T1, true>  { typedef unwrap_check_xtrans_vector<T1>  result; };
-
-
-
-template<typename T1>
-struct unwrap_check< Op<T1, op_htrans> >
-  : public
-    unwrap_check_xtrans_redirect
-      <
-      Op<T1, op_htrans>,
-      ((is_complex<typename T1::elem_type>::value == false) && ((Op<T1, op_htrans>::is_row) || (Op<T1, op_htrans>::is_col)) )
-      >::result
-  {
-  typedef
-  typename
-  unwrap_check_xtrans_redirect
-    <
-    Op<T1, op_htrans>,
-    ((is_complex<typename T1::elem_type>::value == false) && ((Op<T1, op_htrans>::is_row) || (Op<T1, op_htrans>::is_col)) )
-    >::result
-  unwrap_check_xtrans;
-  
-  typedef typename T1::elem_type eT;
-  
-  inline
-  unwrap_check(const Op<T1, op_htrans>& A, const Mat<eT>& B)
-    : unwrap_check_xtrans(A,B)
-    {
-    arma_extra_debug_sigprint();
-    }
-  
-  using unwrap_check_xtrans::M;
-  };
-
-
-
-template<typename T1>
-struct unwrap_check< Op<T1, op_strans> >
-  : public
-    unwrap_check_xtrans_redirect
-      <
-      Op<T1, op_strans>,
-      ( (Op<T1, op_strans>::is_row) || (Op<T1, op_strans>::is_col) )
-      >::result
-  {
-  typedef
-  typename
-  unwrap_check_xtrans_redirect
-    <
-    Op<T1, op_strans>,
-    ( (Op<T1, op_strans>::is_row) || (Op<T1, op_strans>::is_col) )
-    >::result
-  unwrap_check_xtrans;
-  
-  typedef typename T1::elem_type eT;
-  
-  inline
-  unwrap_check(const Op<T1, op_strans>& A, const Mat<eT>& B)
-    : unwrap_check_xtrans(A,B)
-    {
-    arma_extra_debug_sigprint();
-    }
-  
-  using unwrap_check_xtrans::M;
   };
 
 
@@ -679,7 +547,6 @@ struct unwrap_check< Op<T1, op_strans> >
 //
 //
 
-// TODO: add handling for fixed size matrices by unwrap_check_mixed
 
 
 template<typename T1>
@@ -690,6 +557,14 @@ struct unwrap_check_mixed
   template<typename eT2>
   inline
   unwrap_check_mixed(const T1& A, const Mat<eT2>&)
+    : M(A)
+    {
+    arma_extra_debug_sigprint();
+    }
+  
+  template<typename eT2>
+  inline
+  unwrap_check_mixed(const T1& A, const bool)
     : M(A)
     {
     arma_extra_debug_sigprint();
@@ -712,6 +587,14 @@ struct unwrap_check_mixed< Mat<eT1> >
     arma_extra_debug_sigprint();
     }
   
+  template<typename eT2>
+  inline
+  unwrap_check_mixed(const Mat<eT1>& A, const bool is_alias)
+    : M_local( is_alias ? new Mat<eT1>(A) : 0 )
+    , M      ( is_alias ? (*M_local)      : A )
+    {
+    arma_extra_debug_sigprint();
+    }
   
   inline
   ~unwrap_check_mixed()
@@ -742,6 +625,15 @@ struct unwrap_check_mixed< Row<eT1> >
     }
   
   
+  template<typename eT2>
+  inline
+  unwrap_check_mixed(const Row<eT1>& A, const bool is_alias)
+    : M_local( is_alias ? new Row<eT1>(A) : 0 )
+    , M      ( is_alias ? (*M_local)      : A )
+    {
+    arma_extra_debug_sigprint();
+    }
+  
   inline
   ~unwrap_check_mixed()
     {
@@ -770,6 +662,14 @@ struct unwrap_check_mixed< Col<eT1> >
     arma_extra_debug_sigprint();
     }
   
+  template<typename eT2>
+  inline
+  unwrap_check_mixed(const Col<eT1>& A, const bool is_alias)
+    : M_local( is_alias ? new Col<eT1>(A) : 0 )
+    , M      ( is_alias ? (*M_local)      : A )
+    {
+    arma_extra_debug_sigprint();
+    }
   
   inline
   ~unwrap_check_mixed()
@@ -787,22 +687,8 @@ struct unwrap_check_mixed< Col<eT1> >
 
 
 
-template<typename eT1>
-struct unwrap_check_mixed< subview_col<eT1> >
-  {
-  template<typename eT2>
-  inline
-  unwrap_check_mixed(const subview_col<eT1>& A, const Mat<eT2>& B)
-    : M( const_cast<eT1*>(A.colptr(0)), A.n_rows, 1, (void_ptr(&(A.m)) == void_ptr(&B)), false )
-    {
-    arma_extra_debug_sigprint();
-    }
-  
-  const Mat<eT1> M;
-  };
-
-
-
+//
+//
 //
 
 
@@ -829,12 +715,12 @@ struct partial_unwrap_default
 
 
 template<typename T1>
-struct partial_unwrap_Mat_fixed
+struct partial_unwrap_fixed
   {
   typedef typename T1::elem_type eT;
   
   inline explicit
-  partial_unwrap_Mat_fixed(const T1& A)
+  partial_unwrap_fixed(const T1& A)
     : M(A)
     {
     arma_extra_debug_sigprint();
@@ -854,10 +740,10 @@ template<typename T1, bool condition>
 struct partial_unwrap_redirect {};
 
 template<typename T1>
-struct partial_unwrap_redirect<T1, false> { typedef partial_unwrap_default<T1>   result; };
+struct partial_unwrap_redirect<T1, false> { typedef partial_unwrap_default<T1> result; };
 
 template<typename T1>
-struct partial_unwrap_redirect<T1, true>  { typedef partial_unwrap_Mat_fixed<T1> result; };
+struct partial_unwrap_redirect<T1, true>  { typedef partial_unwrap_fixed<T1>   result; };
 
 template<typename T1>
 struct partial_unwrap : public partial_unwrap_redirect<T1, is_Mat_fixed<T1>::value >::result

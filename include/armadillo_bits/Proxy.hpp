@@ -330,11 +330,11 @@ struct Proxy_xtrans_vector< Op<T1, op_htrans> >
   typedef typename T1::elem_type eT;
   
   static const bool prefer_at_accessor = false;
-  static const bool has_subview        = unwrap<T1>::has_subview;
+  static const bool has_subview        = quasi_unwrap<T1>::has_subview;
   static const bool is_fixed           = false;
   
-  arma_aligned const unwrap<T1> U; // avoid copy if T1 is a Row, Col or subview_col
-  arma_aligned const Mat<eT>    Q;
+  arma_aligned const quasi_unwrap<T1> U; // avoid copy if T1 is a Row, Col or subview_col
+  arma_aligned const Mat<eT>          Q;
   
   inline Proxy_xtrans_vector(const Op<T1, op_htrans>& A)
     : U(A.m)
@@ -355,11 +355,11 @@ struct Proxy_xtrans_vector< Op<T1, op_strans> >
   typedef typename T1::elem_type eT;
   
   static const bool prefer_at_accessor = false;
-  static const bool has_subview        = unwrap<T1>::has_subview;
+  static const bool has_subview        = quasi_unwrap<T1>::has_subview;
   static const bool is_fixed           = false;
   
-  arma_aligned const unwrap<T1> U; // avoid copy if T1 is a Row, Col or subview_col
-  arma_aligned const Mat<eT>    Q;
+  arma_aligned const quasi_unwrap<T1> U; // avoid copy if T1 is a Row, Col or subview_col
+  arma_aligned const Mat<eT>          Q;
   
   inline Proxy_xtrans_vector(const Op<T1, op_strans>& A)
     : U(A.m)

@@ -60,12 +60,12 @@ op_htrans::apply_noalias(Mat<eT>& out, const Mat<eT>& A, const typename arma_cx_
 template<typename eT>
 arma_inline
 void
-op_htrans::apply(Mat<eT>& out, const Mat<eT>& A, const bool is_alias, const typename arma_not_cx<eT>::result* junk)
+op_htrans::apply(Mat<eT>& out, const Mat<eT>& A, const typename arma_not_cx<eT>::result* junk)
   {
   arma_extra_debug_sigprint();
   arma_ignore(junk);
   
-  op_strans::apply(out, A, is_alias);
+  op_strans::apply(out, A);
   }
 
 
@@ -73,12 +73,12 @@ op_htrans::apply(Mat<eT>& out, const Mat<eT>& A, const bool is_alias, const type
 template<typename eT>
 inline
 void
-op_htrans::apply(Mat<eT>& out, const Mat<eT>& A, const bool is_alias, const typename arma_cx_only<eT>::result* junk)
+op_htrans::apply(Mat<eT>& out, const Mat<eT>& A, const typename arma_cx_only<eT>::result* junk)
   {
   arma_extra_debug_sigprint();
   arma_ignore(junk);
   
-  if(is_alias == false)
+  if(&out != &A)
     {
     op_htrans::apply_noalias(out, A);
     }
@@ -132,7 +132,7 @@ op_htrans::apply(Mat<typename T1::elem_type>& out, const Op<T1,op_htrans>& in)
   const unwrap<T1> tmp(in.m);
   const Mat<eT>& A = tmp.M;
   
-  op_htrans::apply(out, A, tmp.is_alias(out));
+  op_htrans::apply(out, A);
   }
 
 
@@ -151,7 +151,7 @@ op_htrans::apply(Mat<typename T1::elem_type>& out, const Op< Op<T1, op_trimat>, 
   
   const bool upper = in.m.aux_uword_a;
   
-  op_trimat::apply_htrans(out, A, upper, tmp.is_alias(out));
+  op_trimat::apply_htrans(out, A, upper);
   }
 
 
@@ -164,12 +164,12 @@ op_htrans::apply(Mat<typename T1::elem_type>& out, const Op< Op<T1, op_trimat>, 
 template<typename eT>
 arma_inline
 void
-op_htrans2::apply(Mat<eT>& out, const Mat<eT>& A, const eT val, const bool is_alias, const typename arma_not_cx<eT>::result* junk)
+op_htrans2::apply(Mat<eT>& out, const Mat<eT>& A, const eT val, const typename arma_not_cx<eT>::result* junk)
   {
   arma_extra_debug_sigprint();
   arma_ignore(junk);
   
-  op_strans2::apply(out, A, val, is_alias);
+  op_strans2::apply(out, A, val);
   }
 
 
@@ -177,14 +177,14 @@ op_htrans2::apply(Mat<eT>& out, const Mat<eT>& A, const eT val, const bool is_al
 template<typename eT>
 inline
 void
-op_htrans2::apply(Mat<eT>& out, const Mat<eT>& A, const eT val, const bool is_alias, const typename arma_cx_only<eT>::result* junk)
+op_htrans2::apply(Mat<eT>& out, const Mat<eT>& A, const eT val, const typename arma_cx_only<eT>::result* junk)
   {
   arma_extra_debug_sigprint();
   arma_ignore(junk);
   
   // TODO: replace with specialised implementation
   
-  op_htrans::apply(out, A, is_alias);
+  op_htrans::apply(out, A);
   
   arrayops::inplace_mul( out.memptr(), val, out.n_elem );
   }
@@ -202,7 +202,7 @@ op_htrans2::apply(Mat<typename T1::elem_type>& out, const Op<T1,op_htrans2>& in)
   
   const unwrap<T1> tmp(in.m);
   
-  op_htrans2::apply(out, tmp.M, in.aux, tmp.is_alias(out));
+  op_htrans2::apply(out, tmp.M, in.aux);
   }
 
 
