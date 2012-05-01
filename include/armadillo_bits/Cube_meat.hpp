@@ -278,6 +278,8 @@ Cube<eT>::init
         ea_type1 PX      = X.get_ea();
         ea_type2 PY      = Y.get_ea();
   
+  // TODO: add handling for prefer_at_accessor = true
+  
   for(uword i=0; i<N; ++i)
     {
     out_mem[i] = std::complex<T>(PX[i], PY[i]);
@@ -3339,6 +3341,8 @@ Cube_aux::set_real(Cube< std::complex<T> >& out, const BaseCube<T,T1>& X)
         eT*     out_mem = out.memptr();
         ea_type PA      = A.get_ea();
   
+  // TODO: add handling for prefer_at_accessor = true
+  
   for(uword i=0; i<n_elem; ++i)
     {
     //out_mem[i].real() = PA[i];
@@ -3370,6 +3374,8 @@ Cube_aux::set_imag(Cube< std::complex<T> >& out, const BaseCube<T,T1>& X)
   const uword   n_elem  = out.n_elem;
         eT*     out_mem = out.memptr();
         ea_type PA      = A.get_ea();
+  
+  // TODO: add handling for prefer_at_accessor = true
   
   for(uword i=0; i<n_elem; ++i)
     {
