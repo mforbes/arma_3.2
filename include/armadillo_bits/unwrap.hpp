@@ -167,7 +167,8 @@ struct quasi_unwrap_default
     arma_extra_debug_sigprint();
     }
   
-  const Mat<eT> M;  // NOTE: DO NOT DIRECTLY CHECK FOR ALIASING BY TAKING THE ADDRESS OF THE "M" OBJECT IN ANY quasi_unwrap CLASS !!!
+  // NOTE: DO NOT DIRECTLY CHECK FOR ALIASING BY TAKING THE ADDRESS OF THE "M" OBJECT IN ANY quasi_unwrap CLASS !!!
+  const Mat<eT> M;
   
   template<typename eT2>
   arma_inline bool is_alias(const Mat<eT2>&) const { return false; }
@@ -817,6 +818,8 @@ struct partial_unwrap< Col<eT> >
 
 
 
+// NOTE: we can get away with this shortcut as the partial_unwrap class is only used by as_scalar(),
+// NOTE: which doesn't need to check for aliasing (ie. it doesn't need to compare the address of M with another matrix)
 template<typename eT>
 struct partial_unwrap< subview_col<eT> >
   {
@@ -863,12 +866,12 @@ struct partial_unwrap_htrans_default
 
 
 template<typename T1>
-struct partial_unwrap_htrans_Mat_fixed
+struct partial_unwrap_htrans_fixed
   {
   typedef typename T1::elem_type eT;
   
   inline explicit
-  partial_unwrap_htrans_Mat_fixed(const Op<T1, op_htrans>& A)
+  partial_unwrap_htrans_fixed(const Op<T1, op_htrans>& A)
     : M(A.m)
     {
     arma_extra_debug_sigprint();
@@ -888,10 +891,10 @@ template<typename T1, bool condition>
 struct partial_unwrap_htrans_redirect {};
 
 template<typename T1>
-struct partial_unwrap_htrans_redirect<T1, false> { typedef partial_unwrap_htrans_default<T1>   result; };
+struct partial_unwrap_htrans_redirect<T1, false> { typedef partial_unwrap_htrans_default<T1> result; };
 
 template<typename T1>
-struct partial_unwrap_htrans_redirect<T1, true>  { typedef partial_unwrap_htrans_Mat_fixed<T1> result; };
+struct partial_unwrap_htrans_redirect<T1, true>  { typedef partial_unwrap_htrans_fixed<T1>   result; };
 
 template<typename T1>
 struct partial_unwrap< Op<T1, op_htrans> > : public partial_unwrap_htrans_redirect<T1, is_Mat_fixed<T1>::value >::result
@@ -964,6 +967,8 @@ struct partial_unwrap< Op< Col<eT>, op_htrans> >
 
 
 
+// NOTE: we can get away with this shortcut as the partial_unwrap class is only used by as_scalar(),
+// NOTE: which doesn't need to check for aliasing (ie. it doesn't need to compare the address of M with another matrix)
 template<typename eT>
 struct partial_unwrap< Op< subview_col<eT>, op_htrans> >
   {
@@ -1012,12 +1017,12 @@ struct partial_unwrap_htrans2_default
 
 
 template<typename T1>
-struct partial_unwrap_htrans2_Mat_fixed
+struct partial_unwrap_htrans2_fixed
   {
   typedef typename T1::elem_type eT;
   
   inline explicit
-  partial_unwrap_htrans2_Mat_fixed(const Op<T1, op_htrans2>& A)
+  partial_unwrap_htrans2_fixed(const Op<T1, op_htrans2>& A)
     : val(A.aux)
     , M  (A.m)
     {
@@ -1039,10 +1044,10 @@ template<typename T1, bool condition>
 struct partial_unwrap_htrans2_redirect {};
 
 template<typename T1>
-struct partial_unwrap_htrans2_redirect<T1, false> { typedef partial_unwrap_htrans2_default<T1>   result; };
+struct partial_unwrap_htrans2_redirect<T1, false> { typedef partial_unwrap_htrans2_default<T1> result; };
 
 template<typename T1>
-struct partial_unwrap_htrans2_redirect<T1, true>  { typedef partial_unwrap_htrans2_Mat_fixed<T1> result; };
+struct partial_unwrap_htrans2_redirect<T1, true>  { typedef partial_unwrap_htrans2_fixed<T1>   result; };
 
 template<typename T1>
 struct partial_unwrap< Op<T1, op_htrans2> > : public partial_unwrap_htrans2_redirect<T1, is_Mat_fixed<T1>::value >::result
@@ -1121,6 +1126,8 @@ struct partial_unwrap< Op< Col<eT>, op_htrans2> >
 
 
 
+// NOTE: we can get away with this shortcut as the partial_unwrap class is only used by as_scalar(),
+// NOTE: which doesn't need to check for aliasing (ie. it doesn't need to compare the address of M with another matrix)
 template<typename eT>
 struct partial_unwrap< Op< subview_col<eT>, op_htrans2> >
   {
@@ -1172,12 +1179,12 @@ struct partial_unwrap_scalar_times_default
 
 
 template<typename T1>
-struct partial_unwrap_scalar_times_Mat_fixed
+struct partial_unwrap_scalar_times_fixed
   {
   typedef typename T1::elem_type eT;
   
   inline explicit
-  partial_unwrap_scalar_times_Mat_fixed(const eOp<T1, eop_scalar_times>& A)
+  partial_unwrap_scalar_times_fixed(const eOp<T1, eop_scalar_times>& A)
     : val(A.aux)
     , M  (A.P.Q)
     {
@@ -1199,10 +1206,10 @@ template<typename T1, bool condition>
 struct partial_unwrap_scalar_times_redirect {};
 
 template<typename T1>
-struct partial_unwrap_scalar_times_redirect<T1, false> { typedef partial_unwrap_scalar_times_default<T1>   result; };
+struct partial_unwrap_scalar_times_redirect<T1, false> { typedef partial_unwrap_scalar_times_default<T1> result; };
 
 template<typename T1>
-struct partial_unwrap_scalar_times_redirect<T1, true>  { typedef partial_unwrap_scalar_times_Mat_fixed<T1> result; };
+struct partial_unwrap_scalar_times_redirect<T1, true>  { typedef partial_unwrap_scalar_times_fixed<T1>   result; };
 
 
 template<typename T1>
@@ -1311,12 +1318,12 @@ struct partial_unwrap_check_default
 
 
 template<typename T1>
-struct partial_unwrap_check_Mat_fixed
+struct partial_unwrap_check_fixed
   {
   typedef typename T1::elem_type eT;
   
   inline explicit
-  partial_unwrap_check_Mat_fixed(const T1& A, const Mat<eT>& B)
+  partial_unwrap_check_fixed(const T1& A, const Mat<eT>& B)
     : M_local( (&A == &B) ? new Mat<eT>(A) : 0 )
     , M      ( (&A == &B) ? (*M_local)     : A )
     {
@@ -1324,7 +1331,7 @@ struct partial_unwrap_check_Mat_fixed
     }
   
   inline
-  ~partial_unwrap_check_Mat_fixed()
+  ~partial_unwrap_check_fixed()
     {
     arma_extra_debug_sigprint();
     
@@ -1346,10 +1353,10 @@ template<typename T1, bool condition>
 struct partial_unwrap_check_redirect {};
 
 template<typename T1>
-struct partial_unwrap_check_redirect<T1, false> { typedef partial_unwrap_check_default<T1>   result; };
+struct partial_unwrap_check_redirect<T1, false> { typedef partial_unwrap_check_default<T1> result; };
 
 template<typename T1>
-struct partial_unwrap_check_redirect<T1, true>  { typedef partial_unwrap_check_Mat_fixed<T1> result; };
+struct partial_unwrap_check_redirect<T1, true>  { typedef partial_unwrap_check_fixed<T1>   result; };
 
 template<typename T1>
 struct partial_unwrap_check : public partial_unwrap_check_redirect<T1, is_Mat_fixed<T1>::value >::result
@@ -1460,6 +1467,8 @@ struct partial_unwrap_check< Col<eT> >
 
 
 
+// NOTE: we can get away with this shortcut as the partial_unwrap_check class is only used by the glue_times class,
+// NOTE: which relies on partial_unwrap_check to check for aliasing
 template<typename eT>
 struct partial_unwrap_check< subview_col<eT> >
   {
@@ -1506,12 +1515,12 @@ struct partial_unwrap_check_htrans_default
 
 
 template<typename T1>
-struct partial_unwrap_check_htrans_Mat_fixed
+struct partial_unwrap_check_htrans_fixed
   {
   typedef typename T1::elem_type eT;
   
   inline explicit
-  partial_unwrap_check_htrans_Mat_fixed(const Op<T1, op_htrans>& A, const Mat<eT>& B)
+  partial_unwrap_check_htrans_fixed(const Op<T1, op_htrans>& A, const Mat<eT>& B)
     : M_local( (&(A.m) == &B) ? new Mat<eT>(A.m) : 0   )
     , M      ( (&(A.m) == &B) ? (*M_local)       : A.m )
     {
@@ -1519,7 +1528,7 @@ struct partial_unwrap_check_htrans_Mat_fixed
     }
   
   inline
-  ~partial_unwrap_check_htrans_Mat_fixed()
+  ~partial_unwrap_check_htrans_fixed()
     {
     arma_extra_debug_sigprint();
     
@@ -1541,10 +1550,10 @@ template<typename T1, bool condition>
 struct partial_unwrap_check_htrans_redirect {};
 
 template<typename T1>
-struct partial_unwrap_check_htrans_redirect<T1, false> { typedef partial_unwrap_check_htrans_default<T1>   result; };
+struct partial_unwrap_check_htrans_redirect<T1, false> { typedef partial_unwrap_check_htrans_default<T1> result; };
 
 template<typename T1>
-struct partial_unwrap_check_htrans_redirect<T1, true>  { typedef partial_unwrap_check_htrans_Mat_fixed<T1> result; };
+struct partial_unwrap_check_htrans_redirect<T1, true>  { typedef partial_unwrap_check_htrans_fixed<T1>   result; };
 
 
 template<typename T1>
@@ -1653,6 +1662,8 @@ struct partial_unwrap_check< Op< Col<eT>, op_htrans> >
 
 
 
+// NOTE: we can get away with this shortcut as the partial_unwrap_check class is only used by the glue_times class,
+// NOTE: which relies on partial_unwrap_check to check for aliasing
 template<typename eT>
 struct partial_unwrap_check< Op< subview_col<eT>, op_htrans> >
   {
@@ -1702,12 +1713,12 @@ struct partial_unwrap_check_htrans2_default
 
 
 template<typename T1>
-struct partial_unwrap_check_htrans2_Mat_fixed
+struct partial_unwrap_check_htrans2_fixed
   {
   typedef typename T1::elem_type eT;
   
   inline explicit
-  partial_unwrap_check_htrans2_Mat_fixed(const Op<T1, op_htrans2>& A, const Mat<eT>& B)
+  partial_unwrap_check_htrans2_fixed(const Op<T1, op_htrans2>& A, const Mat<eT>& B)
     : val    (A.aux)
     , M_local( (&(A.m) == &B) ? new Mat<eT>(A.m) : 0   )
     , M      ( (&(A.m) == &B) ? (*M_local)       : A.m )
@@ -1716,7 +1727,7 @@ struct partial_unwrap_check_htrans2_Mat_fixed
     }
   
   inline
-  ~partial_unwrap_check_htrans2_Mat_fixed()
+  ~partial_unwrap_check_htrans2_fixed()
     {
     arma_extra_debug_sigprint();
     
@@ -1739,10 +1750,10 @@ template<typename T1, bool condition>
 struct partial_unwrap_check_htrans2_redirect {};
 
 template<typename T1>
-struct partial_unwrap_check_htrans2_redirect<T1, false> { typedef partial_unwrap_check_htrans2_default<T1>   result; };
+struct partial_unwrap_check_htrans2_redirect<T1, false> { typedef partial_unwrap_check_htrans2_default<T1> result; };
 
 template<typename T1>
-struct partial_unwrap_check_htrans2_redirect<T1, true>  { typedef partial_unwrap_check_htrans2_Mat_fixed<T1> result; };
+struct partial_unwrap_check_htrans2_redirect<T1, true>  { typedef partial_unwrap_check_htrans2_fixed<T1>   result; };
 
 
 template<typename T1>
@@ -1857,6 +1868,8 @@ struct partial_unwrap_check< Op< Col<eT>, op_htrans2> >
 
 
 
+// NOTE: we can get away with this shortcut as the partial_unwrap_check class is only used by the glue_times class,
+// NOTE: which relies on partial_unwrap_check to check for aliasing
 template<typename eT>
 struct partial_unwrap_check< Op< subview_col<eT>, op_htrans2> >
   {
@@ -1908,11 +1921,12 @@ struct partial_unwrap_check_scalar_times_default
 
 
 template<typename T1>
-struct partial_unwrap_check_scalar_times_Mat_fixed
+struct partial_unwrap_check_scalar_times_fixed
   {
   typedef typename T1::elem_type eT;
   
-  inline explicit partial_unwrap_check_scalar_times_Mat_fixed(const eOp<T1, eop_scalar_times>& A, const Mat<eT>& B)
+  inline explicit
+  partial_unwrap_check_scalar_times_fixed(const eOp<T1, eop_scalar_times>& A, const Mat<eT>& B)
     : val    ( A.aux )
     , M_local( (&(A.P.Q) == &B) ? new Mat<eT>(A.P.Q) : 0     )
     , M      ( (&(A.P.Q) == &B) ? (*M_local)         : A.P.Q )
@@ -1921,7 +1935,7 @@ struct partial_unwrap_check_scalar_times_Mat_fixed
     }
   
   inline
-  ~partial_unwrap_check_scalar_times_Mat_fixed()
+  ~partial_unwrap_check_scalar_times_fixed()
     {
     arma_extra_debug_sigprint();
     
@@ -1944,10 +1958,10 @@ template<typename T1, bool condition>
 struct partial_unwrap_check_scalar_times_redirect {};
 
 template<typename T1>
-struct partial_unwrap_check_scalar_times_redirect<T1, false> { typedef partial_unwrap_check_scalar_times_default<T1>   result; };
+struct partial_unwrap_check_scalar_times_redirect<T1, false> { typedef partial_unwrap_check_scalar_times_default<T1> result; };
 
 template<typename T1>
-struct partial_unwrap_check_scalar_times_redirect<T1, true>  { typedef partial_unwrap_check_scalar_times_Mat_fixed<T1> result; };
+struct partial_unwrap_check_scalar_times_redirect<T1, true>  { typedef partial_unwrap_check_scalar_times_fixed<T1>   result; };
 
 
 template<typename T1>
@@ -2059,6 +2073,8 @@ struct partial_unwrap_check< eOp<Col<eT>, eop_scalar_times> >
 
 
 
+// NOTE: we can get away with this shortcut as the partial_unwrap_check class is only used by the glue_times class,
+// NOTE: which relies on partial_unwrap_check to check for aliasing
 template<typename eT>
 struct partial_unwrap_check< eOp<subview_col<eT>, eop_scalar_times> >
   {
