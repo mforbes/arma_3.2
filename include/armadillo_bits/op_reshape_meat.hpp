@@ -29,6 +29,8 @@ op_reshape::apply(Mat<typename T1::elem_type>& out, const Op<T1,op_reshape>& in)
   const unwrap<T1>   tmp(in.m);
   const Mat<eT>& A = tmp.M;
   
+  const bool is_alias = (&out == &A);
+  
   const uword in_n_rows = in.aux_uword_a;
   const uword in_n_cols = in.aux_uword_b;
   const uword in_dim    = in.aux_uword_c;
@@ -39,7 +41,7 @@ op_reshape::apply(Mat<typename T1::elem_type>& out, const Op<T1,op_reshape>& in)
     {
     if(in_dim == 0)
       {
-      if(tmp.is_alias(out) == false)
+      if(is_alias == false)
         {
         out.set_size(in_n_rows, in_n_cols);
         arrayops::copy( out.memptr(), A.memptr(), out.n_elem );
@@ -63,7 +65,7 @@ op_reshape::apply(Mat<typename T1::elem_type>& out, const Op<T1,op_reshape>& in)
       }
     else
       {
-      unwrap_check< Mat<eT> > tmp(A, out);  // TODO: bug. assumes unwrap produces a fresh matrix
+      unwrap_check< Mat<eT> > tmp(A, is_alias);
       const Mat<eT>& B      = tmp.M;
       
       out.set_size(in_n_rows, in_n_cols);
@@ -88,7 +90,7 @@ op_reshape::apply(Mat<typename T1::elem_type>& out, const Op<T1,op_reshape>& in)
   else
     {
     const unwrap_check< Mat<eT> > tmp(A, out);
-    const Mat<eT>& B            = tmp.M;  // TODO: bug. assumes unwrap produces a fresh matrix
+    const Mat<eT>& B            = tmp.M;
     
     const uword n_elem_to_copy = (std::min)(B.n_elem, in_n_elem);
     

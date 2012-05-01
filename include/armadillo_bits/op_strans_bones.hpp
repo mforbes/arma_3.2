@@ -36,7 +36,7 @@ class op_strans
   inline static void apply_noalias(Mat<eT>& out, const Mat<eT>& A);
   
   template<typename eT>
-  inline static void apply(Mat<eT>& out, const Mat<eT>& A, const bool is_alias);
+  inline static void apply(Mat<eT>& out, const Mat<eT>& A);
   
   template<typename T1>
   inline static void apply(Mat<typename T1::elem_type>& out, const Op<T1,op_strans>& in);
@@ -63,7 +63,7 @@ class op_strans2
   inline static void apply_noalias(Mat<eT>& out, const Mat<eT>& A, const eT val);
   
   template<typename eT>
-  inline static void apply(Mat<eT>& out, const Mat<eT>& A, const eT val, const bool is_alias);
+  inline static void apply(Mat<eT>& out, const Mat<eT>& A, const eT val);
   };
 
 

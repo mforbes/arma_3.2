@@ -224,13 +224,13 @@ subview<eT>::operator= (const Base<eT,T1>& in)
     
   arma_debug_assert_same_size(t, P, "copy into submatrix");
   
-  const bool alias = P.is_alias(t.m);
+  const bool is_alias = P.is_alias(t.m);
   
-  arma_extra_debug_warn(alias, "aliasing detected");
+  arma_extra_debug_warn(is_alias, "aliasing detected");
   
-  if( (alias == true) || (is_Mat<typename Proxy<T1>::stored_type>::value == true) )
+  if( (is_Mat<typename Proxy<T1>::stored_type>::value == true) || (is_alias == true) )
     {
-    const unwrap_check<typename Proxy<T1>::stored_type> tmp(P.Q, t.m);  // TODO: possible bug; what if P.Q is a fake matrix ?
+    const unwrap_check<typename Proxy<T1>::stored_type> tmp(P.Q, is_alias);
     const Mat<eT>& x = tmp.M;
     
     if(t_n_rows == 1)
@@ -332,13 +332,13 @@ subview<eT>::operator+= (const Base<eT,T1>& in)
   
   arma_debug_assert_same_size(t, P, "addition");
   
-  const bool alias = P.is_alias(t.m);
+  const bool is_alias = P.is_alias(t.m);
   
-  arma_extra_debug_warn(alias, "aliasing detected");
+  arma_extra_debug_warn(is_alias, "aliasing detected");
   
-  if( (alias == true) || (is_Mat<typename Proxy<T1>::stored_type>::value == true) )
+  if( (is_Mat<typename Proxy<T1>::stored_type>::value == true) || (is_alias == true) )
     {
-    const unwrap_check<typename Proxy<T1>::stored_type> tmp(P.Q, t.m);  // TODO: possible bug
+    const unwrap_check<typename Proxy<T1>::stored_type> tmp(P.Q, is_alias);
     const Mat<eT>& x = tmp.M;
     
     if(t_n_rows == 1)
@@ -440,11 +440,13 @@ subview<eT>::operator-= (const Base<eT,T1>& in)
   
   arma_debug_assert_same_size(t, P, "subtraction");
   
-  const bool alias = P.is_alias(t.m);
+  const bool is_alias = P.is_alias(t.m);
   
-  if( (alias == true) || (is_Mat<typename Proxy<T1>::stored_type>::value == true) )
+  arma_extra_debug_warn(is_alias, "aliasing detected");
+  
+  if( (is_Mat<typename Proxy<T1>::stored_type>::value == true) || (is_alias == true) )
     {
-    const unwrap_check<typename Proxy<T1>::stored_type> tmp(P.Q, t.m);  // TODO: possible bug
+    const unwrap_check<typename Proxy<T1>::stored_type> tmp(P.Q, is_alias);
     const Mat<eT>& x = tmp.M;
     
     if(t_n_rows == 1)
@@ -546,13 +548,13 @@ subview<eT>::operator%= (const Base<eT,T1>& in)
   
   arma_debug_assert_same_size(t, P, "element-wise multiplication");
   
-  const bool alias = P.is_alias(t.m);
+  const bool is_alias = P.is_alias(t.m);
   
-  arma_extra_debug_warn(alias, "aliasing detected");
+  arma_extra_debug_warn(is_alias, "aliasing detected");
   
-  if( (alias == true) || (is_Mat<typename Proxy<T1>::stored_type>::value == true) )
+  if( (is_Mat<typename Proxy<T1>::stored_type>::value == true) || (is_alias == true) )
     {
-    const unwrap_check<typename Proxy<T1>::stored_type> tmp(P.Q, t.m); // TODO: possible bug
+    const unwrap_check<typename Proxy<T1>::stored_type> tmp(P.Q, is_alias);
     const Mat<eT>& x = tmp.M;
     
     if(t_n_rows == 1)
@@ -654,13 +656,13 @@ subview<eT>::operator/= (const Base<eT,T1>& in)
   
   arma_debug_assert_same_size(t, P, "element-wise division");
   
-  const bool alias = P.is_alias(t.m);
+  const bool is_alias = P.is_alias(t.m);
   
-  arma_extra_debug_warn(alias, "aliasing detected");
+  arma_extra_debug_warn(is_alias, "aliasing detected");
   
-  if( (alias == true) || (is_Mat<typename Proxy<T1>::stored_type>::value == true) )
+  if( (is_Mat<typename Proxy<T1>::stored_type>::value == true) || (is_alias == true) )
     {
-    const unwrap_check<typename Proxy<T1>::stored_type> tmp(P.Q, t.m);  // TODO: possible bug
+    const unwrap_check<typename Proxy<T1>::stored_type> tmp(P.Q, is_alias);
     const Mat<eT>& x = tmp.M;
     
     if(t_n_rows == 1)

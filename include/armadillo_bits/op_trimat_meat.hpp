@@ -69,7 +69,7 @@ op_trimat::apply(Mat<typename T1::elem_type>& out, const Op<T1,op_trimat>& in)
   const uword N     = A.n_rows;
   const bool  upper = (in.aux_uword_a == 0);
   
-  if(tmp.is_alias(out) == false)
+  if(&out != &A)
     {
     out.copy_size(A);
     
@@ -116,7 +116,7 @@ op_trimat::apply(Mat<typename T1::elem_type>& out, const Op<Op<T1, op_htrans>, o
   
   const bool upper = (in.aux_uword_a == 0);
   
-  op_trimat::apply_htrans(out, A, upper, tmp.is_alias(out));
+  op_trimat::apply_htrans(out, A, upper);
   }
 
 
@@ -129,7 +129,6 @@ op_trimat::apply_htrans
         Mat<eT>& out,
   const Mat<eT>& A,
   const bool     upper,
-  const bool     is_alias,
   const typename arma_not_cx<eT>::result* junk
   )
   {
@@ -149,7 +148,7 @@ op_trimat::apply_htrans
   
   const uword N = A.n_rows;
   
-  if(is_alias == false)
+  if(&out != &A)
     {
     out.copy_size(A);
     }
@@ -198,7 +197,6 @@ op_trimat::apply_htrans
         Mat<eT>& out,
   const Mat<eT>& A,
   const bool     upper,
-  const bool     is_alias,
   const typename arma_cx_only<eT>::result* junk
   )
   {
@@ -209,7 +207,7 @@ op_trimat::apply_htrans
   
   const uword N = A.n_rows;
   
-  if(is_alias == false)
+  if(&out != &A)
     {
     out.copy_size(A);
     }
