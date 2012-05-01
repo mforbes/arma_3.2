@@ -182,7 +182,8 @@ class diagmat_proxy< Mat<eT> >
   typedef          eT                              elem_type;
   typedef typename get_pod_type<elem_type>::result pod_type;
   
-  inline diagmat_proxy(const Mat<eT>& X)
+  inline
+  diagmat_proxy(const Mat<eT>& X)
     : P       ( X )
     , P_is_vec( (X.n_rows == 1) || (X.n_cols == 1) )
     , n_elem  ( P_is_vec ? X.n_elem : (std::min)(X.n_elem, X.n_rows) )
@@ -215,7 +216,8 @@ class diagmat_proxy< Row<eT> >
   typedef typename get_pod_type<elem_type>::result pod_type;
   
   
-  inline diagmat_proxy(const Row<eT>& X)
+  inline
+  diagmat_proxy(const Row<eT>& X)
     : P(X)
     , n_elem(X.n_elem)
     {
@@ -242,7 +244,8 @@ class diagmat_proxy< Col<eT> >
   typedef typename get_pod_type<elem_type>::result pod_type;
   
   
-  inline diagmat_proxy(const Col<eT>& X)
+  inline
+  diagmat_proxy(const Col<eT>& X)
     : P(X)
     , n_elem(X.n_elem)
     {
@@ -269,7 +272,8 @@ class diagmat_proxy< subview_row<eT> >
   typedef typename get_pod_type<elem_type>::result pod_type;
   
   
-  inline diagmat_proxy(const subview_row<eT>& X)
+  inline
+  diagmat_proxy(const subview_row<eT>& X)
     : P(X)
     , n_elem(X.n_elem)
     {
@@ -296,7 +300,8 @@ class diagmat_proxy< subview_col<eT> >
   typedef typename get_pod_type<elem_type>::result pod_type;
   
   
-  inline diagmat_proxy(const subview_col<eT>& X)
+  inline
+  diagmat_proxy(const subview_col<eT>& X)
     : P(X)
     , n_elem(X.n_elem)
     {
@@ -314,15 +319,22 @@ class diagmat_proxy< subview_col<eT> >
 
 
 
+//
+//
+//
+
+
+
 template<typename T1>
-class diagmat_proxy_check
+class diagmat_proxy_check_default
   {
   public:
   
   typedef typename T1::elem_type                   elem_type;
   typedef typename get_pod_type<elem_type>::result pod_type;
   
-  inline diagmat_proxy_check(const T1& X, const Mat<typename T1::elem_type>&)
+  inline
+  diagmat_proxy_check_default(const T1& X, const Mat<typename T1::elem_type>&)
     : P(X)
     , P_is_vec( (resolves_to_vector<T1>::value) || (P.n_rows == 1) || (P.n_cols == 1) )
     , n_elem( P_is_vec ? P.n_elem : (std::min)(P.n_elem, P.n_rows) )
@@ -346,7 +358,60 @@ class diagmat_proxy_check
 
 
 
-// TODO: handling of fixed size matrices.  Store matrix as Mat (ie. not as a reference), but initialise with auxiliary memory; copy memory if aliasing
+template<typename T1>
+class diagmat_proxy_check_fixed
+  {
+  public:
+  
+  typedef typename T1::elem_type                   eT;
+  typedef typename T1::elem_type                   elem_type;
+  typedef typename get_pod_type<elem_type>::result pod_type;
+  
+  inline
+  diagmat_proxy_check_fixed(const T1& X, const Mat<eT>& out)
+    : P( const_cast<eT*>(X.memptr()), T1::n_rows, T1::n_cols, (&X == &out), false )
+    {
+    arma_extra_debug_sigprint();
+    
+    arma_debug_check
+      (
+      (P_is_vec == false) && (T1::n_rows != T1::n_cols),
+      "diagmat(): only vectors and square matrices are accepted"
+      );
+    }
+  
+  
+  arma_inline eT operator[] (const uword i)                    const { return P_is_vec ? P[i] : P.at(i,i);                                         }
+  arma_inline eT at         (const uword row, const uword col) const { return (row == col) ? ( P_is_vec ? P[row] : P.at(row,row) ) : elem_type(0); }
+  
+  const Mat<eT> P;
+  
+  static const bool  P_is_vec = (T1::n_rows == 1) || (T1::n_cols == 1);
+  static const uword n_elem   = P_is_vec ? T1::n_elem : ( (T1::n_elem < T1::n_rows) ? T1::n_elem : T1::n_rows );
+  };
+
+
+
+template<typename T1, bool condition>
+struct diagmat_proxy_check_redirect {};
+
+template<typename T1>
+struct diagmat_proxy_check_redirect<T1, false> { typedef diagmat_proxy_check_default<T1> result; };
+
+template<typename T1>
+struct diagmat_proxy_check_redirect<T1, true>  { typedef diagmat_proxy_check_fixed<T1>   result; };
+
+
+template<typename T1>
+class diagmat_proxy_check : public diagmat_proxy_check_redirect<T1, is_Mat_fixed<T1>::value >::result
+  {
+  public:
+  inline diagmat_proxy_check(const T1& X, const Mat<typename T1::elem_type>& out)
+    : diagmat_proxy_check_redirect< T1, is_Mat_fixed<T1>::value >::result(X, out)
+    {
+    }
+  };
+
 
 
 template<typename eT>
@@ -358,7 +423,8 @@ class diagmat_proxy_check< Mat<eT> >
   typedef typename get_pod_type<elem_type>::result pod_type;
   
   
-  inline diagmat_proxy_check(const Mat<eT>& X, const Mat<eT>& out)
+  inline
+  diagmat_proxy_check(const Mat<eT>& X, const Mat<eT>& out)
     : P_local ( (&X == &out) ? new Mat<eT>(X) : 0  )
     , P       ( (&X == &out) ? (*P_local)     : X  )
     , P_is_vec( (P.n_rows == 1) || (P.n_cols == 1) )
@@ -397,7 +463,8 @@ class diagmat_proxy_check< Row<eT> >
   typedef          eT                              elem_type;
   typedef typename get_pod_type<elem_type>::result pod_type;
   
-  inline diagmat_proxy_check(const Row<eT>& X, const Mat<eT>& out)
+  inline
+  diagmat_proxy_check(const Row<eT>& X, const Mat<eT>& out)
     : P_local ( (&X == reinterpret_cast<const Row<eT>*>(&out)) ? new Row<eT>(X) : 0 )
     , P       ( (&X == reinterpret_cast<const Row<eT>*>(&out)) ? (*P_local)     : X )
     , n_elem  (X.n_elem)
@@ -430,7 +497,8 @@ class diagmat_proxy_check< Col<eT> >
   typedef          eT                              elem_type;
   typedef typename get_pod_type<elem_type>::result pod_type;
   
-  inline diagmat_proxy_check(const Col<eT>& X, const Mat<eT>& out)
+  inline
+  diagmat_proxy_check(const Col<eT>& X, const Mat<eT>& out)
     : P_local ( (&X == reinterpret_cast<const Col<eT>*>(&out)) ? new Col<eT>(X) : 0 )
     , P       ( (&X == reinterpret_cast<const Col<eT>*>(&out)) ? (*P_local)     : X )
     , n_elem  (X.n_elem)
@@ -463,7 +531,8 @@ class diagmat_proxy_check< subview_row<eT> >
   typedef          eT                              elem_type;
   typedef typename get_pod_type<elem_type>::result pod_type;
   
-  inline diagmat_proxy_check(const subview_row<eT>& X, const Mat<eT>&)
+  inline
+  diagmat_proxy_check(const subview_row<eT>& X, const Mat<eT>&)
     : P       ( X )
     , n_elem  ( X.n_elem )
     {
@@ -489,7 +558,8 @@ class diagmat_proxy_check< subview_col<eT> >
   typedef          eT                              elem_type;
   typedef typename get_pod_type<elem_type>::result pod_type;
   
-  inline diagmat_proxy_check(const subview_col<eT>& X, const Mat<eT>& out)
+  inline
+  diagmat_proxy_check(const subview_col<eT>& X, const Mat<eT>& out)
     : P     ( const_cast<eT*>(X.colptr(0)), X.n_rows, (&(X.m) == &out), false )
     , n_elem( X.n_elem )
     //, X_ref ( X )
