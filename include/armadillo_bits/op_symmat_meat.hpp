@@ -39,7 +39,7 @@ op_symmat::apply
   const uword N     = A.n_rows;
   const bool  upper = (in.aux_uword_a == 0);
   
-  if(tmp.is_alias(out) == false)
+  if(&out != &A)
     {
     out.copy_size(A);
     
@@ -125,7 +125,7 @@ op_symmat::apply
   const uword N     = A.n_rows;
   const bool  upper = (in.aux_uword_a == 0);
   
-  if(tmp.is_alias(out) == false)
+  if(&out != &A)
     {
     out.copy_size(A);
     

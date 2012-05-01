@@ -47,9 +47,11 @@ op_shuffle::apply(Mat<typename T1::elem_type>& out, const Op<T1,op_shuffle>& in)
   
   std::sort( packet_vec.begin(), packet_vec.end() );
   
+  const bool is_alias = (&out == &X);
+  
   if(X.is_vec() == false)
     {
-    if(tmp.is_alias(out) == false)
+    if(is_alias == false)
       {
       arma_extra_debug_print("op_shuffle::apply(): matrix");
       
@@ -109,7 +111,7 @@ op_shuffle::apply(Mat<typename T1::elem_type>& out, const Op<T1,op_shuffle>& in)
     }
   else  // we're dealing with a vector
     {
-    if(tmp.is_alias(out) == false)
+    if(is_alias == false)
       {
       arma_extra_debug_print("op_shuffle::apply(): vector");
       

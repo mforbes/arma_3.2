@@ -37,7 +37,7 @@ op_resize::apply(Mat<typename T1::elem_type>& actual_out, const Op<T1,op_resize>
   
   Mat<eT> B;
   
-  const bool alias = tmp.is_alias(actual_out);
+  const bool alias = (&actual_out == &A);
   
   Mat<eT>& out = alias ? B : actual_out;
   
