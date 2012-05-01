@@ -28,7 +28,7 @@ op_flipud::apply(Mat<typename T1::elem_type>& out, const Op<T1,op_flipud>& in)
   const unwrap<T1>  tmp(in.m);
   const Mat<eT> X = tmp.M;
   
-  if(tmp.is_alias(out) == false)
+  if(&out != &X)
     {
     out.copy_size(X);
     
@@ -62,7 +62,7 @@ op_fliplr::apply(Mat<typename T1::elem_type>& out, const Op<T1,op_fliplr>& in)
   const unwrap<T1>  tmp(in.m);
   const Mat<eT> X = tmp.M;
   
-  if(tmp.is_alias(out) == false)
+  if(&out != &X)
     {
     out.copy_size(X);
     
