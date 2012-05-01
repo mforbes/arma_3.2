@@ -369,21 +369,67 @@ class unwrap< Op<T1, op_strans> >
 
 
 
+// TODO: add handling of op_htrans and op_strans by unwrap_check
+
+
+
 template<typename T1>
-class unwrap_check
+class unwrap_check_default
   {
   public:
   
   typedef typename T1::elem_type eT;
   
   inline
-  unwrap_check(const T1& A, const Mat<eT>&)
+  unwrap_check_default(const T1& A, const Mat<eT>&)
     : M(A)
     {
     arma_extra_debug_sigprint();
     }
   
   const Mat<eT> M;
+  };
+
+
+
+template<typename T1>
+class unwrap_check_fixed
+  {
+  public:
+  
+  typedef typename T1::elem_type eT;
+  
+  inline
+  unwrap_check_fixed(const T1& A, const Mat<eT>& B)
+    : M( const_cast<eT*>(A.memptr()), T1::n_rows, T1::n_cols, (&A == &B), false )
+    {
+    arma_extra_debug_sigprint();
+    }
+  
+  const Mat<eT> M;
+  };
+
+
+
+template<typename T1, bool condition>
+struct unwrap_check_redirect {};
+
+template<typename T1>
+struct unwrap_check_redirect<T1, false> { typedef unwrap_check_default<T1> result; };
+
+template<typename T1>
+struct unwrap_check_redirect<T1, true>  { typedef unwrap_check_fixed<T1>   result; };
+
+
+template<typename T1>
+class unwrap_check : public unwrap_check_redirect<T1, is_Mat_fixed<T1>::value >::result
+  {
+  public:
+  
+  inline unwrap_check(const T1& A, const Mat<typename T1::elem_type>& B)
+    : unwrap_check_redirect< T1, is_Mat_fixed<T1>::value >::result(A, B)
+    {
+    }
   };
 
 
