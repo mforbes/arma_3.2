@@ -344,7 +344,8 @@ struct unwrap< Op<T1, op_strans> >
   
   static const bool has_subview = unwrap_xtrans::has_subview;
   
-  inline unwrap(const Op<T1, op_strans>& A)
+  inline
+  unwrap(const Op<T1, op_strans>& A)
     : unwrap_xtrans(A)
     {
     arma_extra_debug_sigprint();
@@ -392,7 +393,7 @@ struct unwrap_check_fixed
   
   inline
   unwrap_check_fixed(const T1& A, const Mat<eT>& B)
-    : M( const_cast<eT*>(A.memptr()), T1::n_rows, T1::n_cols, (&A == &B), false )
+    : M( const_cast<eT*>(A.memptr()), T1::n_rows, T1::n_cols, (&A == &B), false )  // the (&A == &B) aliasing test is currently sufficient
     {
     arma_extra_debug_sigprint();
     }
@@ -523,6 +524,153 @@ struct unwrap_check< subview_col<eT> >
   
   //// prevents the compiler from potentially deleting the subview object before we're done with it
   //const subview_col<eT>& ref;
+  };
+
+
+
+template<typename T1>
+struct unwrap_check_xtrans_default
+  {
+  typedef typename T1::elem_type eT;
+  
+  inline
+  unwrap_check_xtrans_default(const T1& A, const Mat<eT>&)
+    : M(A)
+    {
+    arma_extra_debug_sigprint();
+    }
+  
+  arma_aligned const Mat<eT> M;
+  };
+
+
+
+template<typename T1>
+struct unwrap_check_xtrans_vector
+  {
+  inline unwrap_check_xtrans_vector(const T1&) {}
+  };
+
+
+
+template<typename T1>
+struct unwrap_check_xtrans_vector< Op<T1, op_htrans> >
+  {
+  typedef typename T1::elem_type eT;
+  
+  inline
+  unwrap_check_xtrans_vector(const Op<T1, op_htrans>& A, const Mat<eT>& B)
+    : U(A.m, B)  // TODO: think about this more
+    , M(const_cast<eT*>(U.M.memptr()), U.M.n_cols, U.M.n_rows, false, false)
+    {
+    arma_extra_debug_sigprint();
+    }
+  
+  arma_aligned const unwrap_check<T1> U; // avoid copy if T1 is a Row, Col or subview_col
+  arma_aligned const Mat<eT>          M;
+  
+  // NOTE: unwrap_check would fail to detect aliasing if T1 is a matrix using external memory
+  // other objects that might be using external memory:
+  // - the result of unwrap< Op < op_xtrans, colvec > >
+  // - the result of unwrap< Op < op_xtrans, rowvec > >
+  // - the result of unwrap< Op < op_xtrans, subview_col > >
+  // - the result of unwrap< subview_col >
+  
+  // chaining unwrap_check operations may not work
+  };
+
+
+
+template<typename T1>
+struct unwrap_check_xtrans_vector< Op<T1, op_strans> >
+  {
+  typedef typename T1::elem_type eT;
+  
+  inline
+  unwrap_check_xtrans_vector(const Op<T1, op_strans>& A, const Mat<eT>& B)
+    : U(A.m, B)
+    , M(const_cast<eT*>(U.M.memptr()), U.M.n_cols, U.M.n_rows, false, false)
+    {
+    arma_extra_debug_sigprint();
+    }
+  
+  arma_aligned const unwrap_check<T1> U; // avoid copy if T1 is a Row, Col or subview_col
+  arma_aligned const Mat<eT>          M;
+  };
+
+
+
+template<typename T1, bool condition>
+struct unwrap_check_xtrans_redirect {};
+
+template<typename T1>
+struct unwrap_check_xtrans_redirect<T1, false> { typedef unwrap_check_xtrans_default<T1> result; };
+
+template<typename T1>
+struct unwrap_check_xtrans_redirect<T1, true>  { typedef unwrap_check_xtrans_vector<T1>  result; };
+
+
+
+template<typename T1>
+struct unwrap_check< Op<T1, op_htrans> >
+  : public
+    unwrap_check_xtrans_redirect
+      <
+      Op<T1, op_htrans>,
+      ((is_complex<typename T1::elem_type>::value == false) && ((Op<T1, op_htrans>::is_row) || (Op<T1, op_htrans>::is_col)) )
+      >::result
+  {
+  typedef
+  typename
+  unwrap_check_xtrans_redirect
+    <
+    Op<T1, op_htrans>,
+    ((is_complex<typename T1::elem_type>::value == false) && ((Op<T1, op_htrans>::is_row) || (Op<T1, op_htrans>::is_col)) )
+    >::result
+  unwrap_check_xtrans;
+  
+  typedef typename T1::elem_type eT;
+  
+  inline
+  unwrap_check(const Op<T1, op_htrans>& A, const Mat<eT>& B)
+    : unwrap_check_xtrans(A,B)
+    {
+    arma_extra_debug_sigprint();
+    }
+  
+  using unwrap_check_xtrans::M;
+  };
+
+
+
+template<typename T1>
+struct unwrap_check< Op<T1, op_strans> >
+  : public
+    unwrap_check_xtrans_redirect
+      <
+      Op<T1, op_strans>,
+      ( (Op<T1, op_strans>::is_row) || (Op<T1, op_strans>::is_col) )
+      >::result
+  {
+  typedef
+  typename
+  unwrap_check_xtrans_redirect
+    <
+    Op<T1, op_strans>,
+    ( (Op<T1, op_strans>::is_row) || (Op<T1, op_strans>::is_col) )
+    >::result
+  unwrap_check_xtrans;
+  
+  typedef typename T1::elem_type eT;
+  
+  inline
+  unwrap_check(const Op<T1, op_strans>& A, const Mat<eT>& B)
+    : unwrap_check_xtrans(A,B)
+    {
+    arma_extra_debug_sigprint();
+    }
+  
+  using unwrap_check_xtrans::M;
   };
 
 
@@ -685,7 +833,8 @@ struct partial_unwrap_Mat_fixed
   {
   typedef typename T1::elem_type eT;
   
-  inline explicit partial_unwrap_Mat_fixed(const T1& A)
+  inline explicit
+  partial_unwrap_Mat_fixed(const T1& A)
     : M(A)
     {
     arma_extra_debug_sigprint();

@@ -34,7 +34,7 @@ op_sum::apply(Mat<typename T1::elem_type>& out, const Op<T1,op_sum>& in)
   
   if( (is_Mat< typename Proxy<T1>::stored_type>::value == true) || (P.is_alias(out) == true) )
     {
-    const unwrap_check< typename Proxy<T1>::stored_type > tmp(P.Q, out);
+    const unwrap_check< typename Proxy<T1>::stored_type > tmp(P.Q, out);  // TODO: possible bug
     
     const Mat<eT>& X = tmp.M;
     
