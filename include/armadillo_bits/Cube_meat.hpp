@@ -351,9 +351,9 @@ Cube<eT>::delete_mat()
   {
   arma_extra_debug_sigprint();
   
-  for(uword slice = 0; slice < n_slices; ++slice)
+  for(uword uslice = 0; uslice < n_slices; ++uslice)
     {
-    delete access::rw(mat_ptrs[slice]);
+    delete access::rw(mat_ptrs[uslice]);
     }
   
   if(mem_state <= 2)
@@ -388,9 +388,9 @@ Cube<eT>::create_mat()
       }
     }
   
-  for(uword slice = 0; slice < n_slices; ++slice)
+  for(uword uslice = 0; uslice < n_slices; ++uslice)
     {
-    mat_ptrs[slice] = new Mat<eT>('j', slice_memptr(slice), n_rows, n_cols);
+    mat_ptrs[uslice] = new Mat<eT>('j', slice_memptr(uslice), n_rows, n_cols);
     }
   }
 
@@ -2267,9 +2267,9 @@ template<typename eT>
 arma_inline
 arma_warn_unused
 eT*
-Cube<eT>::slice_memptr(const uword slice)
+Cube<eT>::slice_memptr(const uword uslice)
   {
-  return const_cast<eT*>( &mem[ slice*n_elem_slice ] );
+  return const_cast<eT*>( &mem[ uslice*n_elem_slice ] );
   }
 
 
@@ -2279,9 +2279,9 @@ template<typename eT>
 arma_inline
 arma_warn_unused
 const eT*
-Cube<eT>::slice_memptr(const uword slice) const
+Cube<eT>::slice_memptr(const uword uslice) const
   {
-  return &mem[ slice*n_elem_slice ];
+  return &mem[ uslice*n_elem_slice ];
   }
 
 
@@ -2291,9 +2291,9 @@ template<typename eT>
 arma_inline
 arma_warn_unused
 eT*
-Cube<eT>::slice_colptr(const uword slice, const uword col)
+Cube<eT>::slice_colptr(const uword uslice, const uword col)
   {
-  return const_cast<eT*>( &mem[ slice*n_elem_slice + col*n_rows] );
+  return const_cast<eT*>( &mem[ uslice*n_elem_slice + col*n_rows] );
   }
 
 
@@ -2303,9 +2303,9 @@ template<typename eT>
 arma_inline
 arma_warn_unused
 const eT*
-Cube<eT>::slice_colptr(const uword slice, const uword col) const
+Cube<eT>::slice_colptr(const uword uslice, const uword col) const
   {
-  return &mem[ slice*n_elem_slice + col*n_rows ];
+  return &mem[ uslice*n_elem_slice + col*n_rows ];
   }
 
 

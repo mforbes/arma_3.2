@@ -275,12 +275,12 @@ class Mat : public Base< eT, Mat<eT> >
   template<typename T1, typename T2, typename glue_type> inline const Mat& operator/=(const mtGlue<eT, T1, T2, glue_type>& X);
   
   
-  arma_inline arma_warn_unused eT& operator[] (const uword i);
-  arma_inline arma_warn_unused eT  operator[] (const uword i) const;
-  arma_inline arma_warn_unused eT& at         (const uword i);
-  arma_inline arma_warn_unused eT  at         (const uword i) const;
-  arma_inline arma_warn_unused eT& operator() (const uword i);
-  arma_inline arma_warn_unused eT  operator() (const uword i) const;
+  arma_inline arma_warn_unused eT& operator[] (const uword ii);
+  arma_inline arma_warn_unused eT  operator[] (const uword ii) const;
+  arma_inline arma_warn_unused eT& at         (const uword ii);
+  arma_inline arma_warn_unused eT  at         (const uword ii) const;
+  arma_inline arma_warn_unused eT& operator() (const uword ii);
+  arma_inline arma_warn_unused eT  operator() (const uword ii) const;
   
   arma_inline arma_warn_unused eT& at         (const uword in_row, const uword in_col);
   arma_inline arma_warn_unused eT  at         (const uword in_row, const uword in_col) const;
@@ -300,8 +300,8 @@ class Mat : public Base< eT, Mat<eT> >
   arma_inline arma_warn_unused bool is_square() const;
        inline arma_warn_unused bool is_finite() const;
   
-  arma_inline arma_warn_unused bool in_range(const uword i) const;
-  arma_inline arma_warn_unused bool in_range(const span& x) const;
+  arma_inline arma_warn_unused bool in_range(const uword ii) const;
+  arma_inline arma_warn_unused bool in_range(const span& x ) const;
   
   arma_inline arma_warn_unused bool in_range(const uword   in_row, const uword   in_col) const;
   arma_inline arma_warn_unused bool in_range(const span& row_span, const uword   in_col) const;

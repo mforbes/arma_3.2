@@ -1017,10 +1017,10 @@ field<oT>::init(const field<oT>& x)
     
     field& t = *this;
     
-    for(uword col=0; col<x.n_cols; ++col)
-    for(uword row=0; row<x.n_rows; ++row)
+    for(uword ucol=0; ucol < x.n_cols; ++ucol)
+    for(uword urow=0; urow < x.n_rows; ++urow)
       {
-      t.at(row,col) = x.at(row,col);
+      t.at(urow,ucol) = x.at(urow,ucol);
       }
     }
   

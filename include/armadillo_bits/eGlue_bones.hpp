@@ -42,7 +42,7 @@ class eGlue : public Base<typename T1::elem_type, eGlue<T1, T2, eglue_type> >
   arma_inline uword get_n_cols() const;
   arma_inline uword get_n_elem() const;
   
-  arma_inline elem_type operator[] (const uword i)                    const;
+  arma_inline elem_type operator[] (const uword ii)                   const;
   arma_inline elem_type at         (const uword row, const uword col) const;
   };
 
