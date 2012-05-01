@@ -391,7 +391,7 @@ Mat<eT>::init(const std::string& text)
   line_start = 0;
   line_end = 0;
   
-  uword row = 0;
+  uword urow = 0;
   
   while( line_start < text.length() )
     {
@@ -404,22 +404,22 @@ Mat<eT>::init(const std::string& text)
     std::string::size_type line_len = line_end - line_start + 1;
     std::stringstream line_stream( text.substr(line_start,line_len) );
     
-//     uword col = 0;
+//     uword ucol = 0;
 //     while(line_stream >> token)
 //       {
-//       x.at(row,col) = strtod(token.c_str(), 0);
-//       ++col;
+//       x.at(urow,ucol) = strtod(token.c_str(), 0);
+//       ++ucol;
 //       }
     
-    uword col = 0;
+    uword ucol = 0;
     eT val;
     while(line_stream >> val)
       {
-      x.at(row,col) = val;
-      ++col;
+      x.at(urow,ucol) = val;
+      ++ucol;
       }
     
-    ++row;
+    ++urow;
     line_start = line_end+1;
     }
   
@@ -642,19 +642,19 @@ Mat<eT>::init
     ea_type1 A = PX.get_ea();
     ea_type2 B = PY.get_ea();
     
-    for(uword i=0; i<N; ++i)
+    for(uword ii=0; ii < N; ++ii)
       {
-      out_mem[i] = std::complex<T>(A[i], B[i]);
+      out_mem[ii] = std::complex<T>(A[ii], B[ii]);
       }
     }
   else
     {
-    uword i = 0;
+    uword ii = 0;
     
-    for(uword col=0; col < local_n_cols; ++col)
-    for(uword row=0; row < local_n_rows; ++row, ++i)
+    for(uword ucol=0; ucol < local_n_cols; ++ucol)
+    for(uword urow=0; urow < local_n_rows; ++urow, ++ii)
       {
-      out_mem[i] = std::complex<T>(PX.at(row,col), PY.at(row,col));
+      out_mem[ii] = std::complex<T>(PX.at(urow,ucol), PY.at(urow,ucol));
       }
     }
   }
@@ -918,9 +918,9 @@ Mat<eT>::operator=(const BaseCube<eT,T1>& X)
     {
     out.set_size(in_n_rows, in_n_cols);
     
-    for(uword col=0; col < in_n_cols; ++col)
+    for(uword ucol=0; ucol < in_n_cols; ++ucol)
       {
-      arrayops::copy( out.colptr(col), in.slice_colptr(0, col), in_n_rows );
+      arrayops::copy( out.colptr(ucol), in.slice_colptr(0, ucol), in_n_rows );
       }
     }
   else
@@ -1005,9 +1005,9 @@ Mat<eT>::operator+=(const BaseCube<eT,T1>& X)
   
   if(in_n_slices == 1)
     {
-    for(uword col=0; col < in_n_cols; ++col)
+    for(uword ucol=0; ucol < in_n_cols; ++ucol)
       {
-      arrayops::inplace_plus( out.colptr(col), in.slice_colptr(0, col), in_n_rows );
+      arrayops::inplace_plus( out.colptr(ucol), in.slice_colptr(0, ucol), in_n_rows );
       }
     }
   else
@@ -1086,9 +1086,9 @@ Mat<eT>::operator-=(const BaseCube<eT,T1>& X)
   
   if(in_n_slices == 1)
     {
-    for(uword col=0; col < in_n_cols; ++col)
+    for(uword ucol=0; ucol < in_n_cols; ++ucol)
       {
-      arrayops::inplace_minus( out.colptr(col), in.slice_colptr(0, col), in_n_rows );
+      arrayops::inplace_minus( out.colptr(ucol), in.slice_colptr(0, ucol), in_n_rows );
       }
     }
   else
@@ -1184,9 +1184,9 @@ Mat<eT>::operator%=(const BaseCube<eT,T1>& X)
   
   if(in_n_slices == 1)
     {
-    for(uword col=0; col < in_n_cols; ++col)
+    for(uword ucol=0; ucol < in_n_cols; ++ucol)
       {
-      arrayops::inplace_mul( out.colptr(col), in.slice_colptr(0, col), in_n_rows );
+      arrayops::inplace_mul( out.colptr(ucol), in.slice_colptr(0, ucol), in_n_rows );
       }
     }
   else
@@ -1265,9 +1265,9 @@ Mat<eT>::operator/=(const BaseCube<eT,T1>& X)
   
   if(in_n_slices == 1)
     {
-    for(uword col=0; col < in_n_cols; ++col)
+    for(uword ucol=0; ucol < in_n_cols; ++ucol)
       {
-      arrayops::inplace_div( out.colptr(col), in.slice_colptr(0, col), in_n_rows );
+      arrayops::inplace_div( out.colptr(ucol), in.slice_colptr(0, ucol), in_n_rows );
       }
     }
   else
@@ -2592,9 +2592,11 @@ Mat<eT>::swap_rows(const uword in_row1, const uword in_row2)
     "Mat::swap_rows(): out of bounds"
     );
   
-  for(uword col=0; col < local_n_cols; ++col)
+  // TODO: check for n_elem > 0
+  
+  for(uword ucol=0; ucol < local_n_cols; ++ucol)
     {
-    const uword offset = col * local_n_rows;
+    const uword offset = ucol * local_n_rows;
     const uword pos1   = in_row1 + offset;
     const uword pos2   = in_row2 + offset;
     
@@ -3932,10 +3934,10 @@ template<typename eT>
 arma_inline
 arma_warn_unused
 eT&
-Mat<eT>::operator() (const uword i)
+Mat<eT>::operator() (const uword ii)
   {
-  arma_debug_check( (i >= n_elem), "Mat::operator(): out of bounds");
-  return access::rw(mem[i]);
+  arma_debug_check( (ii >= n_elem), "Mat::operator(): out of bounds");
+  return access::rw(mem[ii]);
   }
 
 
@@ -3945,10 +3947,10 @@ template<typename eT>
 arma_inline
 arma_warn_unused
 eT
-Mat<eT>::operator() (const uword i) const
+Mat<eT>::operator() (const uword ii) const
   {
-  arma_debug_check( (i >= n_elem), "Mat::operator(): out of bounds");
-  return mem[i];
+  arma_debug_check( (ii >= n_elem), "Mat::operator(): out of bounds");
+  return mem[ii];
   }
 
 
@@ -3957,9 +3959,9 @@ template<typename eT>
 arma_inline
 arma_warn_unused
 eT&
-Mat<eT>::operator[] (const uword i)
+Mat<eT>::operator[] (const uword ii)
   {
-  return access::rw(mem[i]);
+  return access::rw(mem[ii]);
   }
 
 
@@ -3969,9 +3971,9 @@ template<typename eT>
 arma_inline
 arma_warn_unused
 eT
-Mat<eT>::operator[] (const uword i) const
+Mat<eT>::operator[] (const uword ii) const
   {
-  return mem[i];
+  return mem[ii];
   }
 
 
@@ -3981,9 +3983,9 @@ template<typename eT>
 arma_inline
 arma_warn_unused
 eT&
-Mat<eT>::at(const uword i)
+Mat<eT>::at(const uword ii)
   {
-  return access::rw(mem[i]);
+  return access::rw(mem[ii]);
   }
 
 
@@ -3993,9 +3995,9 @@ template<typename eT>
 arma_inline
 arma_warn_unused
 eT
-Mat<eT>::at(const uword i) const
+Mat<eT>::at(const uword ii) const
   {
-  return mem[i];
+  return mem[ii];
   }
 
 
@@ -4173,9 +4175,9 @@ template<typename eT>
 arma_inline
 arma_warn_unused
 bool
-Mat<eT>::in_range(const uword i) const
+Mat<eT>::in_range(const uword ii) const
   {
-  return (i < n_elem);
+  return (ii < n_elem);
   }
 
 
@@ -4712,20 +4714,20 @@ Mat<eT>::randu()
   const uword N   = n_elem;
         eT*   ptr = memptr();
   
-  uword i,j;
+  uword ii,jj;
   
-  for(i=0, j=1; j<N; i+=2, j+=2)
+  for(ii=0, jj=1; jj < N; ii+=2, jj+=2)
     {
-    const eT tmp_i = eT(eop_aux_randu<eT>());
-    const eT tmp_j = eT(eop_aux_randu<eT>());
+    const eT tmp_ii = eT(eop_aux_randu<eT>());
+    const eT tmp_jj = eT(eop_aux_randu<eT>());
     
-    ptr[i] = tmp_i;
-    ptr[j] = tmp_j;
+    ptr[ii] = tmp_ii;
+    ptr[jj] = tmp_jj;
     }
   
-  if(i < N)
+  if(ii < N)
     {
-    ptr[i] = eT(eop_aux_randu<eT>());
+    ptr[ii] = eT(eop_aux_randu<eT>());
     }
   
   return *this;
@@ -4771,9 +4773,9 @@ Mat<eT>::randn()
   const uword N   = n_elem;
         eT*   ptr = memptr();
   
-  for(uword i=0; i<N; ++i)
+  for(uword ii=0; ii<N; ++ii)
     {
-    ptr[i] = eT(eop_aux_randn<eT>());
+    ptr[ii] = eT(eop_aux_randn<eT>());
     }
   
   return *this;
@@ -4820,9 +4822,9 @@ Mat<eT>::eye()
   
   const uword N = (std::min)(n_rows, n_cols);
   
-  for(uword i=0; i<N; ++i)
+  for(uword ii=0; ii<N; ++ii)
     {
-    at(i,i) = eT(1);
+    at(ii,ii) = eT(1);
     }
   
   return *this;

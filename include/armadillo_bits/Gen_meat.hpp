@@ -55,13 +55,13 @@ Gen<T1, gen_type>::generate()
 template<typename T1, typename gen_type>
 arma_inline
 typename T1::elem_type
-Gen<T1, gen_type>::operator[](const uword i) const
+Gen<T1, gen_type>::operator[](const uword ii) const
   {
   typedef typename T1::elem_type eT;
   
   if(is_same_type<gen_type, gen_ones_diag>::value == true)
     {
-    return ((i % n_rows) == (i / n_rows)) ? eT(1) : eT(0);
+    return ((ii % n_rows) == (ii / n_rows)) ? eT(1) : eT(0);
     }
   else
     {

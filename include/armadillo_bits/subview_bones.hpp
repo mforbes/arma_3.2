@@ -77,11 +77,11 @@ class subview : public Base<eT, subview<eT> >
   inline void ones();
   inline void eye();
   
-  inline eT& operator[](const uword i);
-  inline eT  operator[](const uword i) const;
+  inline eT& operator[](const uword ii);
+  inline eT  operator[](const uword ii) const;
   
-  inline eT& operator()(const uword i);
-  inline eT  operator()(const uword i) const;
+  inline eT& operator()(const uword ii);
+  inline eT  operator()(const uword ii) const;
   
   inline eT& operator()(const uword in_row, const uword in_col);
   inline eT  operator()(const uword in_row, const uword in_col) const;
