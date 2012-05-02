@@ -4964,12 +4964,12 @@ Mat<eT>::min(uword& row_of_min_val, uword& col_of_min_val) const
   
   arma_debug_check( (n_elem == 0), "min(): object has no elements" );
   
-  uword i;
+  uword iq;
   
-  eT val = op_min::direct_min(memptr(), n_elem, i);
+  eT val = op_min::direct_min(memptr(), n_elem, iq);
   
-  row_of_min_val = i % n_rows;
-  col_of_min_val = i / n_rows;
+  row_of_min_val = iq % n_rows;
+  col_of_min_val = iq / n_rows;
   
   return val;
   }
@@ -4985,12 +4985,12 @@ Mat<eT>::max(uword& row_of_max_val, uword& col_of_max_val) const
   
   arma_debug_check( (n_elem == 0), "max(): object has no elements" );
   
-  uword i;
+  uword iq;
   
-  eT val = op_max::direct_max(memptr(), n_elem, i);
+  eT val = op_max::direct_max(memptr(), n_elem, iq);
   
-  row_of_max_val = i % n_rows;
-  col_of_max_val = i / n_rows;
+  row_of_max_val = iq % n_rows;
+  col_of_max_val = iq / n_rows;
   
   return val;
   }
