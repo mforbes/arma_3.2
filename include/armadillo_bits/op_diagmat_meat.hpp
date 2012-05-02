@@ -101,6 +101,12 @@ op_diagmat::apply(Mat<typename T1::elem_type>& out, const Op<T1, op_diagmat>& X)
       }
     else   // generate a diagonal matrix out of a matrix
       {
+      // NOTE: we're assuming that the output matrix is the same as the matrix provided by the Proxy,
+      // NOTE: and the alias is not due to a matrix using auxiliary memory;
+      // NOTE: this assumption is currently valid for matrices, but not for vectors;
+      // NOTE: as we've checked that at this point in code we're dealing with a matrix,
+      // NOTE: the assumption is thus currently valid
+      
       arma_debug_check( (n_rows != n_cols), "diagmat(): given matrix is not square" );
       
       for(uword i=0; i < n_rows; ++i)
