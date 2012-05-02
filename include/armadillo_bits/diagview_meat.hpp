@@ -61,19 +61,19 @@ diagview<eT>::operator= (const diagview<eT>& x)
     const uword x_row_offset = x.row_offset;
     const uword x_col_offset = x.col_offset;
     
-    uword i,j;
-    for(i=0, j=1; j < d_n_elem; i+=2, j+=2)
+    uword ii,jj;
+    for(ii=0, jj=1; jj < d_n_elem; ii+=2, jj+=2)
       {
-      const eT tmp_i = x_m.at(i + x_row_offset, i + x_col_offset);
-      const eT tmp_j = x_m.at(j + x_row_offset, j + x_col_offset);
+      const eT tmp_i = x_m.at(ii + x_row_offset, ii + x_col_offset);
+      const eT tmp_j = x_m.at(jj + x_row_offset, jj + x_col_offset);
       
-      d_m.at(i + d_row_offset, i + d_col_offset) = tmp_i;
-      d_m.at(j + d_row_offset, j + d_col_offset) = tmp_j;
+      d_m.at(ii + d_row_offset, ii + d_col_offset) = tmp_i;
+      d_m.at(jj + d_row_offset, jj + d_col_offset) = tmp_j;
       }
     
-    if(i < d_n_elem)
+    if(ii < d_n_elem)
       {
-      d_m.at(i + d_row_offset, i + d_col_offset) = x_m.at(i + x_row_offset, i + x_col_offset);
+      d_m.at(ii + d_row_offset, ii + d_col_offset) = x_m.at(ii + x_row_offset, ii + x_col_offset);
       }
     }
   else
@@ -198,19 +198,19 @@ diagview<eT>::operator= (const Base<eT,T1>& o)
   
   const eT* x_mem = x.memptr();
   
-  uword i,j;
-  for(i=0, j=1; j < d_n_elem; i+=2, j+=2)
+  uword ii,jj;
+  for(ii=0, jj=1; jj < d_n_elem; ii+=2, jj+=2)
     {
-    const eT tmp_i = x_mem[i];
-    const eT tmp_j = x_mem[j];
+    const eT tmp_i = x_mem[ii];
+    const eT tmp_j = x_mem[jj];
     
-    d_m.at( i + d_row_offset,  i + d_col_offset) = tmp_i;
-    d_m.at( j + d_row_offset,  j + d_col_offset) = tmp_j;
+    d_m.at( ii + d_row_offset,  ii + d_col_offset) = tmp_i;
+    d_m.at( jj + d_row_offset,  jj + d_col_offset) = tmp_j;
     }
   
-  if(i < d_n_elem)
+  if(ii < d_n_elem)
     {
-    d_m.at( i + d_row_offset,  i + d_col_offset) = x_mem[i];
+    d_m.at( ii + d_row_offset,  ii + d_col_offset) = x_mem[ii];
     }
   }
 
