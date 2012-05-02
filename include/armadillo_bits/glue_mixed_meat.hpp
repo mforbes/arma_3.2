@@ -300,12 +300,12 @@ glue_mixed_plus::apply(Cube<typename eT_promoter<T1,T2>::eT>& out, const mtGlueC
   const bool prefer_at_accessor = (ProxyCube<T1>::prefer_at_accessor || ProxyCube<T2>::prefer_at_accessor);
   
   if(prefer_at_accessor == false)
-    {    
+    {
+    typename ProxyCube<T1>::ea_type AA = A.get_ea();
+    typename ProxyCube<T2>::ea_type BB = B.get_ea();
+    
     for(uword i=0; i<n_elem; ++i)
       {
-      typename ProxyCube<T1>::ea_type AA = A.get_ea();
-      typename ProxyCube<T2>::ea_type BB = B.get_ea();
-      
       out_mem[i] = upgrade_val<eT1,eT2>::apply(AA[i]) + upgrade_val<eT1,eT2>::apply(BB[i]);
       }
     }
@@ -357,12 +357,12 @@ glue_mixed_minus::apply(Cube<typename eT_promoter<T1,T2>::eT>& out, const mtGlue
   const bool prefer_at_accessor = (ProxyCube<T1>::prefer_at_accessor || ProxyCube<T2>::prefer_at_accessor);
   
   if(prefer_at_accessor == false)
-    {    
+    {
+    typename ProxyCube<T1>::ea_type AA = A.get_ea();
+    typename ProxyCube<T2>::ea_type BB = B.get_ea();
+    
     for(uword i=0; i<n_elem; ++i)
       {
-      typename ProxyCube<T1>::ea_type AA = A.get_ea();
-      typename ProxyCube<T2>::ea_type BB = B.get_ea();
-        
       out_mem[i] = upgrade_val<eT1,eT2>::apply(AA[i]) - upgrade_val<eT1,eT2>::apply(BB[i]);
       }
     }
@@ -414,12 +414,12 @@ glue_mixed_div::apply(Cube<typename eT_promoter<T1,T2>::eT>& out, const mtGlueCu
   const bool prefer_at_accessor = (ProxyCube<T1>::prefer_at_accessor || ProxyCube<T2>::prefer_at_accessor);
   
   if(prefer_at_accessor == false)
-    {    
+    {
+    typename ProxyCube<T1>::ea_type AA = A.get_ea();
+    typename ProxyCube<T2>::ea_type BB = B.get_ea();
+    
     for(uword i=0; i<n_elem; ++i)
       {
-      typename ProxyCube<T1>::ea_type AA = A.get_ea();
-      typename ProxyCube<T2>::ea_type BB = B.get_ea();
-        
       out_mem[i] = upgrade_val<eT1,eT2>::apply(AA[i]) / upgrade_val<eT1,eT2>::apply(BB[i]);
       }
     }
@@ -471,12 +471,12 @@ glue_mixed_schur::apply(Cube<typename eT_promoter<T1,T2>::eT>& out, const mtGlue
   const bool prefer_at_accessor = (ProxyCube<T1>::prefer_at_accessor || ProxyCube<T2>::prefer_at_accessor);
   
   if(prefer_at_accessor == false)
-    {    
+    {
+    typename ProxyCube<T1>::ea_type AA = A.get_ea();
+    typename ProxyCube<T2>::ea_type BB = B.get_ea();
+    
     for(uword i=0; i<n_elem; ++i)
       {
-      typename ProxyCube<T1>::ea_type AA = A.get_ea();
-      typename ProxyCube<T2>::ea_type BB = B.get_ea();
-        
       out_mem[i] = upgrade_val<eT1,eT2>::apply(AA[i]) * upgrade_val<eT1,eT2>::apply(BB[i]);
       }
     }
