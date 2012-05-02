@@ -18,8 +18,8 @@
 
 #define ARMA_VERSION_MAJOR 3
 #define ARMA_VERSION_MINOR 1
-#define ARMA_VERSION_PATCH 0
-#define ARMA_VERSION_NAME  "unstable development version -- not for production use"
+#define ARMA_VERSION_PATCH 91
+#define ARMA_VERSION_NAME  "3.2 beta 1"
 
 
 
