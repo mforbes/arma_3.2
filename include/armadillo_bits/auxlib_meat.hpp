@@ -1387,6 +1387,7 @@ auxlib::eig_sym_dc(Col<eT>& eigval, Mat<eT>& eigvec, const Base<eT,T1>& X)
     {
     arma_ignore(eigval);
     arma_ignore(eigvec);
+    arma_ignore(X);
     arma_stop("eig_sym(): use of LAPACK needs to be enabled");
     return false;
     }
