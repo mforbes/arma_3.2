@@ -438,6 +438,7 @@ Contributors:
 - Oka Kurniawan
 - Simen Kvaal
 - David Lawrence
+- Jussi Lehtola
 - Jeremy Mason
 - Carlos Mendes
 - Artem Novikov
@@ -453,6 +454,7 @@ Contributors:
 - Gerhard Schreiber
 - Shane Stainsby
 - Petter Strandmark
+- Eric Jon Sundstrom
 - Paul Torfs
 - Simon Urbanek
 - Arnold Wiliem
