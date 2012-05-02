@@ -226,7 +226,8 @@ Technical Report, NICTA, 2010.
 <a href="#symmat">symmatu/symmatl</a>&nbsp;&middot;
 <a href="#strans">strans</a>&nbsp;&middot;
 <a href="#trans">trans</a>&nbsp;&middot;
-<a href="#trimat">trimatu/trimatl</a>
+<a href="#trimat">trimatu/trimatl</a>&nbsp;&middot;
+<a href="#unique">unique</a>
 </ul>
 <br>
 
@@ -6523,6 +6524,7 @@ uvec q3 = find(A &gt; 0.5, 3, "last");
 <li>
 See also:
 <ul>
+<li><a href="#unique">unique()</a></li>
 <li><a href="#conv_to">conv_to()</a> (convert between matrix/vector types)</li>
 <li><a href="#submat">submatrix views</a></li>
 <li><a href="#sort_index">sort_index()</a></li>
@@ -7148,6 +7150,44 @@ mat X = inv( trimatu(U) );
 <li><a href="#solve">solve()</a></li>
 <li><a href="http://mathworld.wolfram.com/TriangularMatrix.html">Triangular matrix in MathWorld</a></li>
 <li><a href="http://en.wikipedia.org/wiki/Triangular_matrix">Triangular matrix in Wikipedia</a></li>
+</ul>
+</li>
+</ul>
+<br>
+<hr class="greyline">
+<br>
+
+
+<a name="unique"></a>
+<b>unique(A)</b>
+<br>
+<ul>
+<li>
+Return the unique elements of <i>A</i>, sorted in ascending order
+</li>
+<br>
+<li>
+If <i>A</i> is a vector, the output is also a vector with the same orientation (row or column) as <i>A</i>;
+if <i>A</i> is a matrix, the output is always a column vector
+</li>
+<br>
+<li>
+Examples:
+<ul>
+<pre>
+mat X;
+X &lt;&lt; 1 &lt;&lt; 2 &lt;&lt; endr
+  &lt;&lt; 2 &lt;&lt; 3 &lt;&lt; endr;
+
+mat Y = unique(X);
+</pre>
+</ul>
+</li>
+<br>
+<li>See also:
+<ul>
+<li><a href="#find">find()</a></li>
+<li><a href="#sort">sort()</a></li>
 </ul>
 </li>
 </ul>
