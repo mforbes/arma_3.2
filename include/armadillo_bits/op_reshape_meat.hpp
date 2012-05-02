@@ -65,7 +65,7 @@ op_reshape::apply(Mat<typename T1::elem_type>& out, const Op<T1,op_reshape>& in)
       }
     else
       {
-      unwrap_check< Mat<eT> > B_tmp(A, is_alias);  // TODO: BUG: need to modify unwrap class to make sure all stored matrices are as Mat<eT>
+      unwrap_check< Mat<eT> > B_tmp(A, is_alias);
       const Mat<eT>& B      = B_tmp.M;
       
       out.set_size(in_n_rows, in_n_cols);
