@@ -99,9 +99,9 @@ diagview<eT>::operator+=(const eT val)
   const uword t_row_offset = row_offset;
   const uword t_col_offset = col_offset;
   
-  for(uword i=0; i<t_n_elem; ++i)
+  for(uword ii=0; ii < t_n_elem; ++ii)
     {
-    t_m.at( i + t_row_offset,  i + t_col_offset) += val;
+    t_m.at( ii + t_row_offset,  ii + t_col_offset) += val;
     }
   }
 
@@ -120,9 +120,9 @@ diagview<eT>::operator-=(const eT val)
   const uword t_row_offset = row_offset;
   const uword t_col_offset = col_offset;
   
-  for(uword i=0; i<t_n_elem; ++i)
+  for(uword ii=0; ii < t_n_elem; ++ii)
     {
-    t_m.at( i + t_row_offset,  i + t_col_offset) -= val;
+    t_m.at( ii + t_row_offset,  ii + t_col_offset) -= val;
     }
   }
 
@@ -141,9 +141,9 @@ diagview<eT>::operator*=(const eT val)
   const uword t_row_offset = row_offset;
   const uword t_col_offset = col_offset;
   
-  for(uword i=0; i<t_n_elem; ++i)
+  for(uword ii=0; ii < t_n_elem; ++ii)
     {
-    t_m.at( i + t_row_offset,  i + t_col_offset) *= val;
+    t_m.at( ii + t_row_offset,  ii + t_col_offset) *= val;
     }
   }
 
@@ -162,9 +162,9 @@ diagview<eT>::operator/=(const eT val)
   const uword t_row_offset = row_offset;
   const uword t_col_offset = col_offset;
   
-  for(uword i=0; i<t_n_elem; ++i)
+  for(uword ii=0; ii < t_n_elem; ++ii)
     {
-    t_m.at( i + t_row_offset,  i + t_col_offset) /= val;
+    t_m.at( ii + t_row_offset,  ii + t_col_offset) /= val;
     }
   }
 
@@ -181,36 +181,64 @@ diagview<eT>::operator= (const Base<eT,T1>& o)
   
   diagview<eT>& d = *this;
   
-  const unwrap_check<T1> tmp( o.get_ref(), d.m );
-  const Mat<eT>& x = tmp.M;
-  
-  arma_debug_check
-    (
-    ( (d.n_elem != x.n_elem) || (x.is_vec() == false) ),
-    "diagview: given object has incompatible size"
-    );
-  
   Mat<eT>& d_m = const_cast< Mat<eT>& >(d.m);
   
   const uword d_n_elem     = d.n_elem;
   const uword d_row_offset = d.row_offset;
   const uword d_col_offset = d.col_offset;
-  
-  const eT* x_mem = x.memptr();
-  
-  uword ii,jj;
-  for(ii=0, jj=1; jj < d_n_elem; ii+=2, jj+=2)
-    {
-    const eT tmp_i = x_mem[ii];
-    const eT tmp_j = x_mem[jj];
     
-    d_m.at( ii + d_row_offset,  ii + d_col_offset) = tmp_i;
-    d_m.at( jj + d_row_offset,  jj + d_col_offset) = tmp_j;
-    }
+  const Proxy<T1> P( o.get_ref() );
   
-  if(ii < d_n_elem)
+  arma_debug_check
+    (
+    ( (d.n_elem != P.get_n_elem()) || ((P.get_n_rows() != 1) && (P.get_n_cols() != 1)) ),
+    "diagview: given object has incompatible size"
+    );
+  
+  const bool is_alias = P.is_alias(d_m);
+  
+  arma_extra_debug_warn(is_alias, "aliasing detected");
+  
+  if( (is_Mat<typename Proxy<T1>::stored_type>::value == true) || (Proxy<T1>::prefer_at_accessor == true) || (is_alias == true) )
     {
-    d_m.at( ii + d_row_offset,  ii + d_col_offset) = x_mem[ii];
+    const unwrap_check<typename Proxy<T1>::stored_type> tmp(P.Q, is_alias);
+    const Mat<eT>& x = tmp.M;
+    
+    const eT* x_mem = x.memptr();
+    
+    uword ii,jj;
+    for(ii=0, jj=1; jj < d_n_elem; ii+=2, jj+=2)
+      {
+      const eT tmp_i = x_mem[ii];
+      const eT tmp_j = x_mem[jj];
+      
+      d_m.at( ii + d_row_offset,  ii + d_col_offset) = tmp_i;
+      d_m.at( jj + d_row_offset,  jj + d_col_offset) = tmp_j;
+      }
+    
+    if(ii < d_n_elem)
+      {
+      d_m.at( ii + d_row_offset,  ii + d_col_offset) = x_mem[ii];
+      }
+    }
+  else
+    {
+    typename Proxy<T1>::ea_type Pea = P.get_ea();
+      
+    uword ii,jj;
+    for(ii=0, jj=1; jj < d_n_elem; ii+=2, jj+=2)
+      {
+      const eT tmp_i = Pea[ii];
+      const eT tmp_j = Pea[jj];
+      
+      d_m.at( ii + d_row_offset,  ii + d_col_offset) = tmp_i;
+      d_m.at( jj + d_row_offset,  jj + d_col_offset) = tmp_j;
+      }
+    
+    if(ii < d_n_elem)
+      {
+      d_m.at( ii + d_row_offset,  ii + d_col_offset) = Pea[ii];
+      }
     }
   }
 
@@ -226,36 +254,64 @@ diagview<eT>::operator+=(const Base<eT,T1>& o)
   
   diagview<eT>& d = *this;
   
-  const unwrap_check<T1> tmp( o.get_ref(), d.m );
-  const Mat<eT>& x = tmp.M;
-  
-  arma_debug_check
-    (
-    ( (d.n_elem != x.n_elem) || (x.is_vec() == false) ),
-    "diagview: given object has incompatible size"
-    );
-  
   Mat<eT>& d_m = const_cast< Mat<eT>& >(d.m);
   
   const uword d_n_elem     = d.n_elem;
   const uword d_row_offset = d.row_offset;
   const uword d_col_offset = d.col_offset;
-  
-  const eT* x_mem = x.memptr();
-  
-  uword i,j;
-  for(i=0, j=1; j < d_n_elem; i+=2, j+=2)
-    {
-    const eT tmp_i = x_mem[i];
-    const eT tmp_j = x_mem[j];
     
-    d_m.at( i + d_row_offset,  i + d_col_offset) += tmp_i;
-    d_m.at( j + d_row_offset,  j + d_col_offset) += tmp_j;
-    }
+  const Proxy<T1> P( o.get_ref() );
   
-  if(i < d_n_elem)
+  arma_debug_check
+    (
+    ( (d.n_elem != P.get_n_elem()) || ((P.get_n_rows() != 1) && (P.get_n_cols() != 1)) ),
+    "diagview: given object has incompatible size"
+    );
+  
+  const bool is_alias = P.is_alias(d_m);
+  
+  arma_extra_debug_warn(is_alias, "aliasing detected");
+  
+  if( (is_Mat<typename Proxy<T1>::stored_type>::value == true) || (Proxy<T1>::prefer_at_accessor == true) || (is_alias == true) )
     {
-    d_m.at( i + d_row_offset,  i + d_col_offset) += x_mem[i];
+    const unwrap_check<typename Proxy<T1>::stored_type> tmp(P.Q, is_alias);
+    const Mat<eT>& x = tmp.M;
+    
+    const eT* x_mem = x.memptr();
+    
+    uword ii,jj;
+    for(ii=0, jj=1; jj < d_n_elem; ii+=2, jj+=2)
+      {
+      const eT tmp_i = x_mem[ii];
+      const eT tmp_j = x_mem[jj];
+      
+      d_m.at( ii + d_row_offset,  ii + d_col_offset) += tmp_i;
+      d_m.at( jj + d_row_offset,  jj + d_col_offset) += tmp_j;
+      }
+    
+    if(ii < d_n_elem)
+      {
+      d_m.at( ii + d_row_offset,  ii + d_col_offset) += x_mem[ii];
+      }
+    }
+  else
+    {
+    typename Proxy<T1>::ea_type Pea = P.get_ea();
+      
+    uword ii,jj;
+    for(ii=0, jj=1; jj < d_n_elem; ii+=2, jj+=2)
+      {
+      const eT tmp_i = Pea[ii];
+      const eT tmp_j = Pea[jj];
+      
+      d_m.at( ii + d_row_offset,  ii + d_col_offset) += tmp_i;
+      d_m.at( jj + d_row_offset,  jj + d_col_offset) += tmp_j;
+      }
+    
+    if(ii < d_n_elem)
+      {
+      d_m.at( ii + d_row_offset,  ii + d_col_offset) += Pea[ii];
+      }
     }
   }
 
@@ -271,36 +327,64 @@ diagview<eT>::operator-=(const Base<eT,T1>& o)
   
   diagview<eT>& d = *this;
   
-  const unwrap_check<T1> tmp( o.get_ref(), d.m );
-  const Mat<eT>& x = tmp.M;
-  
-  arma_debug_check
-    (
-    ( (d.n_elem != x.n_elem) || (x.is_vec() == false) ),
-    "diagview: given object has incompatible size"
-    );
-  
   Mat<eT>& d_m = const_cast< Mat<eT>& >(d.m);
   
   const uword d_n_elem     = d.n_elem;
   const uword d_row_offset = d.row_offset;
   const uword d_col_offset = d.col_offset;
-  
-  const eT* x_mem = x.memptr();
-  
-  uword i,j;
-  for(i=0, j=1; j < d_n_elem; i+=2, j+=2)
-    {
-    const eT tmp_i = x_mem[i];
-    const eT tmp_j = x_mem[j];
     
-    d_m.at( i + d_row_offset,  i + d_col_offset) -= tmp_i;
-    d_m.at( j + d_row_offset,  j + d_col_offset) -= tmp_j;
-    }
+  const Proxy<T1> P( o.get_ref() );
   
-  if(i < d_n_elem)
+  arma_debug_check
+    (
+    ( (d.n_elem != P.get_n_elem()) || ((P.get_n_rows() != 1) && (P.get_n_cols() != 1)) ),
+    "diagview: given object has incompatible size"
+    );
+  
+  const bool is_alias = P.is_alias(d_m);
+  
+  arma_extra_debug_warn(is_alias, "aliasing detected");
+  
+  if( (is_Mat<typename Proxy<T1>::stored_type>::value == true) || (Proxy<T1>::prefer_at_accessor == true) || (is_alias == true) )
     {
-    d_m.at( i + d_row_offset,  i + d_col_offset) -= x_mem[i];
+    const unwrap_check<typename Proxy<T1>::stored_type> tmp(P.Q, is_alias);
+    const Mat<eT>& x = tmp.M;
+    
+    const eT* x_mem = x.memptr();
+    
+    uword ii,jj;
+    for(ii=0, jj=1; jj < d_n_elem; ii+=2, jj+=2)
+      {
+      const eT tmp_i = x_mem[ii];
+      const eT tmp_j = x_mem[jj];
+      
+      d_m.at( ii + d_row_offset,  ii + d_col_offset) -= tmp_i;
+      d_m.at( jj + d_row_offset,  jj + d_col_offset) -= tmp_j;
+      }
+    
+    if(ii < d_n_elem)
+      {
+      d_m.at( ii + d_row_offset,  ii + d_col_offset) -= x_mem[ii];
+      }
+    }
+  else
+    {
+    typename Proxy<T1>::ea_type Pea = P.get_ea();
+      
+    uword ii,jj;
+    for(ii=0, jj=1; jj < d_n_elem; ii+=2, jj+=2)
+      {
+      const eT tmp_i = Pea[ii];
+      const eT tmp_j = Pea[jj];
+      
+      d_m.at( ii + d_row_offset,  ii + d_col_offset) -= tmp_i;
+      d_m.at( jj + d_row_offset,  jj + d_col_offset) -= tmp_j;
+      }
+    
+    if(ii < d_n_elem)
+      {
+      d_m.at( ii + d_row_offset,  ii + d_col_offset) -= Pea[ii];
+      }
     }
   }
 
@@ -316,36 +400,64 @@ diagview<eT>::operator%=(const Base<eT,T1>& o)
   
   diagview<eT>& d = *this;
   
-  const unwrap_check<T1> tmp( o.get_ref(), d.m );
-  const Mat<eT>& x = tmp.M;
-  
-  arma_debug_check
-    (
-    ( (d.n_elem != x.n_elem) || (x.is_vec() == false) ),
-    "diagview: given object has incompatible size"
-    );
-  
   Mat<eT>& d_m = const_cast< Mat<eT>& >(d.m);
   
   const uword d_n_elem     = d.n_elem;
   const uword d_row_offset = d.row_offset;
   const uword d_col_offset = d.col_offset;
-  
-  const eT* x_mem = x.memptr();
-  
-  uword i,j;
-  for(i=0, j=1; j < d_n_elem; i+=2, j+=2)
-    {
-    const eT tmp_i = x_mem[i];
-    const eT tmp_j = x_mem[j];
     
-    d_m.at( i + d_row_offset,  i + d_col_offset) *= tmp_i;
-    d_m.at( j + d_row_offset,  j + d_col_offset) *= tmp_j;
-    }
+  const Proxy<T1> P( o.get_ref() );
   
-  if(i < d_n_elem)
+  arma_debug_check
+    (
+    ( (d.n_elem != P.get_n_elem()) || ((P.get_n_rows() != 1) && (P.get_n_cols() != 1)) ),
+    "diagview: given object has incompatible size"
+    );
+  
+  const bool is_alias = P.is_alias(d_m);
+  
+  arma_extra_debug_warn(is_alias, "aliasing detected");
+  
+  if( (is_Mat<typename Proxy<T1>::stored_type>::value == true) || (Proxy<T1>::prefer_at_accessor == true) || (is_alias == true) )
     {
-    d_m.at( i + d_row_offset,  i + d_col_offset) *= x_mem[i];
+    const unwrap_check<typename Proxy<T1>::stored_type> tmp(P.Q, is_alias);
+    const Mat<eT>& x = tmp.M;
+    
+    const eT* x_mem = x.memptr();
+    
+    uword ii,jj;
+    for(ii=0, jj=1; jj < d_n_elem; ii+=2, jj+=2)
+      {
+      const eT tmp_i = x_mem[ii];
+      const eT tmp_j = x_mem[jj];
+      
+      d_m.at( ii + d_row_offset,  ii + d_col_offset) *= tmp_i;
+      d_m.at( jj + d_row_offset,  jj + d_col_offset) *= tmp_j;
+      }
+    
+    if(ii < d_n_elem)
+      {
+      d_m.at( ii + d_row_offset,  ii + d_col_offset) *= x_mem[ii];
+      }
+    }
+  else
+    {
+    typename Proxy<T1>::ea_type Pea = P.get_ea();
+      
+    uword ii,jj;
+    for(ii=0, jj=1; jj < d_n_elem; ii+=2, jj+=2)
+      {
+      const eT tmp_i = Pea[ii];
+      const eT tmp_j = Pea[jj];
+      
+      d_m.at( ii + d_row_offset,  ii + d_col_offset) *= tmp_i;
+      d_m.at( jj + d_row_offset,  jj + d_col_offset) *= tmp_j;
+      }
+    
+    if(ii < d_n_elem)
+      {
+      d_m.at( ii + d_row_offset,  ii + d_col_offset) *= Pea[ii];
+      }
     }
   }
 
@@ -361,36 +473,64 @@ diagview<eT>::operator/=(const Base<eT,T1>& o)
   
   diagview<eT>& d = *this;
   
-  const unwrap_check<T1> tmp( o.get_ref(), d.m );
-  const Mat<eT>& x = tmp.M;
-  
-  arma_debug_check
-    (
-    ( (d.n_elem != x.n_elem) || (x.is_vec() == false) ),
-    "diagview: given object has incompatible size"
-    );
-  
   Mat<eT>& d_m = const_cast< Mat<eT>& >(d.m);
   
   const uword d_n_elem     = d.n_elem;
   const uword d_row_offset = d.row_offset;
   const uword d_col_offset = d.col_offset;
-  
-  const eT* x_mem = x.memptr();
-  
-  uword i,j;
-  for(i=0, j=1; j < d_n_elem; i+=2, j+=2)
-    {
-    const eT tmp_i = x_mem[i];
-    const eT tmp_j = x_mem[j];
     
-    d_m.at( i + d_row_offset,  i + d_col_offset) /= tmp_i;
-    d_m.at( j + d_row_offset,  j + d_col_offset) /= tmp_j;
-    }
+  const Proxy<T1> P( o.get_ref() );
   
-  if(i < d_n_elem)
+  arma_debug_check
+    (
+    ( (d.n_elem != P.get_n_elem()) || ((P.get_n_rows() != 1) && (P.get_n_cols() != 1)) ),
+    "diagview: given object has incompatible size"
+    );
+  
+  const bool is_alias = P.is_alias(d_m);
+  
+  arma_extra_debug_warn(is_alias, "aliasing detected");
+  
+  if( (is_Mat<typename Proxy<T1>::stored_type>::value == true) || (Proxy<T1>::prefer_at_accessor == true) || (is_alias == true) )
     {
-    d_m.at( i + d_row_offset,  i + d_col_offset) /= x_mem[i];
+    const unwrap_check<typename Proxy<T1>::stored_type> tmp(P.Q, is_alias);
+    const Mat<eT>& x = tmp.M;
+    
+    const eT* x_mem = x.memptr();
+    
+    uword ii,jj;
+    for(ii=0, jj=1; jj < d_n_elem; ii+=2, jj+=2)
+      {
+      const eT tmp_i = x_mem[ii];
+      const eT tmp_j = x_mem[jj];
+      
+      d_m.at( ii + d_row_offset,  ii + d_col_offset) /= tmp_i;
+      d_m.at( jj + d_row_offset,  jj + d_col_offset) /= tmp_j;
+      }
+    
+    if(ii < d_n_elem)
+      {
+      d_m.at( ii + d_row_offset,  ii + d_col_offset) /= x_mem[ii];
+      }
+    }
+  else
+    {
+    typename Proxy<T1>::ea_type Pea = P.get_ea();
+      
+    uword ii,jj;
+    for(ii=0, jj=1; jj < d_n_elem; ii+=2, jj+=2)
+      {
+      const eT tmp_i = Pea[ii];
+      const eT tmp_j = Pea[jj];
+      
+      d_m.at( ii + d_row_offset,  ii + d_col_offset) /= tmp_i;
+      d_m.at( jj + d_row_offset,  jj + d_col_offset) /= tmp_j;
+      }
+    
+    if(ii < d_n_elem)
+      {
+      d_m.at( ii + d_row_offset,  ii + d_col_offset) /= Pea[ii];
+      }
     }
   }
 
