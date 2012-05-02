@@ -1480,15 +1480,26 @@ cout &lt;&lt; B.n_cols &lt;&lt; endl;
 </pre>
 </ul>
 </li>
+<br>
+<li>
+See also:
+<ul>
+<li><a href="#reset">.reset()</a></li>
+<li><a href="#set_size">.set_size()</a></li>
+<li><a href="#reshape_member">.reshape()</a></li>
+<li><a href="#resize_member">.resize()</a></li>
+<li><a href="#zeros_member">.zeros()</a></li>
+</ul>
+</li>
 </ul>
 <br>
 <hr class="greyline"><br>
 
 <a name="diag"></a>
-<b>.diag(k=0)</b>
+<b>.diag(</b><i>k=0</i><b>)</b>
 <ul>
 <li>
-Member function of <i>Mat</i>.
+Member function of <i>Mat</i>
 </li>
 <br>
 <li>
@@ -1524,7 +1535,9 @@ X.diag() += 6;
 <li>
 See also:
 <ul>
+<li><a href="#eye_member">.eye()</a></li>
 <li><a href="#diagvec">diagvec()</a></li>
+<li><a href="#diagmat">diagmat()</a></li>
 <li><a href="#submat">submatrix views</a></li>
 </ul>
 </li>
@@ -1758,10 +1771,11 @@ B.eye(5,5);
 <br>
 <li>See also:
 <ul>
-<li><a href="#eye_standalone">eye()</a> (standalone function)</li>
+<li><a href="#ones_member">.ones()</a></li>
+<li><a href="#diag">.diag()</a></li>
 <li><a href="#diagmat">diagmat()</a></li>
 <li><a href="#diagvec">diagvec()</a></li>
-<li><a href="#ones_member">.ones()</a></li>
+<li><a href="#eye_standalone">eye()</a> (standalone function)</li>
 </ul>
 </li>
 <br>
@@ -2970,6 +2984,7 @@ See also:
 <li><a href="#ones_standalone">ones()</a> (standalone function)</li>
 <li><a href="#zeros_member">.zeros()</a></li>
 <li><a href="#fill">.fill()</a></li>
+<li><a href="#randu_randn_member">.randu()</a></li>
 </ul>
 </li>
 <br>
@@ -3378,6 +3393,8 @@ A.reshape(A.n_elem, 1);
 <ul>
 <li><a href="#resize_member">.resize()</a></li>
 <li><a href="#set_size">.set_size()</a></li>
+<li><a href="#copy_size">.copy_size()</a></li>
+<li><a href="#zeros_member">.zeros()</a></li>
 <li><a href="#reset">.reset()</a></li>
 <li><a href="#reshape">reshape()</a> (standalone function)</li>
 </ul>
@@ -3445,6 +3462,8 @@ This function was added in version 2.4
 <ul>
 <li><a href="#reshape_member">.reshape()</a></li>
 <li><a href="#set_size">.set_size()</a></li>
+<li><a href="#copy_size">.copy_size()</a></li>
+<li><a href="#zeros_member">.zeros()</a></li>
 <li><a href="#reset">.reset()</a></li>
 <li><a href="#insert">insert rows/cols/slices</a></li>
 <li><a href="#shed">shed rows/cols/slices</a></li>
@@ -3872,7 +3891,12 @@ If the requested number of elements is equal to the old number of elements, exis
 </li>
 <br>
 <li>
-If the requested number of elements is not equal to the old number of elements, new memory is used
+If the requested number of elements is not equal to the old number of elements, new memory is used;
+the memory is uninitilised
+</li>
+<br>
+<li>
+If you need to initialise the memory, use <a href="#zeros_member">.zeros()</a> instead
 </li>
 <br>
 <li>
@@ -3895,8 +3919,10 @@ q.set_size(100);
 <li>See also:
 <ul>
 <li><a href="#reset">.reset()</a></li>
+<li><a href="#copy_size">.copy_size()</a></li>
 <li><a href="#reshape_member">.reshape()</a></li>
 <li><a href="#resize_member">.resize()</a></li>
+<li><a href="#zeros_member">.zeros()</a></li>
 </ul>
 </li>
 </ul>
@@ -4188,7 +4214,7 @@ X.elem(indices) = ones&lt;vec&gt;(4);
 <li>
 See also:
 <ul>
-<li><a href="#diag">.diag()</a></li>
+<li><a href="#diag">.diag()</a> &nbsp;&nbsp; (read/write access to diagonals)</li>
 <li><a href="#colptr">.colptr()</a></li>
 <li><a href="#in_range">.in_range()</a></li>
 <li><a href="#find">find()</a></li>
@@ -4425,8 +4451,10 @@ See also:
 <ul>
 <li><a href="#zeros_standalone">zeros()</a> (standalone function)</li>
 <li><a href="#ones_member">.ones()</a></li>
+<li><a href="#randu_randn_member">.randu()</a></li>
 <li><a href="#fill">.fill()</a></li>
 <li><a href="#reset">.reset()</a></li>
+<li><a href="#set_size">.set_size()</a></li>
 </ul>
 </li>
 <br>
@@ -4853,6 +4881,7 @@ mat B = 123.0 * eye&lt;mat&gt;(5,5);
 <li>See also:
 <ul>
 <li><a href="#eye_member">.eye()</a> (member function of Mat)</li>
+<li><a href="#diag">.diag()</a></li>
 <li><a href="#ones_standalone">ones()</a></li>
 <li><a href="#diagmat">diagmat()</a></li>
 <li><a href="#diagvec">diagvec()</a></li>
