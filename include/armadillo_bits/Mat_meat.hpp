@@ -2592,17 +2592,17 @@ Mat<eT>::swap_rows(const uword in_row1, const uword in_row2)
     "Mat::swap_rows(): out of bounds"
     );
   
-  // TODO: check for n_elem > 0
-  
-  for(uword ucol=0; ucol < local_n_cols; ++ucol)
+  if(n_elem > 0)
     {
-    const uword offset = ucol * local_n_rows;
-    const uword pos1   = in_row1 + offset;
-    const uword pos2   = in_row2 + offset;
-    
-    std::swap( access::rw(mem[pos1]), access::rw(mem[pos2]) );
+    for(uword ucol=0; ucol < local_n_cols; ++ucol)
+      {
+      const uword offset = ucol * local_n_rows;
+      const uword pos1   = in_row1 + offset;
+      const uword pos2   = in_row2 + offset;
+      
+      std::swap( access::rw(mem[pos1]), access::rw(mem[pos2]) );
+      }
     }
-  
   }
 
 
