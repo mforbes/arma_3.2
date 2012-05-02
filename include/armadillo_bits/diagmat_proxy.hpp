@@ -384,7 +384,7 @@ class diagmat_proxy_check_fixed
   arma_inline eT operator[] (const uword i)                    const { return P_is_vec ? P[i] : P.at(i,i);                                         }
   arma_inline eT at         (const uword row, const uword col) const { return (row == col) ? ( P_is_vec ? P[row] : P.at(row,row) ) : elem_type(0); }
   
-  const Mat<eT> P;
+  const Mat<eT> P;  // TODO: why not just store X directly as T1& ?  test with fixed size vectors and matrices
   
   static const bool  P_is_vec = (T1::n_rows == 1) || (T1::n_cols == 1);
   static const uword n_elem   = P_is_vec ? T1::n_elem : ( (T1::n_elem < T1::n_rows) ? T1::n_elem : T1::n_rows );
