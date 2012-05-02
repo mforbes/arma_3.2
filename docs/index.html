@@ -7259,16 +7259,16 @@ See also:
 <br>
 <li>The eigenvalues and corresponding eigenvectors are stored in <i>eigval</i> and <i>eigvec</i>, respectively</li>
 <br>
-<li>The <i>method</i> argument is optional</li>
-<br>
 <li>The eigenvalues are in ascending order</li>
+<br>
+<li>If <i>X</i> is not square, a <i>std::logic_error</i> exception is thrown</li>
 <br>
 <li>
 By default, a standard eigen decomposition algorithm is used;
 a "divide and conquer" algorithm can be used by explicitly setting <i>method</i> to <i>"dc"</i>,
 which is faster (but slightly less accurate) for matrices with a size &ge; 50x50</li>
 <br>
-<li>If <i>X</i> is not square, a <i>std::logic_error</i> exception is thrown</li>
+<li>The <i>method</i> argument is optional</li>
 <br>
 <li>If the decomposition fails, the output objects are reset and:
 <ul>
@@ -9708,7 +9708,14 @@ Below is a list of additions and changes since prior versions of Armadillo:
 <a name="added_in_32"></a>
 <li>Added in 3.2:
 <ul>
-<li>optional use of a "divide and conquer" algorithm for eigen decomposition by <a href="#eig_sym">eig_sym()</a></li>
+<li>faster eigen decomposition via optional use of "divide and conquer" by <a href="#eig_sym">eig_sym()</a></li>
+<li><a href="#unique">unique()</a>, for finding unique elements of a matrix</li>
+</ul>
+<br>
+</li>
+<li>Changed in 3.2:
+<ul>
+<li>faster handling of compound expressions with vector transposes</li>
 </ul>
 <br>
 </li>
