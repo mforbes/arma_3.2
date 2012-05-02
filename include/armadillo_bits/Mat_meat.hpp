@@ -2631,22 +2631,22 @@ Mat<eT>::swap_cols(const uword in_colA, const uword in_colB)
     eT tmp_i;
     eT tmp_j;
     
-    uword i,j;
-    for(i=0, j=1; j < local_n_rows; i+=2, j+=2)
+    uword iq,jq;
+    for(iq=0, jq=1; jq < local_n_rows; iq+=2, jq+=2)
       {
-      tmp_i = ptrA[i];
-      tmp_j = ptrA[j];
+      tmp_i = ptrA[iq];
+      tmp_j = ptrA[jq];
       
-      ptrA[i] = ptrB[i];
-      ptrA[j] = ptrB[j];
+      ptrA[iq] = ptrB[iq];
+      ptrA[jq] = ptrB[jq];
       
-      ptrB[i] = tmp_i;
-      ptrB[j] = tmp_j;
+      ptrB[iq] = tmp_i;
+      ptrB[jq] = tmp_j;
       }
     
-    if(i < local_n_rows)
+    if(iq < local_n_rows)
       {
-      std::swap( ptrA[i], ptrB[i] );
+      std::swap( ptrA[iq], ptrB[iq] );
       }
     }
   }
@@ -5865,9 +5865,9 @@ template<uword fixed_n_rows, uword fixed_n_cols>
 arma_inline
 arma_warn_unused
 eT&
-Mat<eT>::fixed<fixed_n_rows, fixed_n_cols>::operator[] (const uword i)
+Mat<eT>::fixed<fixed_n_rows, fixed_n_cols>::operator[] (const uword ii)
   {
-  return (use_extra) ? mem_local_extra[i] : mem_local[i];
+  return (use_extra) ? mem_local_extra[ii] : mem_local[ii];
   }
 
 
@@ -5877,9 +5877,9 @@ template<uword fixed_n_rows, uword fixed_n_cols>
 arma_inline
 arma_warn_unused
 eT
-Mat<eT>::fixed<fixed_n_rows, fixed_n_cols>::operator[] (const uword i) const
+Mat<eT>::fixed<fixed_n_rows, fixed_n_cols>::operator[] (const uword ii) const
   {
-  return (use_extra) ? mem_local_extra[i] : mem_local[i];
+  return (use_extra) ? mem_local_extra[ii] : mem_local[ii];
   }
 
 
@@ -5889,9 +5889,9 @@ template<uword fixed_n_rows, uword fixed_n_cols>
 arma_inline
 arma_warn_unused
 eT&
-Mat<eT>::fixed<fixed_n_rows, fixed_n_cols>::at(const uword i)
+Mat<eT>::fixed<fixed_n_rows, fixed_n_cols>::at(const uword ii)
   {
-  return (use_extra) ? mem_local_extra[i] : mem_local[i];
+  return (use_extra) ? mem_local_extra[ii] : mem_local[ii];
   }
 
 
@@ -5901,9 +5901,9 @@ template<uword fixed_n_rows, uword fixed_n_cols>
 arma_inline
 arma_warn_unused
 eT
-Mat<eT>::fixed<fixed_n_rows, fixed_n_cols>::at(const uword i) const
+Mat<eT>::fixed<fixed_n_rows, fixed_n_cols>::at(const uword ii) const
   {
-  return (use_extra) ? mem_local_extra[i] : mem_local[i];
+  return (use_extra) ? mem_local_extra[ii] : mem_local[ii];
   }
 
 
@@ -5913,11 +5913,11 @@ template<uword fixed_n_rows, uword fixed_n_cols>
 arma_inline
 arma_warn_unused
 eT&
-Mat<eT>::fixed<fixed_n_rows, fixed_n_cols>::operator() (const uword i)
+Mat<eT>::fixed<fixed_n_rows, fixed_n_cols>::operator() (const uword ii)
   {
-  arma_debug_check( (i >= fixed_n_elem), "Mat::operator(): out of bounds");
+  arma_debug_check( (ii >= fixed_n_elem), "Mat::operator(): out of bounds");
   
-  return (use_extra) ? mem_local_extra[i] : mem_local[i];
+  return (use_extra) ? mem_local_extra[ii] : mem_local[ii];
   }
 
 
@@ -5927,11 +5927,11 @@ template<uword fixed_n_rows, uword fixed_n_cols>
 arma_inline
 arma_warn_unused
 eT
-Mat<eT>::fixed<fixed_n_rows, fixed_n_cols>::operator() (const uword i) const
+Mat<eT>::fixed<fixed_n_rows, fixed_n_cols>::operator() (const uword ii) const
   {
-  arma_debug_check( (i >= fixed_n_elem), "Mat::operator(): out of bounds");
+  arma_debug_check( (ii >= fixed_n_elem), "Mat::operator(): out of bounds");
   
-  return (use_extra) ? mem_local_extra[i] : mem_local[i];
+  return (use_extra) ? mem_local_extra[ii] : mem_local[ii];
   }
 
 
@@ -5943,9 +5943,9 @@ arma_warn_unused
 eT&
 Mat<eT>::fixed<fixed_n_rows, fixed_n_cols>::at(const uword in_row, const uword in_col)
   {
-  const uword i = in_row + in_col*fixed_n_rows;
+  const uword iq = in_row + in_col*fixed_n_rows;
   
-  return (use_extra) ? mem_local_extra[i] : mem_local[i];
+  return (use_extra) ? mem_local_extra[iq] : mem_local[iq];
   }
 
 
@@ -5957,9 +5957,9 @@ arma_warn_unused
 eT
 Mat<eT>::fixed<fixed_n_rows, fixed_n_cols>::at(const uword in_row, const uword in_col) const
   {
-  const uword i = in_row + in_col*fixed_n_rows;
+  const uword iq = in_row + in_col*fixed_n_rows;
   
-  return (use_extra) ? mem_local_extra[i] : mem_local[i];
+  return (use_extra) ? mem_local_extra[iq] : mem_local[iq];
   }
 
 
@@ -5973,9 +5973,9 @@ Mat<eT>::fixed<fixed_n_rows, fixed_n_cols>::operator() (const uword in_row, cons
   {
   arma_debug_check( ((in_row >= fixed_n_rows) || (in_col >= fixed_n_cols)), "Mat::operator(): out of bounds");
   
-  const uword i = in_row + in_col*fixed_n_rows;
+  const uword iq = in_row + in_col*fixed_n_rows;
   
-  return (use_extra) ? mem_local_extra[i] : mem_local[i];
+  return (use_extra) ? mem_local_extra[iq] : mem_local[iq];
   }
 
 
@@ -5989,9 +5989,9 @@ Mat<eT>::fixed<fixed_n_rows, fixed_n_cols>::operator() (const uword in_row, cons
   {
   arma_debug_check( ((in_row >= fixed_n_rows) || (in_col >= fixed_n_cols)), "Mat::operator(): out of bounds");
   
-  const uword i = in_row + in_col*fixed_n_rows;
+  const uword iq = in_row + in_col*fixed_n_rows;
   
-  return (use_extra) ? mem_local_extra[i] : mem_local[i];
+  return (use_extra) ? mem_local_extra[iq] : mem_local[iq];
   }
 
 

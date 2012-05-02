@@ -945,9 +945,9 @@ template<uword fixed_n_elem>
 arma_inline
 arma_warn_unused
 eT&
-Row<eT>::fixed<fixed_n_elem>::operator[] (const uword i)
+Row<eT>::fixed<fixed_n_elem>::operator[] (const uword ii)
   {
-  return (use_extra) ? mem_local_extra[i] : Mat<eT>::mem_local[i];
+  return (use_extra) ? mem_local_extra[ii] : Mat<eT>::mem_local[ii];
   }
 
 
@@ -957,9 +957,9 @@ template<uword fixed_n_elem>
 arma_inline
 arma_warn_unused
 eT
-Row<eT>::fixed<fixed_n_elem>::operator[] (const uword i) const
+Row<eT>::fixed<fixed_n_elem>::operator[] (const uword ii) const
   {
-  return (use_extra) ? mem_local_extra[i] : Mat<eT>::mem_local[i];
+  return (use_extra) ? mem_local_extra[ii] : Mat<eT>::mem_local[ii];
   }
 
 
@@ -969,9 +969,9 @@ template<uword fixed_n_elem>
 arma_inline
 arma_warn_unused
 eT&
-Row<eT>::fixed<fixed_n_elem>::at(const uword i)
+Row<eT>::fixed<fixed_n_elem>::at(const uword ii)
   {
-  return (use_extra) ? mem_local_extra[i] : Mat<eT>::mem_local[i];
+  return (use_extra) ? mem_local_extra[ii] : Mat<eT>::mem_local[ii];
   }
 
 
@@ -981,9 +981,9 @@ template<uword fixed_n_elem>
 arma_inline
 arma_warn_unused
 eT
-Row<eT>::fixed<fixed_n_elem>::at(const uword i) const
+Row<eT>::fixed<fixed_n_elem>::at(const uword ii) const
   {
-  return (use_extra) ? mem_local_extra[i] : Mat<eT>::mem_local[i];
+  return (use_extra) ? mem_local_extra[ii] : Mat<eT>::mem_local[ii];
   }
 
 
@@ -993,11 +993,11 @@ template<uword fixed_n_elem>
 arma_inline
 arma_warn_unused
 eT&
-Row<eT>::fixed<fixed_n_elem>::operator() (const uword i)
+Row<eT>::fixed<fixed_n_elem>::operator() (const uword ii)
   {
-  arma_debug_check( (i >= fixed_n_elem), "Row::operator(): out of bounds");
+  arma_debug_check( (ii >= fixed_n_elem), "Row::operator(): out of bounds");
   
-  return (use_extra) ? mem_local_extra[i] : Mat<eT>::mem_local[i];
+  return (use_extra) ? mem_local_extra[ii] : Mat<eT>::mem_local[ii];
   }
 
 
@@ -1007,11 +1007,11 @@ template<uword fixed_n_elem>
 arma_inline
 arma_warn_unused
 eT
-Row<eT>::fixed<fixed_n_elem>::operator() (const uword i) const
+Row<eT>::fixed<fixed_n_elem>::operator() (const uword ii) const
   {
-  arma_debug_check( (i >= fixed_n_elem), "Row::operator(): out of bounds");
+  arma_debug_check( (ii >= fixed_n_elem), "Row::operator(): out of bounds");
   
-  return (use_extra) ? mem_local_extra[i] : Mat<eT>::mem_local[i];
+  return (use_extra) ? mem_local_extra[ii] : Mat<eT>::mem_local[ii];
   }
 
 
