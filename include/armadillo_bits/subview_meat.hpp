@@ -2128,19 +2128,18 @@ subview<eT>::swap_rows(const uword in_row1, const uword in_row2)
   
   eT* mem = (const_cast< Mat<eT>& >(m)).memptr();
   
-  // TODO: check for n_elem > 0
-  
-  for(uword ucol=0; ucol < n_cols; ++ucol)
+  if(n_elem > 0)
     {
-    const uword offset = (aux_col1 + ucol) * m.n_rows;
-    const uword pos1   = aux_row1 + in_row1 + offset;
-    const uword pos2   = aux_row1 + in_row2 + offset;
+    const uword m_n_rows = m.n_rows;
     
-    // TODO: replace with std::swap()
-    
-    const eT tmp          = mem[pos1];
-    access::rw(mem[pos1]) = mem[pos2];
-    access::rw(mem[pos2]) = tmp;
+    for(uword ucol=0; ucol < n_cols; ++ucol)
+      {
+      const uword offset = (aux_col1 + ucol) * m_n_rows;
+      const uword pos1   = aux_row1 + in_row1 + offset;
+      const uword pos2   = aux_row1 + in_row2 + offset;
+      
+      std::swap( access::rw(mem[pos1]), access::rw(mem[pos2]) );
+      }
     }
   }
 
@@ -2164,13 +2163,9 @@ subview<eT>::swap_cols(const uword in_col1, const uword in_col2)
     eT* ptr1 = colptr(in_col1);
     eT* ptr2 = colptr(in_col2);
     
-    // TODO: replace with std::swap()
-    
     for(uword urow=0; urow < n_rows; ++urow)
       {
-      const eT tmp = ptr1[urow];
-      ptr1[row]    = ptr2[urow];
-      ptr2[row]    = tmp;
+      std::swap( ptr1[urow], ptr2[urow] );
       }
     }
   }
