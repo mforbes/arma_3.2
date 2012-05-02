@@ -77,19 +77,16 @@ op_reshape::apply(Mat<typename T1::elem_type>& out, const Op<T1,op_reshape>& in)
       const uword B_n_cols = B.n_cols;
       
       for(uword row=0; row<B_n_rows; ++row)
+      for(uword col=0; col<B_n_cols; ++col)
         {
-        for(uword col=0; col<B_n_cols; ++col)
-          {
-          out_mem[i] = B.at(row,col);
-          ++i;
-          }
+        out_mem[i] = B.at(row,col);
+        ++i;
         }
-        
       }
     }
   else
     {
-    const unwrap_check< Mat<eT> > B_tmp(A, out);
+    const unwrap_check< Mat<eT> > B_tmp(A, is_alias);
     const Mat<eT>& B            = B_tmp.M;
     
     const uword n_elem_to_copy = (std::min)(B.n_elem, in_n_elem);
@@ -199,17 +196,12 @@ op_reshape::apply(Cube<typename T1::elem_type>& out, const OpCube<T1,op_reshape>
       const uword B_n_slices = B.n_slices;
       
       for(uword slice=0; slice<B_n_slices; ++slice)
+      for(uword row=0; row<B_n_rows; ++row)
+      for(uword col=0; col<B_n_cols; ++col)
         {
-        for(uword row=0; row<B_n_rows; ++row)
-          {
-          for(uword col=0; col<B_n_cols; ++col)
-            {
-            out_mem[i] = B.at(row,col,slice);
-            ++i;
-            }
-          }
+        out_mem[i] = B.at(row,col,slice);
+        ++i;
         }
-        
       }
     }
   else
