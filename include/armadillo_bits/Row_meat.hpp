@@ -931,7 +931,7 @@ Row<eT>::fixed<fixed_n_elem>::operator=(const std::initializer_list<eT>& list)
   
   arrayops::copy( this_mem, list.begin(), N );
   
-  for(uword i=N; i<fixed_n_elem; ++i) { this_mem[i] = eT(0); }
+  for(uword iq=N; iq < fixed_n_elem; ++iq) { this_mem[iq] = eT(0); }
   
   return *this;
   }
