@@ -219,10 +219,10 @@ Gen<T1, gen_type>::apply_inplace_schur(Mat<typename T1::elem_type>& out) const
     {
     const uword N = (std::min)(n_rows, n_cols);
     
-    for(uword i=0; i<N; ++i)
+    for(uword iq=0; iq < N; ++iq)
       {
-      for(uword row=0;   row<i;      ++row) { out.at(row,i) = eT(0); }
-      for(uword row=i+1; row<n_rows; ++row) { out.at(row,i) = eT(0); }
+      for(uword row=0;    row < iq;     ++row) { out.at(row,iq) = eT(0); }
+      for(uword row=iq+1; row < n_rows; ++row) { out.at(row,iq) = eT(0); }
       }
     }
   else
@@ -230,20 +230,19 @@ Gen<T1, gen_type>::apply_inplace_schur(Mat<typename T1::elem_type>& out) const
           eT*   out_mem = out.memptr();
     const uword n_elem  = out.n_elem;
     
-    uword i,j;
-    
-    for(i=0, j=1; j<n_elem; i+=2, j+=2)
+    uword iq,jq;
+    for(iq=0, jq=1; jq < n_elem; iq+=2, jq+=2)
       {
       const eT tmp_i = Gen<T1, gen_type>::generate();
       const eT tmp_j = Gen<T1, gen_type>::generate();
       
-      out_mem[i] *= tmp_i;
-      out_mem[j] *= tmp_j;
+      out_mem[iq] *= tmp_i;
+      out_mem[jq] *= tmp_j;
       }
     
-    if(i < n_elem)
+    if(iq < n_elem)
       {
-      out_mem[i] *= Gen<T1, gen_type>::generate();
+      out_mem[iq] *= Gen<T1, gen_type>::generate();
       }
     }
   
@@ -268,12 +267,12 @@ Gen<T1, gen_type>::apply_inplace_div(Mat<typename T1::elem_type>& out) const
     {
     const uword N = (std::min)(n_rows, n_cols);
     
-    for(uword i=0; i<N; ++i)
+    for(uword iq=0; iq < N; ++iq)
       {
       const eT zero = eT(0);
       
-      for(uword row=0;   row<i;      ++row) { out.at(row,i) /= zero; }
-      for(uword row=i+1; row<n_rows; ++row) { out.at(row,i) /= zero; }
+      for(uword row=0;    row < iq;     ++row) { out.at(row,iq) /= zero; }
+      for(uword row=iq+1; row < n_rows; ++row) { out.at(row,iq) /= zero; }
       }
     }
   else
@@ -281,20 +280,19 @@ Gen<T1, gen_type>::apply_inplace_div(Mat<typename T1::elem_type>& out) const
           eT*   out_mem = out.memptr();
     const uword n_elem  = out.n_elem;
     
-    uword i,j;
-    
-    for(i=0, j=1; j<n_elem; i+=2, j+=2)
+    uword iq,jq;
+    for(iq=0, jq=1; jq < n_elem; iq+=2, jq+=2)
       {
       const eT tmp_i = Gen<T1, gen_type>::generate();
       const eT tmp_j = Gen<T1, gen_type>::generate();
       
-      out_mem[i] /= tmp_i;
-      out_mem[j] /= tmp_j;
+      out_mem[iq] /= tmp_i;
+      out_mem[jq] /= tmp_j;
       }
     
-    if(i < n_elem)
+    if(iq < n_elem)
       {
-      out_mem[i] /= Gen<T1, gen_type>::generate();
+      out_mem[iq] /= Gen<T1, gen_type>::generate();
       }
     }
   
