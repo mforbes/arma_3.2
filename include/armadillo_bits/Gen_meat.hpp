@@ -125,9 +125,9 @@ Gen<T1, gen_type>::apply_inplace_plus(Mat<typename T1::elem_type>& out) const
     {
     const uword N = (std::min)(n_rows, n_cols);
     
-    for(uword i=0; i<N; ++i)
+    for(uword iq=0; iq < N; ++iq)
       {
-      out.at(i,i) += eT(1);
+      out.at(iq,iq) += eT(1);
       }
     }
   else
@@ -135,20 +135,19 @@ Gen<T1, gen_type>::apply_inplace_plus(Mat<typename T1::elem_type>& out) const
           eT*   out_mem = out.memptr();
     const uword n_elem  = out.n_elem;
     
-    uword i,j;
-    
-    for(i=0, j=1; j<n_elem; i+=2, j+=2)
+    uword iq,jq;
+    for(iq=0, jq=1; jq < n_elem; iq+=2, jq+=2)
       {
       const eT tmp_i = Gen<T1, gen_type>::generate();
       const eT tmp_j = Gen<T1, gen_type>::generate();
       
-      out_mem[i] += tmp_i;
-      out_mem[j] += tmp_j;
+      out_mem[iq] += tmp_i;
+      out_mem[jq] += tmp_j;
       }
     
-    if(i < n_elem)
+    if(iq < n_elem)
       {
-      out_mem[i] += Gen<T1, gen_type>::generate();
+      out_mem[iq] += Gen<T1, gen_type>::generate();
       }
     }
   
@@ -173,9 +172,9 @@ Gen<T1, gen_type>::apply_inplace_minus(Mat<typename T1::elem_type>& out) const
     {
     const uword N = (std::min)(n_rows, n_cols);
     
-    for(uword i=0; i<N; ++i)
+    for(uword iq=0; iq < N; ++iq)
       {
-      out.at(i,i) -= eT(1);
+      out.at(iq,iq) -= eT(1);
       }
     }
   else
@@ -183,20 +182,19 @@ Gen<T1, gen_type>::apply_inplace_minus(Mat<typename T1::elem_type>& out) const
           eT*   out_mem = out.memptr();
     const uword n_elem  = out.n_elem;
     
-    uword i,j;
-    
-    for(i=0, j=1; j<n_elem; i+=2, j+=2)
+    uword iq,jq;
+    for(iq=0, jq=1; jq < n_elem; iq+=2, jq+=2)
       {
       const eT tmp_i = Gen<T1, gen_type>::generate();
       const eT tmp_j = Gen<T1, gen_type>::generate();
       
-      out_mem[i] -= tmp_i;
-      out_mem[j] -= tmp_j;
+      out_mem[iq] -= tmp_i;
+      out_mem[jq] -= tmp_j;
       }
     
-    if(i < n_elem)
+    if(iq < n_elem)
       {
-      out_mem[i] -= Gen<T1, gen_type>::generate();
+      out_mem[iq] -= Gen<T1, gen_type>::generate();
       }
     }
   
