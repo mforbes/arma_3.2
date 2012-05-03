@@ -17,6 +17,7 @@
 
 
 template<typename eT>
+arma_hot
 arma_inline
 void
 op_htrans::apply_noalias(Mat<eT>& out, const Mat<eT>& A, const typename arma_not_cx<eT>::result* junk)
@@ -30,6 +31,7 @@ op_htrans::apply_noalias(Mat<eT>& out, const Mat<eT>& A, const typename arma_not
 
 
 template<typename eT>
+arma_hot
 inline
 void
 op_htrans::apply_noalias(Mat<eT>& out, const Mat<eT>& A, const typename arma_cx_only<eT>::result* junk)
@@ -58,6 +60,7 @@ op_htrans::apply_noalias(Mat<eT>& out, const Mat<eT>& A, const typename arma_cx_
 
 
 template<typename eT>
+arma_hot
 arma_inline
 void
 op_htrans::apply(Mat<eT>& out, const Mat<eT>& A, const typename arma_not_cx<eT>::result* junk)
@@ -71,6 +74,7 @@ op_htrans::apply(Mat<eT>& out, const Mat<eT>& A, const typename arma_not_cx<eT>:
 
 
 template<typename eT>
+arma_hot
 inline
 void
 op_htrans::apply(Mat<eT>& out, const Mat<eT>& A, const typename arma_cx_only<eT>::result* junk)
@@ -121,6 +125,7 @@ op_htrans::apply(Mat<eT>& out, const Mat<eT>& A, const typename arma_cx_only<eT>
 
 
 template<typename T1>
+arma_hot
 inline
 void
 op_htrans::apply(Mat<typename T1::elem_type>& out, const Op<T1,op_htrans>& in)
@@ -138,6 +143,7 @@ op_htrans::apply(Mat<typename T1::elem_type>& out, const Op<T1,op_htrans>& in)
 
 
 template<typename T1>
+arma_hot
 inline
 void
 op_htrans::apply(Mat<typename T1::elem_type>& out, const Op< Op<T1, op_trimat>, op_htrans>& in)
@@ -162,6 +168,7 @@ op_htrans::apply(Mat<typename T1::elem_type>& out, const Op< Op<T1, op_trimat>, 
 
 
 template<typename eT>
+arma_hot
 arma_inline
 void
 op_htrans2::apply(Mat<eT>& out, const Mat<eT>& A, const eT val, const typename arma_not_cx<eT>::result* junk)
@@ -175,6 +182,7 @@ op_htrans2::apply(Mat<eT>& out, const Mat<eT>& A, const eT val, const typename a
 
 
 template<typename eT>
+arma_hot
 inline
 void
 op_htrans2::apply(Mat<eT>& out, const Mat<eT>& A, const eT val, const typename arma_cx_only<eT>::result* junk)
@@ -192,6 +200,7 @@ op_htrans2::apply(Mat<eT>& out, const Mat<eT>& A, const eT val, const typename a
 
 
 template<typename T1>
+arma_hot
 inline
 void
 op_htrans2::apply(Mat<typename T1::elem_type>& out, const Op<T1,op_htrans2>& in)

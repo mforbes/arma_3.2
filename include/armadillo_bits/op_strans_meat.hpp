@@ -18,6 +18,7 @@
 
 //! for tiny square matrices (size <= 4x4)
 template<typename eT>
+arma_hot
 inline
 void
 op_strans::apply_noalias_tinysq(Mat<eT>& out, const Mat<eT>& A)
@@ -93,6 +94,7 @@ op_strans::apply_noalias_tinysq(Mat<eT>& out, const Mat<eT>& A)
 
 //! Immediate transpose of a dense matrix
 template<typename eT>
+arma_hot
 inline
 void
 op_strans::apply_noalias(Mat<eT>& out, const Mat<eT>& A)
@@ -143,6 +145,7 @@ op_strans::apply_noalias(Mat<eT>& out, const Mat<eT>& A)
 
 
 template<typename eT>
+arma_hot
 inline
 void
 op_strans::apply(Mat<eT>& out, const Mat<eT>& A)
@@ -195,6 +198,7 @@ op_strans::apply(Mat<eT>& out, const Mat<eT>& A)
 
 
 template<typename T1>
+arma_hot
 inline
 void
 op_strans::apply(Mat<typename T1::elem_type>& out, const Op<T1,op_strans>& in)
@@ -218,6 +222,7 @@ op_strans::apply(Mat<typename T1::elem_type>& out, const Op<T1,op_strans>& in)
 
 //! for tiny square matrices (size <= 4x4)
 template<typename eT>
+arma_hot
 inline
 void
 op_strans2::apply_noalias_tinysq(Mat<eT>& out, const Mat<eT>& A, const eT val)
@@ -293,6 +298,7 @@ op_strans2::apply_noalias_tinysq(Mat<eT>& out, const Mat<eT>& A, const eT val)
 
 //! Immediate transpose of a dense matrix
 template<typename eT>
+arma_hot
 inline
 void
 op_strans2::apply_noalias(Mat<eT>& out, const Mat<eT>& A, const eT val)
@@ -361,6 +367,7 @@ op_strans2::apply_noalias(Mat<eT>& out, const Mat<eT>& A, const eT val)
 
 
 template<typename eT>
+arma_hot
 inline
 void
 op_strans2::apply(Mat<eT>& out, const Mat<eT>& A, const eT val)
