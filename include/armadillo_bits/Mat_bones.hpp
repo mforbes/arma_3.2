@@ -318,14 +318,8 @@ class Mat : public Base< eT, Mat<eT> >
   inline void impl_print(const std::string& extra_text) const;
   inline void impl_print(std::ostream& user_stream, const std::string& extra_text) const;
   
-  inline void impl_print_trans(const std::string& extra_text) const;
-  inline void impl_print_trans(std::ostream& user_stream, const std::string& extra_text) const;
-  
   inline void impl_raw_print(const std::string& extra_text) const;
   inline void impl_raw_print(std::ostream& user_stream, const std::string& extra_text) const;
-  
-  inline void impl_raw_print_trans(const std::string& extra_text) const;
-  inline void impl_raw_print_trans(std::ostream& user_stream, const std::string& extra_text) const;
   
   
   template<typename eT2, typename expr>
