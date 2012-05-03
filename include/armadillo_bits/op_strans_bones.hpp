@@ -30,16 +30,16 @@ class op_strans
     };
   
   template<typename eT>
-  inline static void apply_noalias_tinysq(Mat<eT>& out, const Mat<eT>& A);
+  arma_hot inline static void apply_noalias_tinysq(Mat<eT>& out, const Mat<eT>& A);
   
   template<typename eT>
-  inline static void apply_noalias(Mat<eT>& out, const Mat<eT>& A);
+  arma_hot inline static void apply_noalias(Mat<eT>& out, const Mat<eT>& A);
   
   template<typename eT>
-  inline static void apply(Mat<eT>& out, const Mat<eT>& A);
+  arma_hot inline static void apply(Mat<eT>& out, const Mat<eT>& A);
   
   template<typename T1>
-  inline static void apply(Mat<typename T1::elem_type>& out, const Op<T1,op_strans>& in);
+  arma_hot inline static void apply(Mat<typename T1::elem_type>& out, const Op<T1,op_strans>& in);
   };
 
 
@@ -57,13 +57,13 @@ class op_strans2
     };
   
   template<typename eT>
-  inline static void apply_noalias_tinysq(Mat<eT>& out, const Mat<eT>& A, const eT val);
+  arma_hot inline static void apply_noalias_tinysq(Mat<eT>& out, const Mat<eT>& A, const eT val);
   
   template<typename eT>
-  inline static void apply_noalias(Mat<eT>& out, const Mat<eT>& A, const eT val);
+  arma_hot inline static void apply_noalias(Mat<eT>& out, const Mat<eT>& A, const eT val);
   
   template<typename eT>
-  inline static void apply(Mat<eT>& out, const Mat<eT>& A, const eT val);
+  arma_hot inline static void apply(Mat<eT>& out, const Mat<eT>& A, const eT val);
   };
 
 
