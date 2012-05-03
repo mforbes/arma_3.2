@@ -4384,38 +4384,6 @@ Mat<eT>::impl_print(std::ostream& user_stream, const std::string& extra_text) co
 
 
 
-//! DEPRECATED FUNCTION
-template<typename eT>
-inline
-void
-Mat<eT>::impl_print_trans(const std::string& extra_text) const
-  {
-  arma_extra_debug_sigprint();
-  
-  Mat<eT> tmp;
-  op_strans::apply_noalias(tmp, *this);
-  
-  tmp.impl_print(extra_text);
-  }
-
-
-
-//! DEPRECATED FUNCTION
-template<typename eT>
-inline
-void
-Mat<eT>::impl_print_trans(std::ostream& user_stream, const std::string& extra_text) const
-  {
-  arma_extra_debug_sigprint();
-  
-  Mat<eT> tmp;
-  op_strans::apply_noalias(tmp, *this);
-  
-  tmp.impl_print(user_stream, extra_text);
-  }
-
-
-
 //! print contents of the matrix (to the cout stream),
 //! optionally preceding with a user specified line of text.
 //! the stream's state are used as is and are not modified
@@ -4462,38 +4430,6 @@ Mat<eT>::impl_raw_print(std::ostream& user_stream, const std::string& extra_text
     }
   
   arma_ostream::print(user_stream, *this, false);
-  }
-
-
-
-//! DEPRECATED FUNCTION
-template<typename eT>
-inline
-void
-Mat<eT>::impl_raw_print_trans(const std::string& extra_text) const
-  {
-  arma_extra_debug_sigprint();
-  
-  Mat<eT> tmp;
-  op_strans::apply_noalias(tmp, *this);
-  
-  tmp.impl_raw_print(extra_text);
-  }
-
-
-
-//! DEPRECATED FUNCTION
-template<typename eT>
-inline
-void
-Mat<eT>::impl_raw_print_trans(std::ostream& user_stream, const std::string& extra_text) const
-  {
-  arma_extra_debug_sigprint();
-  
-  Mat<eT> tmp;
-  op_strans::apply_noalias(tmp, *this);
-  
-  tmp.impl_raw_print(user_stream, extra_text);
   }
 
 
