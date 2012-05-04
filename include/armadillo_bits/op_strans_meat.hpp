@@ -201,16 +201,149 @@ template<typename T1>
 arma_hot
 inline
 void
+op_strans::apply_proxy(Mat<typename T1::elem_type>& out, const T1& X)
+  {
+  typedef typename T1::elem_type eT;
+  
+  const Proxy<T1> P(X);
+  
+  if(
+    (is_Mat<typename Proxy<T1>::stored_type>::value || is_Mat_fixed<typename Proxy<T1>::stored_type>::value)
+    &&
+    (Proxy<T1>::fake_mat == false)  // can't rely on simple alias checking for matrices constructed out of auxiliary memory
+    )
+    {
+    const unwrap<typename Proxy<T1>::stored_type> tmp(P.Q);  // need this unwrap to keep stupid compilers happy
+    
+    op_strans::apply(out, tmp.M);
+    }
+  else
+    {
+    const uword n_rows = P.get_n_rows();
+    const uword n_cols = P.get_n_cols();
+    
+    const bool is_alias = P.is_alias(out);
+    
+    if( (resolves_to_vector<T1>::value == true) && (Proxy<T1>::prefer_at_accessor == false) )
+      {
+      if(is_alias == false)
+        {
+        out.set_size(n_cols, n_rows);
+        
+        eT* out_mem = out.memptr();
+        
+        const uword n_elem = P.get_n_elem();
+        
+        typename Proxy<T1>::ea_type Pea = P.get_ea();
+        
+        uword i,j;
+        for(i=0, j=1; j < n_elem; i+=2, j+=2)
+          {
+          const eT tmp_i = Pea[i];
+          const eT tmp_j = Pea[j];
+          
+          out_mem[i] = tmp_i;
+          out_mem[j] = tmp_j;
+          }
+        
+        if(i < n_elem)
+          {
+          out_mem[i] = Pea[i];
+          }
+        }
+      else  // aliasing
+        {
+        Mat<eT> out2(n_cols, n_rows);
+        
+        eT* out_mem = out2.memptr();
+        
+        const uword n_elem = P.get_n_elem();
+        
+        typename Proxy<T1>::ea_type Pea = P.get_ea();
+        
+        uword i,j;
+        for(i=0, j=1; j < n_elem; i+=2, j+=2)
+          {
+          const eT tmp_i = Pea[i];
+          const eT tmp_j = Pea[j];
+          
+          out_mem[i] = tmp_i;
+          out_mem[j] = tmp_j;
+          }
+        
+        if(i < n_elem)
+          {
+          out_mem[i] = Pea[i];
+          }
+        
+        out.steal_mem(out2);
+        }
+      }
+    else   // general matrix transpose
+      {
+      if(is_alias == false)
+        {
+        out.set_size(n_cols, n_rows);
+        
+        for(uword k=0; k < n_cols; ++k)
+          {
+          uword i, j;
+          
+          for(i=0, j=1; j < n_rows; i+=2, j+=2)
+            {
+            const eT tmp_i = P.at(i,k);
+            const eT tmp_j = P.at(j,k);
+            
+            out.at(k,i) = tmp_i;
+            out.at(k,j) = tmp_j;
+            }
+          
+          if(i < n_rows)
+            {
+            out.at(k,i) = P.at(i,k);
+            }
+          }
+        }
+      else // aliasing
+        {
+        Mat<eT> out2(n_cols, n_rows);
+        
+        for(uword k=0; k < n_cols; ++k)
+          {
+          uword i, j;
+          
+          for(i=0, j=1; j < n_rows; i+=2, j+=2)
+            {
+            const eT tmp_i = P.at(i,k);
+            const eT tmp_j = P.at(j,k);
+            
+            out2.at(k,i) = tmp_i;
+            out2.at(k,j) = tmp_j;
+            }
+          
+          if(i < n_rows)
+            {
+            out2.at(k,i) = P.at(i,k);
+            }
+          }
+        
+        out.steal_mem(out2);
+        }
+      }
+    }
+  }
+
+
+
+template<typename T1>
+arma_hot
+inline
+void
 op_strans::apply(Mat<typename T1::elem_type>& out, const Op<T1,op_strans>& in)
   {
   arma_extra_debug_sigprint();
   
-  typedef typename T1::elem_type eT;
-  
-  const unwrap<T1>   tmp(in.m);
-  const Mat<eT>& A = tmp.M;
-  
-  op_strans::apply(out, A);
+  op_strans::apply_proxy(out, in.m);
   }
 
 
@@ -296,7 +429,6 @@ op_strans2::apply_noalias_tinysq(Mat<eT>& out, const Mat<eT>& A, const eT val)
 
 
 
-//! Immediate transpose of a dense matrix
 template<typename eT>
 arma_hot
 inline
@@ -408,7 +540,7 @@ op_strans2::apply(Mat<eT>& out, const Mat<eT>& A, const eT val)
           std::swap(out.at(k,i), colptr[i]);
           }
         }
-        
+      
       arrayops::inplace_mul( out.memptr(), val, out.n_elem );
       }
     else
@@ -417,6 +549,146 @@ op_strans2::apply(Mat<eT>& out, const Mat<eT>& A, const eT val)
       op_strans2::apply_noalias(tmp, A, val);
       
       out.steal_mem(tmp);
+      }
+    }
+  }
+
+
+
+template<typename T1>
+arma_hot
+inline
+void
+op_strans2::apply_proxy(Mat<typename T1::elem_type>& out, const T1& X, const typename T1::elem_type val)
+  {
+  arma_extra_debug_sigprint();
+  
+  typedef typename T1::elem_type eT;
+  
+  const Proxy<T1> P(X);
+  
+  if(
+    (is_Mat<typename Proxy<T1>::stored_type>::value || is_Mat_fixed<typename Proxy<T1>::stored_type>::value)
+    &&
+    (Proxy<T1>::fake_mat == false)  // can't rely on simple alias checking for matrices constructed out of auxiliary memory
+    )
+    {
+    const unwrap<typename Proxy<T1>::stored_type> tmp(P.Q);  // need this unwrap to keep stupid compilers happy
+    
+    op_strans2::apply(out, tmp.M, val);
+    }
+  else
+    {
+    const uword n_rows = P.get_n_rows();
+    const uword n_cols = P.get_n_cols();
+    
+    const bool is_alias = P.is_alias(out);
+    
+    if( (resolves_to_vector<T1>::value == true) && (Proxy<T1>::prefer_at_accessor == false) )
+      {
+      if(is_alias == false)
+        {
+        out.set_size(n_cols, n_rows);
+        
+        eT* out_mem = out.memptr();
+        
+        const uword n_elem = P.get_n_elem();
+        
+        typename Proxy<T1>::ea_type Pea = P.get_ea();
+        
+        uword i,j;
+        for(i=0, j=1; j < n_elem; i+=2, j+=2)
+          {
+          const eT tmp_i = Pea[i];
+          const eT tmp_j = Pea[j];
+          
+          out_mem[i] = val * tmp_i;
+          out_mem[j] = val * tmp_j;
+          }
+        
+        if(i < n_elem)
+          {
+          out_mem[i] = val * Pea[i];
+          }
+        }
+      else  // aliasing
+        {
+        Mat<eT> out2(n_cols, n_rows);
+        
+        eT* out_mem = out2.memptr();
+        
+        const uword n_elem = P.get_n_elem();
+        
+        typename Proxy<T1>::ea_type Pea = P.get_ea();
+        
+        uword i,j;
+        for(i=0, j=1; j < n_elem; i+=2, j+=2)
+          {
+          const eT tmp_i = Pea[i];
+          const eT tmp_j = Pea[j];
+          
+          out_mem[i] = val * tmp_i;
+          out_mem[j] = val * tmp_j;
+          }
+        
+        if(i < n_elem)
+          {
+          out_mem[i] = val * Pea[i];
+          }
+        
+        out.steal_mem(out2);
+        }
+      }
+    else   // general matrix transpose
+      {
+      if(is_alias == false)
+        {
+        out.set_size(n_cols, n_rows);
+        
+        for(uword k=0; k < n_cols; ++k)
+          {
+          uword i, j;
+          
+          for(i=0, j=1; j < n_rows; i+=2, j+=2)
+            {
+            const eT tmp_i = P.at(i,k);
+            const eT tmp_j = P.at(j,k);
+            
+            out.at(k,i) = val * tmp_i;
+            out.at(k,j) = val * tmp_j;
+            }
+          
+          if(i < n_rows)
+            {
+            out.at(k,i) = val * P.at(i,k);
+            }
+          }
+        }
+      else // aliasing
+        {
+        Mat<eT> out2(n_cols, n_rows);
+        
+        for(uword k=0; k < n_cols; ++k)
+          {
+          uword i, j;
+          
+          for(i=0, j=1; j < n_rows; i+=2, j+=2)
+            {
+            const eT tmp_i = P.at(i,k);
+            const eT tmp_j = P.at(j,k);
+            
+            out2.at(k,i) = val * tmp_i;
+            out2.at(k,j) = val * tmp_j;
+            }
+          
+          if(i < n_rows)
+            {
+            out2.at(k,i) = val * P.at(i,k);
+            }
+          }
+        
+        out.steal_mem(out2);
+        }
       }
     }
   }

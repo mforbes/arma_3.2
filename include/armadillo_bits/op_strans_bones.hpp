@@ -39,6 +39,9 @@ class op_strans
   arma_hot inline static void apply(Mat<eT>& out, const Mat<eT>& A);
   
   template<typename T1>
+  arma_hot inline static void apply_proxy(Mat<typename T1::elem_type>& out, const T1& X);
+  
+  template<typename T1>
   arma_hot inline static void apply(Mat<typename T1::elem_type>& out, const Op<T1,op_strans>& in);
   };
 
@@ -64,6 +67,9 @@ class op_strans2
   
   template<typename eT>
   arma_hot inline static void apply(Mat<eT>& out, const Mat<eT>& A, const eT val);
+  
+  template<typename T1>
+  arma_hot inline static void apply_proxy(Mat<typename T1::elem_type>& out, const T1& X, const typename T1::elem_type val);
   };
 
 
