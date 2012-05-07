@@ -16,42 +16,6 @@
 
 
 
-class eglue_plus : public eglue_core<eglue_plus>
-  {
-  public:
-  
-  inline static const char* text() { return "addition"; }
-  };
-
-
-
-class eglue_minus : public eglue_core<eglue_minus>
-  {
-  public:
-  
-  inline static const char* text() { return "subtraction"; }
-  };
-
-
-
-class eglue_div : public eglue_core<eglue_div>
-  {
-  public:
-  
-  inline static const char* text() { return "element-wise division"; }
-  };
-
-
-
-class eglue_schur : public eglue_core<eglue_schur>
-  {
-  public:
-  
-  inline static const char* text() { return "element-wise multiplication"; }
-  };
-
-
-
 #undef arma_applier_1
 #undef arma_applier_2
 #undef arma_applier_3
