@@ -332,6 +332,10 @@ PATTERN "*~" EXCLUDE
 PATTERN "*orig" EXCLUDE
 )
 
+install(FILES ${PROJECT_BINARY_DIR}/include/armadillo_bits/config.hpp
+DESTINATION ${INSTALL_INCLUDE_DIR}/armadillo_bits
+)
+
 install(TARGETS armadillo 
   DESTINATION ${INSTALL_LIB_DIR}
   EXPORT ArmadilloLibraryDepends)
