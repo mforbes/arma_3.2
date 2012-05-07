@@ -55,7 +55,7 @@ op_unique::apply(Mat<typename T1::elem_type>& out, const Op<T1, op_unique>& X)
     }
   
   
-  std::vector<eT> vec(in_n_elem);
+  std::vector<eT> lvec(in_n_elem);
   
   
   if(Proxy<T1>::prefer_at_accessor == false)
@@ -68,13 +68,13 @@ op_unique::apply(Mat<typename T1::elem_type>& out, const Op<T1, op_unique>& X)
       const eT tmp_i = Pea[i];
       const eT tmp_j = Pea[j];
       
-      vec[i] = tmp_i;
-      vec[j] = tmp_j;
+      lvec[i] = tmp_i;
+      lvec[j] = tmp_j;
       }
     
     if(i < in_n_elem)
       {
-      vec[i] = Pea[i];
+      lvec[i] = Pea[i];
       }
     }
   else
@@ -84,18 +84,18 @@ op_unique::apply(Mat<typename T1::elem_type>& out, const Op<T1, op_unique>& X)
     for(uword col=0; col < in_n_cols; ++col)
     for(uword row=0; row < in_n_rows; ++row, ++i)
       {
-      vec[i] = P.at(row,col);
+      lvec[i] = P.at(row,col);
       }
     }
   
-  std::sort( vec.begin(), vec.end() );
+  std::sort( lvec.begin(), lvec.end() );
   
   uword N_unique = 1;
   
   for(uword i=1; i < in_n_elem; ++i)
     {
-    const eT a = vec[i-1];
-    const eT b = vec[i  ];
+    const eT a = lvec[i-1];
+    const eT b = lvec[i  ];
     
     const eT diff = a - b;
     
@@ -124,19 +124,19 @@ op_unique::apply(Mat<typename T1::elem_type>& out, const Op<T1, op_unique>& X)
     out_n_cols = 1;
     }
   
-  // we don't need to worry about aliasing at this stage, as all the data is stored in vec
+  // we don't need to worry about aliasing at this stage, as all the data is stored in lvec
   out.set_size(out_n_rows, out_n_cols);
   
   eT* out_mem = out.memptr();
   
-  if(in_n_elem > 0) { out_mem[0] = vec[0]; }
+  if(in_n_elem > 0) { out_mem[0] = lvec[0]; }
   
   N_unique = 1;
   
   for(uword i=1; i < in_n_elem; ++i)
     {
-    const eT a = vec[i-1];
-    const eT b = vec[i  ];
+    const eT a = lvec[i-1];
+    const eT b = lvec[i  ];
     
     const eT diff = a - b;
     
