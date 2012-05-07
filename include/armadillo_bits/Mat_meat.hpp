@@ -193,7 +193,7 @@ Mat<eT>::init_warm(uword in_n_rows, uword in_n_cols)
         err_state,
         err_msg,
         ( ((t_vec_state == 1) && (in_n_cols != 1)) || ((t_vec_state == 2) && (in_n_rows != 1)) ),
-        "Mat::init(): object is a vector; requested size is not compatible"
+        "Mat::init(): object is a row or column vector; requested size is not compatible"
         );
       }
     }
