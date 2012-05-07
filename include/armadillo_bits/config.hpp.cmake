@@ -71,6 +71,7 @@
 #cmakedefine ARMA_USE_BOOST
 #cmakedefine ARMA_USE_BOOST_DATE
 #cmakedefine ARMA_USE_WRAPPER
+#cmakedefine ARMA_USE_HDF5
 
 #if !defined(ARMA_DEFAULT_OSTREAM)
   #define ARMA_DEFAULT_OSTREAM std::cout
