@@ -734,24 +734,6 @@ template<typename eT>
 template<uword fixed_n_elem>
 arma_inline
 void
-Col<eT>::fixed<fixed_n_elem>::mem_setup()
-  {
-  arma_extra_debug_sigprint();
-  
-  access::rw(Mat<eT>::n_rows)    = fixed_n_elem;
-  access::rw(Mat<eT>::n_cols)    = 1;
-  access::rw(Mat<eT>::n_elem)    = fixed_n_elem;
-  access::rw(Mat<eT>::vec_state) = 1;
-  access::rw(Mat<eT>::mem_state) = 3;
-  access::rw(Mat<eT>::mem)       = (use_extra) ? mem_local_extra : Mat<eT>::mem_local;
-  }
-
-
-
-template<typename eT>
-template<uword fixed_n_elem>
-arma_inline
-void
 Col<eT>::fixed<fixed_n_elem>::change_to_row()
   {
   arma_extra_debug_sigprint();
@@ -766,10 +748,9 @@ template<typename eT>
 template<uword fixed_n_elem>
 arma_inline
 Col<eT>::fixed<fixed_n_elem>::fixed()
+  : Col<eT>( arma_fixed_indicator(), fixed_n_elem, ((use_extra) ? mem_local_extra : Mat<eT>::mem_local) )
   {
   arma_extra_debug_sigprint_this(this);
-  
-  mem_setup();
   }
 
 
@@ -778,10 +759,9 @@ template<typename eT>
 template<uword fixed_n_elem>
 arma_inline
 Col<eT>::fixed<fixed_n_elem>::fixed(const fixed<fixed_n_elem>& X)
+  : Col<eT>( arma_fixed_indicator(), fixed_n_elem, ((use_extra) ? mem_local_extra : Mat<eT>::mem_local) )
   {
   arma_extra_debug_sigprint_this(this);
-  
-  mem_setup();
   
   eT* dest = (use_extra) ? mem_local_extra : Mat<eT>::mem_local;
   
@@ -794,10 +774,9 @@ template<typename eT>
 template<uword fixed_n_elem>
 inline
 Col<eT>::fixed<fixed_n_elem>::fixed(const subview_cube<eT>& X)
+  : Col<eT>( arma_fixed_indicator(), fixed_n_elem, ((use_extra) ? mem_local_extra : Mat<eT>::mem_local) )
   {
   arma_extra_debug_sigprint_this(this);
-  
-  mem_setup();
   
   Col<eT>::operator=(X);
   }
@@ -809,10 +788,9 @@ template<uword fixed_n_elem>
 template<typename T1>
 inline
 Col<eT>::fixed<fixed_n_elem>::fixed(const Base<eT,T1>& A)
+  : Col<eT>( arma_fixed_indicator(), fixed_n_elem, ((use_extra) ? mem_local_extra : Mat<eT>::mem_local) )
   {
   arma_extra_debug_sigprint_this(this);
-  
-  mem_setup();
   
   Col<eT>::operator=(A.get_ref());
   }
@@ -824,10 +802,9 @@ template<uword fixed_n_elem>
 template<typename T1, typename T2>
 inline
 Col<eT>::fixed<fixed_n_elem>::fixed(const Base<pod_type,T1>& A, const Base<pod_type,T2>& B)
+  : Col<eT>( arma_fixed_indicator(), fixed_n_elem, ((use_extra) ? mem_local_extra : Mat<eT>::mem_local) )
   {
   arma_extra_debug_sigprint_this(this);
-  
-  mem_setup();
   
   Col<eT>::init(A,B);
   }
@@ -838,12 +815,13 @@ template<typename eT>
 template<uword fixed_n_elem>
 inline
 Col<eT>::fixed<fixed_n_elem>::fixed(const eT* aux_mem)
+  : Col<eT>( arma_fixed_indicator(), fixed_n_elem, ((use_extra) ? mem_local_extra : Mat<eT>::mem_local) )
   {
   arma_extra_debug_sigprint_this(this);
   
-  mem_setup();
+  eT* dest = (use_extra) ? mem_local_extra : Mat<eT>::mem_local;
   
-  arrayops::copy( const_cast<eT*>(Mat<eT>::mem), aux_mem, fixed_n_elem );
+  arrayops::copy( dest, aux_mem, fixed_n_elem );
   }
 
 
@@ -855,10 +833,9 @@ template<typename eT>
 template<uword fixed_n_elem>
 inline
 Col<eT>::fixed<fixed_n_elem>::fixed(const char* text)
+  : Col<eT>( arma_fixed_indicator(), fixed_n_elem, ((use_extra) ? mem_local_extra : Mat<eT>::mem_local) )
   {
   arma_extra_debug_sigprint_this(this);
-  
-  mem_setup();
   
   change_to_row();
   
@@ -874,10 +851,9 @@ template<typename eT>
 template<uword fixed_n_elem>
 inline
 Col<eT>::fixed<fixed_n_elem>::fixed(const std::string& text)
+  : Col<eT>( arma_fixed_indicator(), fixed_n_elem, ((use_extra) ? mem_local_extra : Mat<eT>::mem_local) )
   {
   arma_extra_debug_sigprint_this(this);
-  
-  mem_setup();
   
   change_to_row();
   
@@ -967,10 +943,9 @@ template<typename eT>
 template<uword fixed_n_elem>
 inline
 Col<eT>::fixed<fixed_n_elem>::fixed(const std::initializer_list<eT>& list)
+  : Col<eT>( arma_fixed_indicator(), fixed_n_elem, ((use_extra) ? mem_local_extra : Mat<eT>::mem_local) )
   {
   arma_extra_debug_sigprint();
-  
-  mem_setup();
   
   (*this).operator=(list);
   }
@@ -1204,6 +1179,16 @@ Col<eT>::fixed<fixed_n_elem>::ones()
   arrayops::inplace_set_fixed<eT,fixed_n_elem>( mem_use, eT(1) );
   
   return *this;
+  }
+
+
+
+template<typename eT>
+inline
+Col<eT>::Col(const arma_fixed_indicator&, const uword in_n_elem, const eT* in_mem)
+  : Mat<eT>(arma_fixed_indicator(), in_n_elem, 1, 1, in_mem)
+  {
+  arma_extra_debug_sigprint_this(this);
   }
 
 

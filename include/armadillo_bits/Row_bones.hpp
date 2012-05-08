@@ -118,8 +118,6 @@ class Row : public Mat<eT>
     
     arma_aligned eT mem_local_extra[ (use_extra) ? fixed_n_elem : 1 ];
     
-    arma_inline void mem_setup();
-    
     
     public:
     
@@ -182,10 +180,16 @@ class Row : public Mat<eT>
     };
   
   
+  protected:
+  
+  inline Row(const arma_fixed_indicator&, const uword in_n_elem, const eT* in_mem);
+  
+  
+  public:
+  
   #ifdef ARMA_EXTRA_ROW_PROTO
     #include ARMA_INCFILE_WRAP(ARMA_EXTRA_ROW_PROTO)
   #endif
-  
   };
 
 

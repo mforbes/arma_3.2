@@ -473,8 +473,6 @@ class Mat : public Base< eT, Mat<eT> >
     
     arma_aligned eT mem_local_extra[ (use_extra) ? fixed_n_elem : 1 ];
     
-    arma_inline void mem_setup();
-    
     
     public:
     
@@ -553,7 +551,10 @@ class Mat : public Base< eT, Mat<eT> >
   
   inline Mat(const arma_vec_indicator&, const uhword in_vec_state);
   inline Mat(const arma_vec_indicator&, const uword in_n_rows, const uword in_n_cols, const uhword in_vec_state);
-
+  
+  inline Mat(const arma_fixed_indicator&, const uword in_n_rows, const uword in_n_cols, const uhword in_vec_state, const eT* in_mem);
+  
+  
   friend class Cube<eT>;
   friend class glue_join;
   friend class op_strans;
