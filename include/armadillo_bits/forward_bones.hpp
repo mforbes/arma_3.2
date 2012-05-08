@@ -136,8 +136,8 @@ template<typename T1> class Proxy;
 template<typename T1> class ProxyCube;
 
 
-struct arma_vec_indicator {};
-
+struct arma_vec_indicator   {};
+struct arma_fixed_indicator {};
 
 
 //! \addtogroup injector
