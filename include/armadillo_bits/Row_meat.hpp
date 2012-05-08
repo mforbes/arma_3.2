@@ -883,7 +883,7 @@ inline
 Row<eT>::fixed<fixed_n_elem>::fixed(const std::initializer_list<eT>& list)
   : Row<eT>( arma_fixed_indicator(), fixed_n_elem, ((use_extra) ? mem_local_extra : Mat<eT>::mem_local) )
   {
-  arma_extra_debug_sigprint();
+  arma_extra_debug_sigprint_this(this);
   
   (*this).operator=(list);
   }
