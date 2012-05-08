@@ -7127,8 +7127,8 @@ If a given object has complex elements, a Hermitian transpose is done (ie. the c
 <li>
 <b>Caveat:</b> for complex matrices, the functionality of trans() has changed in version 2.0:
 <ul>
-<li>in version 1.2.x and earlier, trans() does not take the conjugate of complex elements</li>
-<li>in version 1.2.x and earlier, the deprecated htrans() function is used for the Hermitian transpose</li>
+<li>in version 1.2 and earlier, <i>trans()</i> does not take the conjugate of complex elements</li>
+<li>in version 1.2 and earlier, the <i>htrans()</i> function is used for the Hermitian transpose</li>
 </ul>
 </li>
 <br>
@@ -7212,6 +7212,10 @@ if <i>A</i> is a matrix, the output is always a column vector
 </li>
 <br>
 <li>
+This function was added in version 3.2
+</li>
+<br>
+<li>
 Examples:
 <ul>
 <pre>
@@ -7279,6 +7283,7 @@ mat R = chol(Y);
 See also:
 <ul>
 <li><a href="http://mathworld.wolfram.com/CholeskyDecomposition.html">Cholesky decomposition in MathWorld</a></li>
+<li><a href="http://en.wikipedia.org/wiki/Cholesky_decomposition">Cholesky decomposition in Wikipedia</a></li>
 </ul>
 </li>
 </ul>
@@ -7306,7 +7311,7 @@ See also:
 <li>
 By default, a standard eigen decomposition algorithm is used;
 a "divide and conquer" algorithm can be used by explicitly setting <i>method</i> to <i>"dc"</i>,
-which is faster (but slightly less accurate) for matrices with a size &ge; 50x50</li>
+which is slightly less accurate but faster for matrices with a size &ge; 50x50</li>
 <br>
 <li>The <i>method</i> argument is optional</li>
 <br>
@@ -7345,6 +7350,8 @@ See also:
 <li><a href="#svd">svd()</a></li>
 <li><a href="#svd_econ">svd_econ()</a></li>
 <li><a href="http://mathworld.wolfram.com/EigenDecomposition.html">eigen decomposition in MathWorld</a></li>
+<li><a href="http://en.wikipedia.org/wiki/Eigenvalues_and_eigenvectors">eigenvalues &amp; eigenvectors in Wikipedia</a></li>
+<li><a href="http://en.wikipedia.org/wiki/Divide-and-conquer_eigenvalue_algorithm">divide &amp; conquer eigenvalue algorithm in Wikipedia</a></li>
 </ul>
 </li>
 <br>
@@ -7402,6 +7409,7 @@ See also:
 <li><a href="#svd">svd()</a></li>
 <li><a href="#svd_econ">svd_econ()</a></li>
 <li><a href="http://mathworld.wolfram.com/EigenDecomposition.html">eigen decomposition in MathWorld</a></li>
+<li><a href="http://en.wikipedia.org/wiki/Eigenvalues_and_eigenvectors">eigenvalues &amp; eigenvectors in Wikipedia</a></li>
 </ul>
 </li>
 </ul>
@@ -7689,6 +7697,7 @@ qr(Q,R,X);
 See also:
 <ul>
 <li><a href="http://mathworld.wolfram.com/QRDecomposition.html">QR decomposition in MathWorld</a></li>
+<li><a href="http://en.wikipedia.org/wiki/QR_decomposition">QR decomposition in Wikipedia</a></li>
 <li><a href="http://octave.sourceforge.net/octave/function/qr.html">QR decomposition in Octave</a></li>
 </ul>
 </li>
@@ -9748,14 +9757,14 @@ Below is a list of additions and changes since prior versions of Armadillo:
 <a name="added_in_32"></a>
 <li>Added in 3.2:
 <ul>
-<li>faster eigen decomposition via optional use of "divide and conquer" by <a href="#eig_sym">eig_sym()</a></li>
 <li><a href="#unique">unique()</a>, for finding unique elements of a matrix</li>
+<li>faster eigen decomposition via optional use of "divide and conquer" by <a href="#eig_sym">eig_sym()</a></li>
 </ul>
 <br>
 </li>
 <li>Changed in 3.2:
 <ul>
-<li>faster handling of compound expressions with vector transposes</li>
+<li>faster <a href="#t_st_members">transpose</a> of vectors and compound expressions</li>
 </ul>
 <br>
 </li>
