@@ -1,5 +1,5 @@
-// Copyright (C) 2008-2011 NICTA (www.nicta.com.au)
-// Copyright (C) 2008-2011 Conrad Sanderson
+// Copyright (C) 2008-2012 NICTA (www.nicta.com.au)
+// Copyright (C) 2008-2012 Conrad Sanderson
 // 
 // This file is part of the Armadillo C++ library.
 // It is provided without any warranty of fitness
@@ -34,10 +34,6 @@ Cube<eT>::~Cube()
   if(arma_config::debug == true)
     {
     // try to expose buggy user code that accesses deleted objects
-    access::rw(n_rows)   = 0;
-    access::rw(n_cols)   = 0;
-    access::rw(n_slices) = 0;
-    access::rw(n_elem)   = 0;
     access::rw(mat_ptrs) = 0;
     access::rw(mem)      = 0;
     }
