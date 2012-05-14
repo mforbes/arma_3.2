@@ -694,6 +694,7 @@ new memory will be allocated and the auxiliary memory will no longer be used.
 Create a column vector by copying data from read-only auxiliary memory.
 </ul>
 </li>
+<a name="adv_constructors_col_fixed"></a>
 <br>
 <li>vec::fixed&lt;number_of_elements&gt;
 <br>
@@ -9765,6 +9766,7 @@ Below is a list of additions and changes since prior versions of Armadillo:
 <li>Changed in 3.2:
 <ul>
 <li>faster <a href="#t_st_members">transpose</a> of vectors and compound expressions</li>
+<li>faster handling of tiny <a href="#adv_constructors_col_fixed">fixed size</a> vectors (&le; 4 elements)</li>
 </ul>
 <br>
 </li>
