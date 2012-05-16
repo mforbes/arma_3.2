@@ -86,12 +86,12 @@ accu_proxy_at(const Proxy<T1>& P)
 template<typename T1>
 arma_hot
 inline
-typename T1::elem_type
-accu(const Base<typename T1::elem_type,T1>& X)
+typename enable_if2< is_arma_type<T1>::value, typename T1::elem_type >::result
+accu(const T1& X)
   {
   arma_extra_debug_sigprint();
   
-  const Proxy<T1> P(X.get_ref());
+  const Proxy<T1> P(X);
   
   return (Proxy<T1>::prefer_at_accessor == false) ? accu_proxy_linear(P) : accu_proxy_at(P);
   }

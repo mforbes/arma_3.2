@@ -18,10 +18,10 @@
 //! \brief
 //! Delayed sum of elements of a matrix along a specified dimension (either rows or columns).
 //! The result is stored in a dense matrix that has either one column or one row.
-//! For dim = 0, find the sum of each column.
-//! For dim = 1, find the sum of each row.
+//! For dim = 0, find the sum of each column (traverse across rows)
+//! For dim = 1, find the sum of each row (traverse across columns)
 //! The default is dim = 0.
-//! NOTE: this function works differently than in Matlab/Octave.
+//! NOTE: the dim argument is different than in Matlab/Octave.
 
 template<typename T1>
 arma_inline
@@ -62,6 +62,28 @@ sum
 
 
 //! \brief
+//! Immediate 'sum all values' operation for expressions which resolve to a vector 
+template<typename T1>
+inline
+arma_warn_unused
+typename T1::elem_type
+sum
+  (
+  const T1& X,
+  const arma_empty_class junk1 = arma_empty_class(),
+  const typename enable_if< resolves_to_vector<T1>::value >::result* junk2 = 0
+  )
+  {
+  arma_extra_debug_sigprint();
+  arma_ignore(junk1);
+  arma_ignore(junk2);
+  
+  return accu(X);
+  }
+
+
+
+//! \brief
 //! Immediate 'sum all values' operation,
 //! invoked, for example, by: sum(sum(A))
 
@@ -87,48 +109,6 @@ sum(const Op<T1, op_sum>& in, const uword dim)
   arma_extra_debug_sigprint();
   
   return Op<Op<T1, op_sum>, op_sum>(in, dim, 0);
-  }
-
-
-
-//! \brief
-//! Immediate 'sum all values' operation for expressions which resolve to a vector 
-template<typename T1>
-inline
-arma_warn_unused
-typename T1::elem_type
-sum
-  (
-  const Base<typename T1::elem_type,T1>& X,
-  const arma_empty_class junk1 = arma_empty_class(),
-  const typename enable_if<resolves_to_vector<T1>::value == true>::result* junk2 = 0
-  )
-  {
-  arma_extra_debug_sigprint();
-  arma_ignore(junk1);
-  arma_ignore(junk2);
-  
-  return accu(X.get_ref());
-  }
-
-
-
-template<typename T1>
-inline
-arma_warn_unused
-typename T1::elem_type
-sum
-  (
-  const T1& X,
-  const arma_empty_class junk1 = arma_empty_class(),
-  const typename enable_if<is_basevec<T1>::value == true>::result* junk2 = 0
-  )
-  {
-  arma_extra_debug_sigprint();
-  arma_ignore(junk1);
-  arma_ignore(junk2);
-  
-  return accu(X);
   }
 
 
