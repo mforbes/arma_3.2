@@ -87,6 +87,7 @@ prod
 
 template<typename T1>
 inline
+arma_warn_unused
 typename T1::elem_type
 prod(const Op<T1, op_prod>& in)
   {
