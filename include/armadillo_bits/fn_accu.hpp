@@ -156,6 +156,7 @@ accu(const mtOp<uword,T1,op_rel_noteq>& X)
 
 //! accumulate the elements of a subview (submatrix)
 template<typename eT>
+arma_hot
 arma_pure
 arma_warn_unused
 inline
@@ -209,6 +210,7 @@ accu(const subview<eT>& X)
 
 
 template<typename eT>
+arma_hot
 arma_pure
 arma_warn_unused
 inline
