@@ -40,7 +40,7 @@ accu_proxy_linear(const Proxy<T1>& P)
   
   if(i < n_elem)
     {
-    val1 += A[i];
+    val1 += A[i];   // equivalent to: val1 += A[n_elem-1];
     }
   
   return (val1 + val2);
