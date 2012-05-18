@@ -17,9 +17,9 @@
 
 
 #define ARMA_VERSION_MAJOR 3
-#define ARMA_VERSION_MINOR 1
-#define ARMA_VERSION_PATCH 96
-#define ARMA_VERSION_NAME  "v3.2 beta 6"
+#define ARMA_VERSION_MINOR 2
+#define ARMA_VERSION_PATCH 0
+#define ARMA_VERSION_NAME  "Creamfields"
 
 
 

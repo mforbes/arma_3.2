@@ -17,9 +17,9 @@
   <tbody>
     <tr>
       <td style="text-align: left; vertical-align: top;">
-        <font size=+2><b>Reference for Armadillo 3.1.96</b></font>
+        <font size=+2><b>Reference for Armadillo 3.2</b></font>
         <br>
-        <font size=-1><b>&#8220;v3.2 beta 6&#8221;</b></font>
+        <font size=-1><b>&#8220;Creamfields&#8221;</b></font>
       </td>
       <td style="text-align: right; vertical-align: top;">
         <b><a href="http://arma.sourceforge.net">to Armadillo home page</a></b>
@@ -8565,7 +8565,7 @@ Meaning of the constants:
 <br>
 <li>
 <b>Caveat:</b>
-nan is not equal to anything, even itself;
+datum::nan is not equal to anything, even itself;
 if you wish to check whether a given number <i>x</i> is finite,
 use <a href="#is_finite_standalone">is_finite</a>(<i>x</i>).
 </li>
@@ -9765,11 +9765,6 @@ Below is a list of additions and changes since prior versions of Armadillo:
 <ul>
 <li><a href="#unique">unique()</a>, for finding unique elements of a matrix</li>
 <li>faster <a href="#eig_sym">eigen decomposition</a> via "divide and conquer" algorithm</li>
-</ul>
-<br>
-</li>
-<li>Changed in 3.2:
-<ul>
 <li>faster <a href="#t_st_members">transpose</a> of vectors and compound expressions</li>
 <li>faster handling of <a href="#diag">diagonal views</a></li>
 <li>faster handling of tiny <a href="#adv_constructors_col_fixed">fixed size</a> vectors (&le; 4 elements)</li>
@@ -9783,6 +9778,9 @@ Below is a list of additions and changes since prior versions of Armadillo:
 <li><a href="#constants">datum</a> class</li>
 <li><a href="#hist">hist()</a> and <a href="#histc">histc()</a></li>
 <li>non-contiguous <a href="#submat">submatrix views</a></li>
+<li>faster handling of <a href="#submat">submatrix views</a> with a single row or column</li>
+<li>faster element access in <a href="#adv_constructors_mat_fixed">fixed size matrices</a></li>
+<li>faster <a href="#repmat">repmat()</a></li>
 </ul>
 <br>
 </li>
@@ -9790,13 +9788,10 @@ Below is a list of additions and changes since prior versions of Armadillo:
 <ul>
 <li>expressions <i>X=<a href="#inv">inv</a>(A)*B</i> and <i>X=A<a href="#i_member">.i()</a>*B</i> are automatically converted to <i>X=<a href="#solve">solve</a>(A,B)</i>
 <li>better detection of vector expressions by <a href="#sum">sum()</a>, <a href="#cumsum">cumsum()</a>, <a href="#prod">prod()</a>, <a href="#min_and_max">min()</a>, <a href="#min_and_max">max()</a>, <a href="#stats_fns">mean()</a>, <a href="#stats_fns">median()</a>, <a href="#stats_fns">stddev()</a>, <a href="#stats_fns">var()</a>
-<li>faster handling of <a href="#submat">submatrix views</a> with a single row or column</li>
 <li>faster generation of random numbers
 (eg. <a href="#randu_randn_standalone">randu()</a> and <a href="#randu_randn_standalone">randn()</a>),
 via an algorithm that produces slightly different numbers than in 2.x
 </li>
-<li>faster element access in <a href="#adv_constructors_mat_fixed">fixed size matrices</a></li>
-<li>faster <a href="#repmat">repmat()</a></li>
 <li>
 support for tying writeable auxiliary (external) memory to fixed size matrices has been removed;
 instead, you can use standard matrices with <a href="#adv_constructors_mat">writeable auxiliary memory</a>,
@@ -9839,19 +9834,6 @@ the <i>uword</i> type then has a minimum width of 64 bits
 <li><a href="#is_vec">.is_colvec()</a> and <a href="#is_vec">.is_rowvec()</a></li>
 </ul>
 <br>
-<li>Changed in 2.0:
-<ul>
-<li><a href="#trans">trans()</a> now takes the complex conjugate when transposing a complex matrix</li>
-<li>Forms of
-<a href="#chol">chol()</a>, <a href="#eig_sym">eig_sym()</a>, <a href="#eig_gen">eig_gen()</a>,
-<a href="#inv">inv()</a>, <a href="#lu">lu()</a>, <a href="#pinv">pinv()</a>, <a href="#princomp">princomp()</a>,
-<a href="#qr">qr()</a>, <a href="#solve">solve()</a>, <a href="#svd">svd()</a>, <a href="#syl">syl()</a>
-that do not return a bool indicating success now throw <i>std::runtime_error</i> exceptions when failures are detected</li>
-<li>princomp_cov() has been removed; <a href="#eig_sym">eig_sym()</a> in conjunction with <a href="#cov">cov()</a> can be used instead</li>
-<li><a href="#is_vec">.is_vec()</a> now outputs <i>true</i> for empty vectors (eg. 0x1)</li>
-<li>set_log_stream() &amp; get_log_stream() have been replaced by <a href="#logging">set_stream_err1()</a> &amp; <a href="#logging">get_stream_err1()</a></li>
-</ul>
-<br>
 <li>Added in 2.0:
 <ul>
 <li><a href="#det">det()</a>, <a href="#inv">inv()</a> and <a href="#solve">solve()</a> can be forced to use more precise algorithms for tiny matrices (&le;&nbsp;4x4)</li>
@@ -9866,6 +9848,19 @@ that do not return a bool indicating success now throw <i>std::runtime_error</i>
 <li>handling of arbitrarily sized empty matrices (eg. 5x0)</li>
 <li>.count() member function in <a href="#running_stat">running_stat</a> and <a href="#running_stat_vec">running_stat_vec</a></li>
 <li><a href="#save_load_mat">loading &amp; saving</a> of matrices as CSV text files</li>
+</ul>
+<br>
+<li>Changed in 2.0:
+<ul>
+<li><a href="#trans">trans()</a> now takes the complex conjugate when transposing a complex matrix</li>
+<li>Forms of
+<a href="#chol">chol()</a>, <a href="#eig_sym">eig_sym()</a>, <a href="#eig_gen">eig_gen()</a>,
+<a href="#inv">inv()</a>, <a href="#lu">lu()</a>, <a href="#pinv">pinv()</a>, <a href="#princomp">princomp()</a>,
+<a href="#qr">qr()</a>, <a href="#solve">solve()</a>, <a href="#svd">svd()</a>, <a href="#syl">syl()</a>
+that do not return a bool indicating success now throw <i>std::runtime_error</i> exceptions when failures are detected</li>
+<li>princomp_cov() has been removed; <a href="#eig_sym">eig_sym()</a> in conjunction with <a href="#cov">cov()</a> can be used instead</li>
+<li><a href="#is_vec">.is_vec()</a> now outputs <i>true</i> for empty vectors (eg. 0x1)</li>
+<li>set_log_stream() &amp; get_log_stream() have been replaced by <a href="#logging">set_stream_err1()</a> &amp; <a href="#logging">get_stream_err1()</a></li>
 </ul>
 <br>
 <li>Added in 1.2:
