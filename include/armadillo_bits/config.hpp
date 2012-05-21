@@ -13,14 +13,14 @@
 
 
 #if !defined(ARMA_USE_LAPACK)
-// #define ARMA_USE_LAPACK
+#define ARMA_USE_LAPACK
 //// Uncomment the above line if you have LAPACK or a high-speed replacement for LAPACK,
 //// such as Intel's MKL, AMD's ACML, or the Accelerate framework.
 //// LAPACK is required for matrix decompositions (eg. SVD) and matrix inverse.
 #endif
 
 #if !defined(ARMA_USE_BLAS)
-// #define ARMA_USE_BLAS
+#define ARMA_USE_BLAS
 //// Uncomment the above line if you have BLAS or a high-speed replacement for BLAS,
 //// such as GotoBLAS, Intel's MKL, AMD's ACML, or the Accelerate framework.
 //// BLAS is used for matrix multiplication.
@@ -46,8 +46,8 @@
 // #define ARMA_USE_MKL_ALLOC
 //// Uncomment the above line if you want to use Intel MKL mkl_malloc() and mkl_free() instead of standard new[] and delete[]
 
-// #define ARMA_USE_ATLAS
-// #define ARMA_ATLAS_INCLUDE_DIR /usr/include/
+/* #undef ARMA_USE_ATLAS */
+#define ARMA_ATLAS_INCLUDE_DIR /
 //// If you're using ATLAS and the compiler can't find cblas.h and/or clapack.h
 //// uncomment the above define and specify the appropriate include directory.
 //// Make sure the directory has a trailing /
@@ -79,10 +79,10 @@
 //// Uncomment the above line if you want to see the function traces of how Armadillo evaluates expressions.
 //// This is mainly useful for debugging of the library.
 
-// #define ARMA_USE_BOOST
-// #define ARMA_USE_BOOST_DATE
-// #define ARMA_USE_WRAPPER
-// #define ARMA_USE_HDF5
+#define ARMA_USE_BOOST
+#define ARMA_USE_BOOST_DATE
+#define ARMA_USE_WRAPPER
+/* #undef ARMA_USE_HDF5 */
 
 #if !defined(ARMA_DEFAULT_OSTREAM)
   #define ARMA_DEFAULT_OSTREAM std::cout
@@ -91,13 +91,13 @@
 #define ARMA_PRINT_LOGIC_ERRORS
 #define ARMA_PRINT_RUNTIME_ERRORS
 
-// #define ARMA_HAVE_STD_ISFINITE
-// #define ARMA_HAVE_STD_ISINF
-// #define ARMA_HAVE_STD_ISNAN
-// #define ARMA_HAVE_STD_SNPRINTF
+#define ARMA_HAVE_STD_ISFINITE
+#define ARMA_HAVE_STD_ISINF
+#define ARMA_HAVE_STD_ISNAN
+#define ARMA_HAVE_STD_SNPRINTF
 
-// #define ARMA_HAVE_LOG1P
-// #define ARMA_HAVE_GETTIMEOFDAY
+#define ARMA_HAVE_LOG1P
+#define ARMA_HAVE_GETTIMEOFDAY
 
 
 
