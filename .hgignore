@@ -1,0 +1,11 @@
+syntax: glob
+
+ArmadilloConfig.cmake
+ArmadilloConfigVersion.cmake
+InstallFiles/
+CMakeFiles/
+CMakeCache.txt
+libarmadillo*.dylib
+Makefile
+cmake_install.cmake
+install_manifest.txt
