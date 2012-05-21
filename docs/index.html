@@ -7677,10 +7677,14 @@ See also:
 <hr class="greyline"><br>
 
 <a name="qr"></a>
-<b>qr(Q,R,X)</b>
+<b>qr(Q,R,X,full=true)</b>
 <ul>
 <li>
 Decomposition of matrix <i>X</i> into an orthogonal (<i>Q</i>) and a right triangular matrix (<i>R</i>), such that <i>Q*R = X</i>
+</li>
+<br>
+<li>
+If <i>n < m</i>, then one can decompose <i>Q = [Q1, Q2]</i> and <i>R = [R1; 0]</i>.  Setting the flag <i>full=false</i> will return <i>Q1</i> (<i>m</i> by <i>n</i>) and <i>R1</i> (<i>n</i> by <i>n</i>) instead.
 </li>
 <br>
 <li>

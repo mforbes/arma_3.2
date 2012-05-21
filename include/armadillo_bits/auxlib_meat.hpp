@@ -1706,12 +1706,28 @@ auxlib::chol(Mat<eT>& out, const Base<eT,T1>& X)
 template<typename eT, typename T1>
 inline
 bool 
-auxlib::qr(Mat<eT>& Q, Mat<eT>& R, const Base<eT,T1>& X)
+auxlib::qr(Mat<eT>& Q, Mat<eT>& R, const Base<eT,T1>& X, bool full)
   {
+  // This method has been patched to implement a memory-efficient version in the
+  // non-square case if full is False.  This basically discards the basis for
+  // the null-space.  The patch could probably be rolled into the old code
+  // better, but I am  not so familiar with the code, so I just duplicated and
+  // modified the routine.  The logic is as follows:
+  //
+  // if full or m <= n: (old routine)
+  //     Q[m,m]*R[m,n] = X[m,n]
+  //     geqrf Needs A[m,n]: Uses R
+  //     orgqr Needs A[m,m]: Uses Q
+  // otherwise: (new memory-efficient routine)
+  //     Q[m,n]*R[n,n] = X[m,n]
+  //     geqrf Needs A[m,n]: Uses Q
+  //     geqrf Needs A[m,n]: Uses Q
   arma_extra_debug_sigprint();
   
   #if defined(ARMA_USE_LAPACK)
-    {
+  const T1 &_X = X.get_ref();
+  if (full || _X.n_rows <= _X.n_cols)
+    { // Old routine
     R = X.get_ref();
     
     const uword R_n_rows = R.n_rows;
@@ -1789,6 +1805,98 @@ auxlib::qr(Mat<eT>& Q, Mat<eT>& R, const Base<eT,T1>& X)
         }
       
       lapack::ungqr(&m, &m, &k, Q.memptr(), &m, tau.memptr(), work.memptr(), &work_len, &info);
+      }
+    
+    return (info == 0);
+    } 
+  else
+    { // New memory-efficient routine.
+    Q = X.get_ref();
+
+    if(Q.is_empty())
+      {
+        Q.eye(R_n_rows, R_n_rows);
+        return true;
+      }
+    
+    const uword Q_n_rows = Q.n_rows;
+    const uword Q_n_cols = Q.n_cols;
+    
+    blas_int m            = static_cast<blas_int>(Q_n_rows);
+    blas_int n            = static_cast<blas_int>(Q_n_cols);
+    blas_int work_len     = (std::max)(blas_int(1),n);
+    blas_int work_len_tmp;
+    blas_int k            = (std::min)(m,n);
+    blas_int info         = 0;
+    
+    podarray<eT> tau( static_cast<uword>(k) );
+    podarray<eT> work(  static_cast<uword>(work_len) );
+    
+    // query for the optimum value of work_len
+    work_len_tmp = -1;
+    lapack::geqrf(&m, &n, Q.memptr(), &m, tau.memptr(), work.memptr(), &work_len_tmp, &info);
+    
+    if(info == 0)
+      {
+      work_len = static_cast<blas_int>(access::tmp_real(work[0]));
+      work.set_size( static_cast<uword>(work_len) );
+      }
+
+    lapack::geqrf(&m, &n, Q.memptr(), &m, tau.memptr(), work.memptr(), &work_len, &info);
+    
+    // Q now has the elements on and above the diagonal of the array
+    // contain the min(M,N)-by-N upper trapezoidal matrix Q (Q is
+    // upper triangular if m >= n); the elements below the diagonal,
+    // with the array TAU, represent the orthogonal matrix Q as a
+    // product of min(m,n) elementary reflectors.
+
+    R.set_size(Q_n_cols, Q_n_cols);
+    
+    //arrayops::copy( R.memptr(), Q.memptr(), (std::min)(Q.n_elem, R.n_elem) );
+    
+    //
+    // construct R
+    
+    for(uword col=0; col < Q_n_cols; ++col)
+      {
+      for(uword row=0; row <= col; ++row)
+        {
+          R.at(row,col) = Q.at(row,col);
+        }
+      for(uword row=(col+1); row < Q_n_cols; ++row)
+        {
+          R.at(row,col) = eT(0);
+        }
+      }
+    
+    if( (is_float<eT>::value == true) || (is_double<eT>::value == true) )
+      {
+      // query for the optimum value of work_len
+      work_len_tmp = -1;
+      lapack::orgqr(&m, &n, &k, Q.memptr(), &m, tau.memptr(), work.memptr(), &work_len_tmp, &info);
+      
+      if(info == 0)
+        {
+        work_len = static_cast<blas_int>(access::tmp_real(work[0]));
+        work.set_size( static_cast<uword>(work_len) );
+        }
+      
+      lapack::orgqr(&m, &n, &k, Q.memptr(), &m, tau.memptr(), work.memptr(), &work_len, &info);
+      }
+    else
+    if( (is_supported_complex_float<eT>::value == true) || (is_supported_complex_double<eT>::value == true) )
+      {
+      // query for the optimum value of work_len
+      work_len_tmp = -1;
+      lapack::ungqr(&m, &n, &k, Q.memptr(), &m, tau.memptr(), work.memptr(), &work_len_tmp, &info);
+      
+      if(info == 0)
+        {
+        work_len = static_cast<blas_int>(access::tmp_real(work[0]));
+        work.set_size( static_cast<uword>(work_len) );
+        }
+      
+      lapack::ungqr(&m, &n, &k, Q.memptr(), &m, tau.memptr(), work.memptr(), &work_len, &info);
       }
     
     return (info == 0);

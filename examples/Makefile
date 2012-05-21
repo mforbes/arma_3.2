@@ -5,7 +5,9 @@
 # You may need to edit this file to reflect the type and capabilities
 # of your system.  The defaults are for a Linux system and will need
 # to be changed for other systems (e.g. Mac OS X).
-
+#
+# The generated "Makefile" from "Makefile.cmake" is only usable after
+# the Armadillo library has been configured and installed by CMake. 
 
 CXX=g++
 #CXX=g++-4.2

@@ -25,6 +25,7 @@ qr
          Mat<typename T1::elem_type>&    Q,
          Mat<typename T1::elem_type>&    R,
   const Base<typename T1::elem_type,T1>& X,
+                                    bool full = true,
   const typename arma_blas_type_only<typename T1::elem_type>::result* junk = 0
   )
   {
@@ -33,7 +34,7 @@ qr
   
   arma_debug_check( (&Q == &R), "qr(): Q and R are the same object");
   
-  const bool status = auxlib::qr(Q, R, X);
+  const bool status = auxlib::qr(Q, R, X, full);
   
   if(status == false)
     {
