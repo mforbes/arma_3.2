@@ -145,7 +145,7 @@ class auxlib
   // qr
   
   template<typename eT, typename T1>
-  inline static bool qr(Mat<eT>& Q, Mat<eT>& R, const Base<eT,T1>& X);
+  inline static bool qr(Mat<eT>& Q, Mat<eT>& R, const Base<eT,T1>& X, bool full);
   
   
   //
