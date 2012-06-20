@@ -1729,10 +1729,10 @@ auxlib::qr(Mat<eT>& Q, Mat<eT>& R, const Base<eT,T1>& X, bool full)
   if (full || _X.n_rows <= _X.n_cols)
     { // Old routine
     R = X.get_ref();
-    
+        
     const uword R_n_rows = R.n_rows;
     const uword R_n_cols = R.n_cols;
-    
+
     if(R.is_empty())
       {
       Q.eye(R_n_rows, R_n_rows);
@@ -1812,6 +1812,9 @@ auxlib::qr(Mat<eT>& Q, Mat<eT>& R, const Base<eT,T1>& X, bool full)
   else
     { // New memory-efficient routine.
     Q = X.get_ref();
+
+    const uword R_n_rows = R.n_rows;
+    const uword R_n_cols = R.n_cols;
 
     if(Q.is_empty())
       {
